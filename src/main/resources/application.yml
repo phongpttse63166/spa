@@ -1,0 +1,17 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /project
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/swp490_spa
+    data-username: postgres
+    data-password: postgres
+  jpa:
+    database: postgresql
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
