@@ -5,4 +5,5 @@ import swp490.spa.entities.User;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
     User findUserByPhoneAndPasswordAndRole(String phone, String password, String role);
+    User findUserByPhone(String phone);
 }
