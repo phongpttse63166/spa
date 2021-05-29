@@ -1,4 +1,4 @@
-package swp490.spa.utils.helper;
+package swp490.spa.dto.helper;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

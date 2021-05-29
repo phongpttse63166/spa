@@ -1,4 +1,4 @@
-package swp490.spa.utils.support;
+package swp490.spa.dto.support;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

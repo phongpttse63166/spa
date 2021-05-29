@@ -1,11 +1,9 @@
-package swp490.spa.responses;
+package swp490.spa.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import swp490.spa.entities.Role;
-
-import javax.persistence.Column;
 
 @Data
 @NoArgsConstructor

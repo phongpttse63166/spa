@@ -1,21 +1,21 @@
 server:
   port: 8080
   servlet:
-    context-path: /project
+    context-path: /api
 
 spring:
   datasource:
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql://localhost:5432/swp490_spa
-#    data-username: postgres
-#    data-password: postgres
+#    username: postgres
+#    password: postgres
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://ec2-23-23-128-222.compute-1.amazonaws.com:5432/d94nh5l6qrrsgk
-    data-username: eiqbwqqlteaaqc
-    data-password: e46ae95a83614c0d6effea4654dc408cac7f6719708460737cece689da7447f4
+    username: eiqbwqqlteaaqc
+    password: e46ae95a83614c0d6effea4654dc408cac7f6719708460737cece689da7447f4
   jpa:
     database: postgresql
     generate-ddl: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect

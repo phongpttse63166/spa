@@ -1,10 +1,10 @@
-package swp490.spa.utils.helper;
+package swp490.spa.dto.helper;
 
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import swp490.spa.utils.support.Paging;
-import swp490.spa.utils.support.Response;
+import swp490.spa.dto.support.Paging;
+import swp490.spa.dto.support.Response;
 
 import java.util.List;
 
