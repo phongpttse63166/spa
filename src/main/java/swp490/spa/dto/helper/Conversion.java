@@ -1,4 +1,4 @@
-package swp490.spa.dto.support;
+package swp490.spa.dto.helper;
 
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;

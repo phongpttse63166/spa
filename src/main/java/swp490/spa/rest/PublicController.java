@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import swp490.spa.dto.support.Conversion;
+import swp490.spa.dto.helper.Conversion;
 import swp490.spa.entities.Category;
 import swp490.spa.services.CategoryService;
 import swp490.spa.services.UserService;
