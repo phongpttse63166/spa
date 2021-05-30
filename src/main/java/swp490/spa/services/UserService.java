@@ -13,6 +13,10 @@ public class UserService {
     }
 
     public User findByPhoneAndPassword(String phone, String password, String role){
-        return this.userRepository.findUserByPhoneAndPasswordAndRole(phone, password, role);
+        return this.userRepository.findByPhoneAndPasswordAndRole(phone, password, role);
+    }
+
+    public User findByPhone(String phone){
+        return this.userRepository.findByPhone(phone);
     }
 }

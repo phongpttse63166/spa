@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.entities.Category;
+import swp490.spa.entities.User;
 import swp490.spa.services.CategoryService;
 import swp490.spa.services.UserService;
 import swp490.spa.dto.helper.ResponseHelper;
@@ -41,5 +42,9 @@ public class PublicController {
         return ResponseHelper.ok(conversion.convertToCategoryResponse(categories));
     }
 
-
+    @GetMapping("/user")
+    public Response findUserByPhone(@RequestParam String phone){
+        User user = userService.findByPhone(phone);
+        return ResponseHelper.ok(user);
+    }
 }
