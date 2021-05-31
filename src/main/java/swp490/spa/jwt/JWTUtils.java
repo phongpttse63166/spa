@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JWTUtils {
 
-    private String secret = "thanhdeptrai";
+    private String secret = "swp490";
     // 7 ngày
     private long JWT_EXPIRATION = 604800000;
 

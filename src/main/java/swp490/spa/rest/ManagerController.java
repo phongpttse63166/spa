@@ -5,11 +5,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/manager")
+@RequestMapping("/api/manager")
 @RestController
 @CrossOrigin
 public class ManagerController {
-    @GetMapping(value = "test")
+    @GetMapping(value = "/test")
     public String testJWT(){
         return "Thành công";
     }

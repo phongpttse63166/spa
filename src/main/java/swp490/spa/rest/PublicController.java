@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.responses.LoginResponse;
+import swp490.spa.entities.AuthRequest;
 import swp490.spa.entities.Category;
 import swp490.spa.entities.User;
 import swp490.spa.jwt.JWTUtils;
@@ -17,7 +18,7 @@ import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
 
 @RestController
-@RequestMapping("/public")
+@RequestMapping("/api/public")
 @CrossOrigin
 public class PublicController {
     @Autowired
@@ -54,22 +55,22 @@ public class PublicController {
         return ResponseHelper.ok(user);
     }
 
-    @GetMapping("/login")
-    public LoginResponse login (@RequestParam("phone") String phone, @RequestParam("password") String password){
-        User newAccount = userRepository.findByPhone(phone);
+    @PostMapping("/login")
+    public LoginResponse login (@RequestBody AuthRequest account){
+        User newAccount = userRepository.findByPhone(account.getPhone());
 
         if(newAccount == null){
             return LoginResponse.createErrorResponse(LoginResponse.Error.USERNAME_NOT_FOUND);
         }
 
-        if(!newAccount.getPassword().equals(password)){
+        if(!newAccount.getPassword().equals(account.getPassword())){
             return LoginResponse.createErrorResponse(LoginResponse.Error.WRONG_PASSWORD);
         }
 
         String role = newAccount.getRole().name();
         String token = jwtUtils.generateToken(newAccount.getPhone());
-        int idAccount = newAccount.getId();
+        int userId = newAccount.getId();
 
-        return LoginResponse.createSuccessResponse(token,role,idAccount);
+        return LoginResponse.createSuccessResponse(token,role,userId);
     }
 }
