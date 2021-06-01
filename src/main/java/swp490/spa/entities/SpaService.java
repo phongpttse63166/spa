@@ -27,7 +27,7 @@ public class SpaService implements Serializable {
     @Column(name = "status")
     private Status status;
     @Column(name = "create_time")
-    private String creatTime;
+    private String createTime;
     @Column(name = "create_by")
     private String createBy;
     @ManyToOne

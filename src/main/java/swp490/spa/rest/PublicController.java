@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.responses.LoginResponse;
-import swp490.spa.dto.support.Conversion;
+import swp490.spa.dto.helper.Conversion;
 import swp490.spa.entities.*;
 //import swp490.spa.jwt.JWTUtils;
 import swp490.spa.repositories.UserRepository;

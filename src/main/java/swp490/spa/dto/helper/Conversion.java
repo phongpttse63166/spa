@@ -1,4 +1,4 @@
-package swp490.spa.dto.support;
+package swp490.spa.dto.helper;
 
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -77,7 +77,7 @@ public class Conversion {
                         spaService.getDescription(),
                         spaService.getPrice(),
                         spaService.getStatus(),
-                        spaService.getCreatTime(),
+                        spaService.getCreateTime(),
                         spaService.getCreateBy()))
                 .collect(Collectors.toList());
         long totalElements = spaServices.getTotalElements();

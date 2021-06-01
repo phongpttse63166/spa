@@ -16,6 +16,6 @@ public class SpaServiceResponse {
     private String description;
     private Double price;
     private Status status;
-    private String creatTime;
+    private String createTime;
     private String createBy;
 }
