@@ -28,6 +28,4 @@ public class User implements Serializable {
     private String email;
     @Column(name = "address")
     private String address;
-    @Column(name = "role")
-    private Role role;
 }

@@ -4,9 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import swp490.spa.entities.Category;
+import swp490.spa.entities.Spa;
+import swp490.spa.entities.Status;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Integer> {
-    Page<Category> findByStatus(String status, Pageable pageable);
+public interface SpaRepository extends JpaRepository<Spa, Integer> {
+    Page<Spa> findByStatus(Status status, Pageable pageable);
 }
