@@ -9,9 +9,9 @@ spring:
 #    username: postgres
 #    password: postgres
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://ec2-23-23-128-222.compute-1.amazonaws.com:5432/d94nh5l6qrrsgk
-    username: eiqbwqqlteaaqc
-    password: e46ae95a83614c0d6effea4654dc408cac7f6719708460737cece689da7447f4
+    url: jdbc:postgresql://ec2-52-86-25-51.compute-1.amazonaws.com:5432/d6qkngahebnl7l
+    username: mqsqmlkflqivko
+    password: 6bcaea1d1032c41c42e3319e6526327024e82fcbd9d6b83810efbc0e98637b91
   jpa:
     database: postgresql
     generate-ddl: true
