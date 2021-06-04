@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Date;
 
 @Entity
 @NoArgsConstructor
@@ -22,10 +23,20 @@ public class Spa implements Serializable {
     private String name;
     @Column(name = "image")
     private String image;
+    @Column(name = "street")
+    private String street;
+    @Column(name = "district")
+    private String district;
+    @Column(name = "city")
+    private String city;
+    @Column(name = "locationx")
+    private String locationX;
+    @Column(name = "locationy")
+    private String locationY;
     @Column(name = "create_by")
     private String createBy;
     @Column(name = "create_time")
-    private String createTime;
+    private Date createTime;
     @Column(name = "status")
     private Status status;
 

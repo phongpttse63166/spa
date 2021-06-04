@@ -15,4 +15,8 @@ public class CategoryService {
     public Page<Category> findAllByStatus(String status, Pageable pageable){
         return this.categoryRepository.findByStatus(status, pageable);
     }
+
+//    public List<Category> findAllByStatus(String status){
+//        return this.categoryRepository.findByStatus(status);
+//    }
 }

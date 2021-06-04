@@ -11,10 +11,18 @@ public class UserService {
     private UserRepository userRepository;
 
 //    public User findByPhoneAndPassword(String phone, String password, String role){
-//        return this.userRepository.findByPhoneAndPasswordAndRole(phone, password, role);
+//        return this.userRepository.findUserByPhoneAndPasswordAndRole(phone, password, role);
 //    }
 
     public User findByPhone(String phone){
         return this.userRepository.findByPhone(phone);
+    }
+
+    public User insertNewUser(User user){
+        return this.userRepository.save(user);
+    }
+
+    public User editUser(User user){
+        return this.userRepository.save(user);
     }
 }

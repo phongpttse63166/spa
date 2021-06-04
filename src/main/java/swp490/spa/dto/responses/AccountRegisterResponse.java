@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import swp490.spa.entities.Spa;
 
 import java.sql.Date;
 
@@ -13,19 +12,19 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CategoryResponse {
+public class AccountRegisterResponse {
     @JsonProperty("id")
     private Integer id;
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("description")
-    private String description;
+    @JsonProperty("fullname")
+    private String fullname;
+    @JsonProperty("phone")
+    private String phone;
+    @JsonProperty("password")
+    private String password;
+    @JsonProperty("otp_code")
+    private String otpCode;
     @JsonProperty("create_time")
     private Date createTime;
-    @JsonProperty("create_by")
-    private Integer createBy;
-    @JsonProperty("status")
-    private String status;
-    @JsonProperty("spa")
-    private Spa spa;
+    @JsonProperty("expired_time")
+    private Date expiredTime;
 }

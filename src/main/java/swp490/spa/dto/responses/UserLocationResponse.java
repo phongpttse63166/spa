@@ -1,6 +1,5 @@
 package swp490.spa.dto.responses;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -9,14 +8,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import swp490.spa.entities.User;
 
+import java.sql.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CustomerResponse {
+public class UserLocationResponse {
     @JsonProperty("user")
     private User user;
-    @JsonProperty("custom_type")
-    private String customType;
+    @JsonProperty("locationx")
+    private String locationX;
+    @JsonProperty("locationy")
+    private String locationY;
+    @JsonProperty("modifier_time")
+    private Date modifier_time;
 }

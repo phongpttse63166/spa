@@ -1,4 +1,4 @@
-package swp490.spa.entities;
+package swp490.spa.dto.model;
 
 import lombok.*;
 

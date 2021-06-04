@@ -16,4 +16,8 @@ public class SpaService {
     public Page<Spa> findByStatus(Status status, Pageable pageable){
         return this.spaRepository.findByStatus(status, pageable);
     }
+
+    public Spa insertNewSpa(Spa spa){
+        return this.spaRepository.save(spa);
+    }
 }

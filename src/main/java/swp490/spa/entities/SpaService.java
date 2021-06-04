@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Date;
 
 @Entity
 @NoArgsConstructor
@@ -20,14 +21,20 @@ public class SpaService implements Serializable {
     private Integer id;
     @Column(name = "name")
     private String name;
+    @Column(name = "image")
+    private String image;
     @Column(name = "description")
     private String description;
     @Column(name = "price")
     private Double price;
     @Column(name = "status")
     private Status status;
+    @Column(name = "type")
+    private Type type;
+    @Column(name = "duration_min")
+    private Integer durationMin;
     @Column(name = "create_time")
-    private String createTime;
+    private Date createTime;
     @Column(name = "create_by")
     private String createBy;
     @ManyToOne

@@ -7,14 +7,15 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Date;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "staff", schema = "public")
-public class Staff implements Serializable {
+@Table(name = "user_location", schema = "public")
+public class UserLocation implements Serializable {
     @Id
     @Column(name = "user_id")
     private Integer id;
@@ -22,7 +23,10 @@ public class Staff implements Serializable {
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne
-    @JoinColumn(name = "spa_id")
-    private Spa spa;
+    @Column(name = "locationx")
+    private String locationX;
+    @Column(name = "locationy")
+    private String locationY;
+    @Column(name = "modifier_time")
+    private Date modifier_time;
 }

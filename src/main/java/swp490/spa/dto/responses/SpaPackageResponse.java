@@ -5,35 +5,38 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import swp490.spa.entities.Category;
+import swp490.spa.entities.Spa;
 import swp490.spa.entities.Status;
 import swp490.spa.entities.Type;
 
-import javax.persistence.Column;
 import java.sql.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SpaServiceResponse {
+public class SpaPackageResponse {
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("name")
     private String name;
-    @Column(name = "image")
-    private String image;
     @JsonProperty("description")
     private String description;
-    @JsonProperty("price")
-    private Double price;
+    @JsonProperty("image")
+    private String image;
+    @JsonProperty("type")
+    private Type type;
+    @JsonProperty("total_slot")
+    private Integer totalSlot;
     @JsonProperty("status")
     private Status status;
-    @Column(name = "type")
-    private Type type;
-    @Column(name = "duration_min")
-    private Integer durationMin;
     @JsonProperty("create_time")
     private Date createTime;
     @JsonProperty("create_by")
-    private String createBy;
+    private Integer create_by;
+    @JsonProperty("category_id")
+    private Category category;
+    @JsonProperty("spa_id")
+    private Spa spa;
 }

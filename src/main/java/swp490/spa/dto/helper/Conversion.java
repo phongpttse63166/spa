@@ -15,10 +15,13 @@ public class Conversion {
 
     public Page<CategoryResponse> convertToCategoryResponse(Page<Category> categories) {
         List<CategoryResponse> categoryData = categories.getContent().stream()
-                .map(category -> new CategoryResponse(  category.getId(),
+                .map(category -> new CategoryResponse(category.getId(),
                         category.getName(),
                         category.getDescription(),
-                        category.getStatus()))
+                        category.getCreateTime(),
+                        category.getCreateBy(),
+                        category.getStatus(),
+                        category.getSpa()))
                 .collect(Collectors.toList());
 
         long totalElements = categories.getTotalElements();
@@ -33,8 +36,11 @@ public class Conversion {
                         user.getFullname(),
                         user.getPhone(),
                         user.getPassword(),
+                        user.getGender(),
+                        user.getBirthdate(),
                         user.getEmail(),
-                        user.getAddress()))
+                        user.getAddress(),
+                        user.isActive()))
                 .collect(Collectors.toList());
 
         long totalElements = users.getTotalElements();
@@ -48,6 +54,11 @@ public class Conversion {
                 .map(spa -> new SpaResponse(spa.getId(),
                         spa.getName(),
                         spa.getImage(),
+                        spa.getStreet(),
+                        spa.getDistrict(),
+                        spa.getCity(),
+                        spa.getLocationX(),
+                        spa.getLocationY(),
                         spa.getCreateBy(),
                         spa.getCreateTime(),
                         spa.getStatus()))
@@ -57,31 +68,69 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<SpaAddressResponse> convertToSpaAddressResponse(Page<SpaAddress> spaAddresses) {
-        List<SpaAddressResponse> spaAddressData = spaAddresses.getContent().stream()
-                .map(spaAddress -> new SpaAddressResponse(spaAddress.getId(),
-                        spaAddress.getStreet(),
-                        spaAddress.getDistrict(),
-                        spaAddress.getCity(),
-                        spaAddress.getSpa()))
-                .collect(Collectors.toList());
-        long totalElements = spaAddresses.getTotalElements();
-        return new PageImpl<>(spaAddressData, totalElements == 0 ? Pageable.unpaged() : spaAddresses.getPageable(),
-                totalElements);
-    }
-
     public Page<SpaServiceResponse> convertToSpaServiceResponse(Page<SpaService> spaServices){
         List<SpaServiceResponse> spaServiceData = spaServices.getContent().stream()
                 .map(spaService -> new SpaServiceResponse(spaService.getId(),
                         spaService.getName(),
+                        spaService.getImage(),
                         spaService.getDescription(),
                         spaService.getPrice(),
                         spaService.getStatus(),
+                        spaService.getType(),
+                        spaService.getDurationMin(),
                         spaService.getCreateTime(),
                         spaService.getCreateBy()))
                 .collect(Collectors.toList());
         long totalElements = spaServices.getTotalElements();
         return new PageImpl<>(spaServiceData, totalElements == 0 ? Pageable.unpaged() : spaServices.getPageable(),
                 totalElements);
+    }
+
+    public Page<SpaTreatmentResponse> convertToSpaTreatmentResponse(Page<SpaTreatment> spaTreatments){
+        List<SpaTreatmentResponse> spaTreatmentData = spaTreatments.getContent().stream()
+                .map(spaTreatment -> new SpaTreatmentResponse(spaTreatment.getId(),
+                        spaTreatment.getName(),
+                        spaTreatment.getDescription(),
+                        spaTreatment.getCreateTime(),
+                        spaTreatment.getCreateBy(),
+                        spaTreatment.getSpaPackage(),
+                        spaTreatment.getSpa()))
+                .collect(Collectors.toList());
+        long totalElements = spaTreatments.getTotalElements();
+        return new PageImpl<>(spaTreatmentData, totalElements == 0 ? Pageable.unpaged() : spaTreatments.getPageable(),
+                totalElements);
+    }
+
+    public Page<SpaPackageResponse> convertToSpaPackageResponse(Page<SpaPackage> spaPackages){
+        List<SpaPackageResponse> spaPackageData = spaPackages.getContent().stream()
+                .map(spaPackage -> new SpaPackageResponse(spaPackage.getId(),
+                        spaPackage.getName(),
+                        spaPackage.getDescription(),
+                        spaPackage.getImage(),
+                        spaPackage.getType(),
+                        spaPackage.getTotalSlot(),
+                        spaPackage.getStatus(),
+                        spaPackage.getCreateTime(),
+                        spaPackage.getCreate_by(),
+                        spaPackage.getCategory(),
+                        spaPackage.getSpa()))
+                .collect(Collectors.toList());
+        long totalElements = spaPackages.getTotalElements();
+        return new PageImpl<>(spaPackageData, totalElements == 0 ? Pageable.unpaged() : spaPackages.getPageable(),
+                totalElements);
+    }
+
+    public Page<TreatmentServiceResponse> convertToTreatmentServiceResponse(Page<TreatmentService> treatmentServices) {
+        List<TreatmentServiceResponse> treatmentServiceData = treatmentServices.getContent().stream()
+                .map(treatmentService -> new TreatmentServiceResponse(treatmentService.getId(),
+                        treatmentService.getOrdinal(),
+                        treatmentService.getSpaTreatment(),
+                        treatmentService.getSpaService()))
+                .collect(Collectors.toList());
+        long totalElements = treatmentServices.getTotalElements();
+        return new PageImpl<>(treatmentServiceData,
+                totalElements == 0 ? Pageable.unpaged() : treatmentServices.getPageable(),
+                totalElements);
+
     }
 }

@@ -23,6 +23,6 @@ public class Manager implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "spa_address_id")
-    private SpaAddress spaAddress;
+    @JoinColumn(name = "spa_id")
+    private Spa spa;
 }

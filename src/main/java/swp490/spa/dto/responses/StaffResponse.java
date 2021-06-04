@@ -1,11 +1,12 @@
 package swp490.spa.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import swp490.spa.entities.SpaAddress;
+import swp490.spa.entities.Spa;
 import swp490.spa.entities.User;
 
 @Data
@@ -14,6 +15,8 @@ import swp490.spa.entities.User;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffResponse {
+    @JsonProperty("user")
     private User user;
-    private SpaAddress spaAddress;
+    @JsonProperty("spa")
+    private Spa spa;
 }

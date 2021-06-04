@@ -7,14 +7,15 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Date;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "user", schema = "public")
-public class User implements Serializable {
+@Table(name = "account_register", schema = "public")
+public class AccountRegister implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -24,14 +25,10 @@ public class User implements Serializable {
     private String phone;
     @Column(name = "password")
     private String password;
-    @Column(name = "gender")
-    private String gender;
-    @Column(name = "birthdate")
-    private String birthdate;
-    @Column(name = "email")
-    private String email;
-    @Column(name = "address")
-    private String address;
-    @Column(name = "isActive")
-    private boolean isActive;
+    @Column(name = "otp_code")
+    private String otpCode;
+    @Column(name = "create_time")
+    private Date createTime;
+    @Column(name = "expired_time")
+    private Date expiredTime;
 }

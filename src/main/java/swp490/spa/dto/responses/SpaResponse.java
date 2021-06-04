@@ -1,28 +1,40 @@
 package swp490.spa.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import swp490.spa.entities.Status;
 
+import java.sql.Date;
+
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SpaResponse {
+    @JsonProperty("id")
     private Integer id;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("image")
     private String image;
+    @JsonProperty("street")
+    private String street;
+    @JsonProperty("district")
+    private String district;
+    @JsonProperty("city")
+    private String city;
+    @JsonProperty("locationx")
+    private String locationX;
+    @JsonProperty("locationy")
+    private String locationY;
+    @JsonProperty("create_by")
     private String createBy;
-    private String createTime;
+    @JsonProperty("create_time")
+    private Date createTime;
+    @JsonProperty("status")
     private Status status;
 
-    public SpaResponse(Integer id, String name, String image, String createBy,
-                       String createTime, Status status) {
-        this.id = id;
-        this.name = name;
-        this.image = image;
-        this.createBy = createBy;
-        this.createTime = createTime;
-        this.status = status;
-    }
 }
