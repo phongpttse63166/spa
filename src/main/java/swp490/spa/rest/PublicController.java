@@ -11,7 +11,8 @@ import swp490.spa.dto.model.AuthRequest;
 import swp490.spa.dto.responses.LoginResponse;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.entities.*;
-//import swp490.spa.jwt.JWTUtils;
+
+import swp490.spa.jwt.JWTUtils;
 import swp490.spa.repositories.UserRepository;
 import swp490.spa.services.*;
 import swp490.spa.dto.helper.ResponseHelper;
@@ -50,8 +51,8 @@ public class PublicController {
     @Autowired
     private AccountRegisterService accountRegisterService;
     private Conversion conversion;
-//    @Autowired
-//    JWTUtils jwtUtils;
+    @Autowired
+    private JWTUtils jwtUtils;
 
     public PublicController(UserService userService, CategoryService categoryService,
                             SpaService spaService, SpaServiceService spaServiceService,
@@ -244,9 +245,9 @@ public class PublicController {
             return LoginResponse.createErrorResponse(LoginResponse.Error.ROLE_NOT_EXISTED);
         }
 
-//        String token = jwtUtils.generateToken(newAccount.getPhone(), role);
+        String token = jwtUtils.generateToken(user.getPhone(), role);
         Integer userId = user.getId();
-        return LoginResponse.createSuccessResponse("token",role,userId);
+        return LoginResponse.createSuccessResponse(token,role,userId);
 
     }
 
