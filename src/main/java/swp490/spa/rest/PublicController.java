@@ -7,11 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import swp490.spa.dto.model.AuthRequest;
 import swp490.spa.dto.responses.LoginResponse;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.entities.*;
-//import swp490.spa.jwt.JWTUtils;
-import swp490.spa.repositories.UserRepository;
+import swp490.spa.jwt.JWTUtils;
 import swp490.spa.services.*;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
@@ -49,8 +49,8 @@ public class PublicController {
     @Autowired
     private AccountRegisterService accountRegisterService;
     private Conversion conversion;
-//    @Autowired
-//    JWTUtils jwtUtils;
+    @Autowired
+    JWTUtils jwtUtils;
 
     public PublicController(UserService userService, CategoryService categoryService,
                             SpaService spaService, SpaServiceService spaServiceService,
@@ -201,53 +201,52 @@ public class PublicController {
         return ResponseHelper.error(Notification.VERIFY_FAIL);
     }
 
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody AuthRequest authRequest){
+        String phone = authRequest.getPhone().trim();
+        String password = authRequest.getPassword().trim();
+        String role = authRequest.getRole().name();
 
+        if(phone.isEmpty() || password.isEmpty() || role.isEmpty()){
+            return LoginResponse.createErrorResponse(LoginResponse.Error.BLANK_FIELD);
+        }
 
+        User user = userService.findByPhone(phone);
+        if(user == null){
+            return LoginResponse.createErrorResponse(LoginResponse.Error.USERNAME_NOT_FOUND);
+        }
+        if(!user.getPassword().equals(password)){
+            return LoginResponse.createErrorResponse(LoginResponse.Error.WRONG_PASSWORD);
+        }
 
-//    @PostMapping("/login")
-//    public LoginResponse login (@RequestBody AuthRequest account){
-//
-//        User newAccount = userService.findByPhone(account.getPhone());
-//
-//        if(newAccount == null){
-//            return LoginResponse.createErrorResponse(LoginResponse.Error.USERNAME_NOT_FOUND);
-//        }
-//
-//        if(!newAccount.getPassword().equals(account.getPassword())){
-//            return LoginResponse.createErrorResponse(LoginResponse.Error.WRONG_PASSWORD);
-//        }
-//
-//        boolean isExisted = false;
-//
-//        switch (account.getRole()){
-//            case CUSTOMER:
-//                Customer customer = customerService.findByUserId(newAccount.getId());
-//                if(customer!=null){
-//                    isExisted = true;
-//                }
-//                break;
-//            case MANAGER:
-//                 Manager manager = managerService.findManagerById(newAccount.getId());
-//                if(manager!=null){
-//                    isExisted = true;
-//                }
-//                break;
-//            case STAFF:
-//                Staff staff = staffService.findByStaffId(newAccount.getId());
-//                if(staff!=null){
-//                    isExisted = true;
-//                }
-//                break;
-//        }
-//
-//        if(isExisted == false){
-//            return LoginResponse.createErrorResponse(LoginResponse.Error.ROLE_NOT_EXISTED);
-//        }
-//
-//        String role = account.getRole().toString();
-//        String token = jwtUtils.generateToken(newAccount.getPhone(), role);
-//        int userId = newAccount.getId();
-//        return LoginResponse.createSuccessResponse(token,role,userId);
-//    }
+        boolean isExisted = true;
+
+        switch(role){
+            case "CUSTOMER":
+                Customer customer = customerService.findByUserId(user.getId());
+                if(customer == null){
+                    return LoginResponse.createErrorResponse(LoginResponse.Error.CUSTOMER_NOT_EXISTED);
+                }
+                break;
+            case "STAFF":
+                break;
+            case "MANAGER":
+                break;
+            case "ADMIN":
+                break;
+            default:
+                isExisted = false;
+                break;
+        }
+
+        if(!isExisted){
+            return LoginResponse.createErrorResponse(LoginResponse.Error.ROLE_NOT_EXISTED);
+        }
+
+        String token = jwtUtils.generateToken(user.getPhone(), role);
+        Integer userId = user.getId();
+        return LoginResponse.createSuccessResponse(token,role,userId);
+
+    }
 
 }

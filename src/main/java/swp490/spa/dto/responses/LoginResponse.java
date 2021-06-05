@@ -27,7 +27,11 @@ public class LoginResponse {
     public enum Error{
         USERNAME_NOT_FOUND(1,"Số điện thoại không tồn tại"),
         WRONG_PASSWORD(2,"Sai mật khẩu, vui lòng kiểm tra lại"),
-        ROLE_NOT_EXISTED(3,"Role này không tồn tại");
+        ROLE_NOT_EXISTED(3,"Role này không tồn tại"),
+        BLANK_FIELD(4,"Không đầy đủ field"),
+        CUSTOMER_NOT_EXISTED(5, "Nhân viên không tồn tại"),
+        MANAGER_NOT_EXISTED(5, "Quản lý không tồn tại"),
+        ADMIN_NOT_EXISTED(5, "Admin không tồn tại");
 
         private final int code;
         private final String message;

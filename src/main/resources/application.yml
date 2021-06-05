@@ -4,10 +4,6 @@ server:
 
 spring:
   datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://localhost:5432/swp490_spa
-#    username: postgres
-#    password: postgres
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://ec2-52-86-25-51.compute-1.amazonaws.com:5432/d6qkngahebnl7l
     username: mqsqmlkflqivko
