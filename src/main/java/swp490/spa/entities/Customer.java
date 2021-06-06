@@ -20,7 +20,7 @@ public class Customer implements Serializable {
     private Integer id;
     @Column(name = "custom_type")
     private String customType;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;

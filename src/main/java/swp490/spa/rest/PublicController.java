@@ -188,7 +188,12 @@ public class PublicController {
                 User resultUser = userService.findByPhone(newUser.getPhone());
                 if(Objects.nonNull(resultUser)){
                     accountRegisterService.deleteAccountRegister(result.getId());
-                    return ResponseHelper.ok(Notification.REGISTER_SUCCESS);
+                    Customer customer = new Customer();
+                    customer.setUser(resultUser);
+                    customer.setCustomType("Normal");
+                    if(Objects.nonNull(customerService.insertNewCustomer(customer))){
+                        return ResponseHelper.error(Notification.REGISTER_SUCCESS);
+                    }
                 } else {
                     return ResponseHelper.error(Notification.NO_DATA_USER);
                 }
@@ -248,5 +253,4 @@ public class PublicController {
         return LoginResponse.createSuccessResponse(token,role,userId);
 
     }
-
 }
