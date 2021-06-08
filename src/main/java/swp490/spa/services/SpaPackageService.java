@@ -16,4 +16,8 @@ public class SpaPackageService {
     public Page<SpaPackage> findSpaPackageBySpaIdAndStatus(Integer spaId, Status status, Pageable pageable){
         return this.spaPackageRepository.findSpaPackageBySpaIdAndStatus(spaId, status, pageable);
     }
+
+    public Page<SpaPackage> findAllStatusAvailable(Pageable pageable){
+        return this.spaPackageRepository.findAllByStatus(Status.AVAILABLE, pageable);
+    }
 }

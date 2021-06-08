@@ -13,8 +13,8 @@ public class SpaService {
     @Autowired
     private SpaRepository spaRepository;
 
-    public Page<Spa> findByStatus(Status status, Pageable pageable){
-        return this.spaRepository.findByStatus(status, pageable);
+    public Page<Spa> findAllSpaByStatusAvailable(Pageable pageable){
+        return this.spaRepository.findByStatus(Status.AVAILABLE, pageable);
     }
 
     public Spa insertNewSpa(Spa spa){

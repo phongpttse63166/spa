@@ -1,17 +1,16 @@
 package swp490.spa.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.support.Response;
-import swp490.spa.entities.Customer;
-import swp490.spa.entities.User;
-import swp490.spa.entities.UserLocation;
-import swp490.spa.services.AccountRegisterService;
-import swp490.spa.services.CustomerService;
-import swp490.spa.services.UserLocationService;
-import swp490.spa.services.UserService;
+import swp490.spa.entities.*;
+import swp490.spa.services.*;
+import swp490.spa.services.SpaService;
 import swp490.spa.utils.support.Notification;
 
 import java.util.Objects;
@@ -27,15 +26,22 @@ public class CustomerController {
     @Autowired
     private AccountRegisterService accountRegisterService;
     @Autowired
+    private SpaPackageService spaPackageService;
+    @Autowired
+    private SpaService spaService;
+    @Autowired
     private UserService userService;
     private Conversion conversion;
 
     public CustomerController(CustomerService customerService, UserLocationService userLocationService,
-                              AccountRegisterService accountRegisterService, UserService userService) {
+                              AccountRegisterService accountRegisterService, UserService userService,
+                              SpaPackageService spaPackageService, SpaService spaService) {
         this.customerService = customerService;
         this.userLocationService = userLocationService;
         this.accountRegisterService = accountRegisterService;
         this.userService = userService;
+        this.spaPackageService = spaPackageService;
+        this.spaService = spaService;
         this.conversion = new Conversion();
     }
 
@@ -72,5 +78,36 @@ public class CustomerController {
             }
         }
         return ResponseHelper.error(Notification.EDIT_PROFILE_FAIL);
+    }
+
+    @GetMapping("/getprofile")
+    public Response getUserProfile(@RequestParam String userId){
+        Customer customer = customerService.findByUserId(Integer.parseInt(userId));
+        if (Objects.nonNull(customer)) {
+            return ResponseHelper.ok(customer);
+        }
+        return ResponseHelper.error(Notification.CUSTOMER_NOT_EXISTED);
+    }
+
+    @GetMapping("/getallspapackage")
+    public Response getAllSpaPackage(Pageable pageable){
+        Page<SpaPackage> spaPackages =
+                spaPackageService.findAllStatusAvailable(pageable);
+        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+            spaPackages = spaPackageService
+                    .findAllStatusAvailable(PageRequest.of(spaPackages.getTotalPages()-1,
+                            spaPackages.getSize(), spaPackages.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+    }
+
+    @GetMapping("/getallspa")
+    public Response getAllSpa(Pageable pageable){
+        Page<Spa> spas = spaService.findAllSpaByStatusAvailable(pageable);
+        if(!spas.hasContent() && !spas.isFirst()){
+            spas = spaService.findAllSpaByStatusAvailable(
+                    PageRequest.of(spas.getTotalPages()-1, spas.getSize(), spas.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToSpaResponse(spas));
     }
 }

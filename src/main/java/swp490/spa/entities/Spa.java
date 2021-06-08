@@ -29,10 +29,10 @@ public class Spa implements Serializable {
     private String district;
     @Column(name = "city")
     private String city;
-    @Column(name = "locationx")
-    private String locationX;
-    @Column(name = "locationy")
-    private String locationY;
+    @Column(name = "latitude")
+    private String latitude;
+    @Column(name = "longtitude")
+    private String longtitude;
     @Column(name = "create_by")
     private String createBy;
     @Column(name = "create_time")

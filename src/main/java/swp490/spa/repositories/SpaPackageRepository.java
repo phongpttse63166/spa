@@ -12,4 +12,6 @@ import swp490.spa.entities.Status;
 public interface SpaPackageRepository extends JpaRepository<SpaPackage, Integer> {
     @Query("FROM SpaPackage s WHERE s.spa.id = ?1 AND s.status = ?2")
     Page<SpaPackage> findSpaPackageBySpaIdAndStatus(Integer spaId, Status status, Pageable pageable);
+
+    Page<SpaPackage> findAllByStatus(Status status, Pageable pageable);
 }

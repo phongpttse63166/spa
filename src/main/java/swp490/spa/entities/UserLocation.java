@@ -23,10 +23,10 @@ public class UserLocation implements Serializable {
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;
-    @Column(name = "locationx")
-    private String locationX;
-    @Column(name = "locationy")
-    private String locationY;
+    @Column(name = "latitude")
+    private String latitude;
+    @Column(name = "longtitude")
+    private String longtitude;
     @Column(name = "modifier_time")
     private Date modifier_time;
 }
