@@ -16,4 +16,8 @@ public class SpaServiceService {
     public Page<SpaService> findBySpaIdAndStatus(Integer spaId, Status status, String search, Pageable pageable){
         return this.spaServiceRepository.findBySpaIdAndStatus(spaId, status, search, pageable);
     }
+
+    public SpaService insertNewSpaService(SpaService spaService) {
+        return this.spaServiceRepository.saveAndFlush(spaService);
+    }
 }

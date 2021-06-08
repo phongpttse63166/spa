@@ -18,10 +18,10 @@ import java.sql.Date;
 public class UserLocationResponse {
     @JsonProperty("user")
     private User user;
-    @JsonProperty("locationx")
-    private String locationX;
-    @JsonProperty("locationy")
-    private String locationY;
+    @JsonProperty("latitude")
+    private String latitude;
+    @JsonProperty("longtitude")
+    private String longtitude;
     @JsonProperty("modifier_time")
     private Date modifier_time;
 }

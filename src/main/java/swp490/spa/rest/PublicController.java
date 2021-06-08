@@ -86,16 +86,6 @@ public class PublicController {
         return ResponseHelper.ok(user);
     }
 
-    @GetMapping("/spa")
-    public Response findSpaByStatusAvailable(Pageable pageable){
-        Page<Spa> spas = spaService.findByStatus(Status.AVAILABLE,pageable);
-        if(!spas.hasContent() && !spas.isFirst()){
-            spas = spaService.findByStatus(Status.AVAILABLE,
-                    PageRequest.of(spas.getTotalPages()-1, spas.getSize(), spas.getSort()));
-        }
-        return ResponseHelper.ok(conversion.convertToSpaResponse(spas));
-    }
-
     @GetMapping("/spaservice")
     public Response findSpaServiceBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
                                           @RequestParam String search, Pageable pageable){

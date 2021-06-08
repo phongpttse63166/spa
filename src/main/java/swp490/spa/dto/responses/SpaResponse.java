@@ -26,10 +26,10 @@ public class SpaResponse {
     private String district;
     @JsonProperty("city")
     private String city;
-    @JsonProperty("locationx")
-    private String locationX;
-    @JsonProperty("locationy")
-    private String locationY;
+    @JsonProperty("latitude")
+    private String latitude;
+    @JsonProperty("longtitude")
+    private String longtitude;
     @JsonProperty("create_by")
     private String createBy;
     @JsonProperty("create_time")
