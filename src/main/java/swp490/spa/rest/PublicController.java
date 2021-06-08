@@ -111,11 +111,12 @@ public class PublicController {
     }
 
     @GetMapping("/spapackage")
-    public Response findSpaPackageBySpaId(@RequestParam Integer spaId, @RequestParam Status status, Pageable pageable){
+    public Response findSpaPackageBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
+                                          @RequestParam String search, Pageable pageable){
         Page<SpaPackage> spaPackages =
-                spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status, pageable);
+                spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status, search, pageable);
         if(!spaPackages.hasContent() && !spaPackages.isFirst()){
-            spaPackages = spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status,
+            spaPackages = spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status, search,
                     PageRequest.of(spaPackages.getTotalPages()-1, spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
