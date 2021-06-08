@@ -197,6 +197,16 @@ public class PublicController {
         return ResponseHelper.error(Notification.VERIFY_FAIL);
     }
 
+    @GetMapping("/getallspa")
+    public Response getAllSpa(Pageable pageable){
+        Page<Spa> spas = spaService.findAllSpaByStatusAvailable(pageable);
+        if(!spas.hasContent() && !spas.isFirst()){
+            spas = spaService.findAllSpaByStatusAvailable(
+                    PageRequest.of(spas.getTotalPages()-1, spas.getSize(), spas.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToSpaResponse(spas));
+    }
+
     @PostMapping("/login")
     public LoginResponse login(@RequestBody AuthRequest authRequest){
         String phone = authRequest.getPhone().trim();
@@ -242,6 +252,5 @@ public class PublicController {
         String token = jwtUtils.generateToken(user.getPhone(), role);
         Integer userId = user.getId();
         return LoginResponse.createSuccessResponse(token,role,userId);
-
     }
 }

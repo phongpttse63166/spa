@@ -100,14 +100,4 @@ public class CustomerController {
         }
         return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
     }
-
-    @GetMapping("/getallspa")
-    public Response getAllSpa(Pageable pageable){
-        Page<Spa> spas = spaService.findAllSpaByStatusAvailable(pageable);
-        if(!spas.hasContent() && !spas.isFirst()){
-            spas = spaService.findAllSpaByStatusAvailable(
-                    PageRequest.of(spas.getTotalPages()-1, spas.getSize(), spas.getSort()));
-        }
-        return ResponseHelper.ok(conversion.convertToSpaResponse(spas));
-    }
 }
