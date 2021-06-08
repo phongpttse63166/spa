@@ -1,16 +1,18 @@
 package swp490.spa.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
-import swp490.spa.entities.Manager;
-import swp490.spa.entities.Spa;
-import swp490.spa.entities.SpaService;
-import swp490.spa.entities.User;
+import swp490.spa.entities.*;
 import swp490.spa.services.ManagerService;
+import swp490.spa.services.SpaPackageService;
 import swp490.spa.services.SpaServiceService;
+import swp490.spa.services.SpaTreatmentService;
 import swp490.spa.utils.support.Notification;
 
 import java.util.Objects;
@@ -23,11 +25,18 @@ public class ManagerController {
     private ManagerService managerService;
     @Autowired
     private SpaServiceService spaServiceService;
+    @Autowired
+    private SpaPackageService spaPackageService;
+    @Autowired
+    private SpaTreatmentService spaTreatmentService;
     private Conversion conversion;
 
-    public ManagerController(ManagerService managerService, SpaServiceService spaServiceService){
+    public ManagerController(ManagerService managerService, SpaServiceService spaServiceService,
+                             SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService){
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
+        this.spaPackageService = spaPackageService;
+        this.spaTreatmentService = spaTreatmentService;
         this.conversion = new Conversion();
     }
 
@@ -50,5 +59,32 @@ public class ManagerController {
             return ResponseHelper.ok(serviceResult);
         }
         return ResponseHelper.error(Notification.SERVICE_CREATE_FAIL);
+    }
+
+    @GetMapping("/spapackage/findbyspaid")
+    public Response getSpaPackageBySpaId(@RequestParam Integer spaId,
+                                         @RequestParam String search ,
+                                         Pageable pageable){
+        Page<SpaPackage> spaPackages =
+                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search ,pageable);
+        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+            spaPackages = spaPackageService
+                    .findSpaPackageBySpaIdAndStatusAvailable(spaId, search,
+                            PageRequest.of(spaPackages.getTotalPages()-1,
+                            spaPackages.getSize(), spaPackages.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+    }
+
+    @GetMapping("/spatreatment/findbypackageId")
+    public Response findSpaTreatmentByPackageId(@RequestParam Integer packageId,
+                                            @RequestParam String search, Pageable pageable){
+        Page<SpaTreatment> spaTreatments =
+                spaTreatmentService.findByPackageId(packageId, search, pageable);
+        if(!spaTreatments.hasContent() && !spaTreatments.isFirst()){
+            spaTreatments = spaTreatmentService.findByPackageId(packageId, search,
+                    PageRequest.of(spaTreatments.getTotalPages()-1, spaTreatments.getSize(), spaTreatments.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToSpaTreatmentResponse(spaTreatments));
     }
 }

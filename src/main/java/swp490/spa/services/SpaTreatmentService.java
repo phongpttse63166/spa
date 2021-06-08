@@ -15,4 +15,8 @@ public class SpaTreatmentService {
     public Page<SpaTreatment> findTreatmentBySpaId(Integer spaId, String search, Pageable pageable){
         return this.spaTreatmentRepository.findTreatmentBySpaId(spaId, search, pageable);
     }
+
+    public Page<SpaTreatment> findByPackageId(Integer packageId, String search, Pageable pageable){
+        return this.spaTreatmentRepository.findByPackageId(packageId, search, pageable);
+    }
 }
