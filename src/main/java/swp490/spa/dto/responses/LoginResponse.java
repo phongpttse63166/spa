@@ -14,14 +14,16 @@ public class LoginResponse {
     private Integer errorCode;
     private String role;
     private int idAccount;
+    private int spaId;
 
 
     public static LoginResponse createErrorResponse(Error error){
-        return new LoginResponse(false, null, error.getMessage(), error.getCode(), null, 0);
+        return new LoginResponse(false, null,
+                error.getMessage(), error.getCode(), null, 0, 0);
     }
 
-    public static LoginResponse createSuccessResponse(String jsonWebToken, String role, int idAccount){
-        return new LoginResponse(true,jsonWebToken, null, null, role, idAccount);
+    public static LoginResponse createSuccessResponse(String jsonWebToken, String role, int idAccount, int spaId){
+        return new LoginResponse(true,jsonWebToken, null, null, role, idAccount, spaId);
     }
 
     public enum Error{

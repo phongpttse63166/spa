@@ -16,7 +16,7 @@ import swp490.spa.jwt.JwtFilter;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class    SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     JwtFilter jwtFilter;
@@ -28,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/public/**").permitAll()
                 .antMatchers("/api/manager/**").hasAuthority("MANAGER")
