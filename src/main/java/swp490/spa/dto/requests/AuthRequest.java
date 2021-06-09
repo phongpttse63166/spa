@@ -1,4 +1,4 @@
-package swp490.spa.dto.model;
+package swp490.spa.dto.requests;
 
 import lombok.*;
 import swp490.spa.entities.Role;
