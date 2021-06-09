@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.requests.AuthRequest;
-import swp490.spa.dto.requests.SpaPackageCreateRequest;
 import swp490.spa.dto.responses.LoginResponse;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.entities.*;
@@ -22,8 +21,6 @@ import swp490.spa.utils.support.Notification;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -243,6 +240,9 @@ public class PublicController {
                 break;
             case "MANAGER":
                 Manager manager = managerService.findManagerById(user.getId());
+                if(Objects.isNull(manager)){
+                    return LoginResponse.createErrorResponse(LoginResponse.Error.MANAGER_NOT_EXISTED);
+                }
                 spaId = manager.getSpa().getId();
                 break;
             case "ADMIN":
@@ -260,43 +260,4 @@ public class PublicController {
         Integer userId = user.getId();
         return LoginResponse.createSuccessResponse(token,role,userId,spaId);
     }
-
-//    @PutMapping("/spapackageservices/insert")
-//    public Response insertNewSpaPackageWithServices(@RequestBody SpaPackageCreateRequest spaPackage,
-//                                                    List<Integer> listServiceId){
-//        List<swp490.spa.entities.SpaService> spaServices = new ArrayList<>();
-//        Category category = categoryService.findById(spaPackage.getCategoryId());
-//        if(Objects.isNull(category)){
-//            return ResponseHelper.error(Notification.CATEGORY_NOT_EXISTED);
-//        }
-//        Spa spa = spaService.findById(spaPackage.getSpaId());
-//        if(Objects.isNull(spa)){
-//            return ResponseHelper.error(Notification.SPA_NOT_EXISTED);
-//        }
-//        SpaPackage spaPackageInsert = new SpaPackage();
-//        spaPackageInsert.setName(spaPackage.getName());
-//        spaPackageInsert.setSpa(spa);
-//        spaPackageInsert.setCategory(category);
-//        spaPackageInsert.setCreate_by(spaPackage.getCreateBy());
-//        spaPackageInsert.setCreateTime(spaPackage.getCreateTime());
-//        spaPackageInsert.setDescription(spaPackage.getDescription());
-//        spaPackageInsert.setImage(spaPackage.getImage());
-//        spaPackageInsert.setStatus(spaPackage.getStatus());
-//        SpaPackage spaPackageResult = spaPackageService.insertNewSpaPackage(spaPackageInsert);
-//        if(Objects.isNull(spaPackageResult)){
-//            return ResponseHelper.error(Notification.SPA_PACKAGE_CREATE_FAIL);
-//        }
-//        for (Integer serviceId : listServiceId) {
-//            swp490.spa.entities.SpaService spaService = spaServiceService.findBySpaId(serviceId);
-//            if(Objects.isNull(spaService)){
-//                ResponseHelper.error(Notification.SPA_SERVICE_NOT_EXISTED);
-//            }
-//            spaServices.add(spaService);
-//        }
-//        spaPackageResult.addListService(spaServices);
-//        if(Objects.nonNull(spaPackageService.insertNewSpaPackage(spaPackageResult))){
-//            return ResponseHelper.ok(spaPackageResult);
-//        }
-//        return ResponseHelper.error(Notification.SPA_PACKAGE_SERVICE_INSERT_FAIL);
-//    }
 }

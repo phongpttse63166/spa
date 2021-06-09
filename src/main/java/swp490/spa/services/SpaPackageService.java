@@ -27,4 +27,8 @@ public class SpaPackageService {
         return this.spaPackageRepository
                 .findSpaPackageBySpaIdAndStatus(spaId, Status.AVAILABLE, search ,pageable);
     }
+
+    public SpaPackage insertNewSpaPackage(SpaPackage spaPackage) {
+        return this.spaPackageRepository.saveAndFlush(spaPackage);
+    }
 }

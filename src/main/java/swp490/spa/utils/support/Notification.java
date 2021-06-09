@@ -14,9 +14,10 @@ public class Notification {
     public static final String CUSTOMER_NOT_EXISTED = "Tài khoản không tồn tại";
     public static final String SERVICE_CREATE_FAIL = "Tạo spa service lỗi";
     public static final String MANAGER_NOT_EXISTED = "Tài khoản không tồn tại role này";
-    public static final String SPA_PACKAGE_CREATE_FAIL = "Tạo spa package lỗi";
+    public static final String SPA_PACKAGE_CREATE_FAIL = "Tạo spa package - service lỗi";
     public static final String SPA_SERVICE_NOT_EXISTED = "Service không tồn tại";
     public static final String SPA_PACKAGE_SERVICE_INSERT_FAIL = "Tạo spa package service fail!";
     public static final String CATEGORY_NOT_EXISTED = "Category không tồn tại";
     public static final String SPA_NOT_EXISTED = "Spa không tồn tại";
+    public static final String SPA_PACKAGE_SERVICE_INSERT_SUCCESS = "Tạo spa package-service thành công";
 }

@@ -3,8 +3,8 @@ package swp490.spa.dto.requests;
 import lombok.*;
 import swp490.spa.entities.Status;
 
-import javax.persistence.Column;
 import java.sql.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,4 +20,5 @@ public class SpaPackageCreateRequest {
     private Integer createBy;
     private Integer categoryId;
     private Integer spaId;
+    private List<Integer> listSpaServiceId;
 }

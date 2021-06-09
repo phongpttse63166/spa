@@ -8,6 +8,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -40,4 +42,6 @@ public class SpaService implements Serializable {
     @ManyToOne
     @JoinColumn(name = "spa_id")
     private Spa spa;
+    @ManyToMany(mappedBy = "spaServices")
+    private Set<SpaPackage> spaPackages = new HashSet<>();
 }

@@ -10,6 +10,9 @@ import swp490.spa.entities.Status;
 
 @Repository
 public interface SpaServiceRepository extends JpaRepository<SpaService, Integer> {
+    @Query("FROM SpaService s WHERE s.id = ?1")
+    SpaService findBySpaId(Integer spaId);
+
     @Query("FROM SpaService s where s.spa.id = ?1 and s.status = ?2 and s.name like %?3%")
     Page<SpaService> findBySpaIdAndStatus(Integer spaId, Status status, String search, Pageable pageable);
 }

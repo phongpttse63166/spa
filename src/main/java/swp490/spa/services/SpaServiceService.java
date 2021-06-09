@@ -20,4 +20,8 @@ public class SpaServiceService {
     public SpaService insertNewSpaService(SpaService spaService) {
         return this.spaServiceRepository.saveAndFlush(spaService);
     }
+
+    public SpaService findBySpaId(Integer serviceId) {
+        return this.spaServiceRepository.findBySpaId(serviceId);
+    }
 }

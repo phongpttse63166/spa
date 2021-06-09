@@ -7,14 +7,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
+import swp490.spa.dto.requests.SpaPackageCreateRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
-import swp490.spa.services.ManagerService;
-import swp490.spa.services.SpaPackageService;
-import swp490.spa.services.SpaServiceService;
-import swp490.spa.services.SpaTreatmentService;
+import swp490.spa.entities.SpaService;
+import swp490.spa.services.*;
 import swp490.spa.utils.support.Notification;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @RequestMapping("/api/manager")
@@ -29,14 +30,20 @@ public class ManagerController {
     private SpaPackageService spaPackageService;
     @Autowired
     private SpaTreatmentService spaTreatmentService;
+    @Autowired
+    private swp490.spa.services.SpaService spaService;
+    @Autowired
+    private CategoryService categoryService;
     private Conversion conversion;
 
     public ManagerController(ManagerService managerService, SpaServiceService spaServiceService,
-                             SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService){
+                             SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
+                             swp490.spa.services.SpaService spaService){
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
         this.spaTreatmentService = spaTreatmentService;
+        this.spaService = spaService;
         this.conversion = new Conversion();
     }
 
@@ -98,5 +105,43 @@ public class ManagerController {
                     PageRequest.of(spaServices.getTotalPages()-1, spaServices.getSize(), spaServices.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToSpaServiceResponse(spaServices));
+    }
+
+    @PutMapping("/spapackageservices/insert")
+    public Response insertNewSpaPackageWithServices(@RequestBody SpaPackageCreateRequest spaPackage){
+        List<SpaService> spaServices = new ArrayList<>();
+        Category category = categoryService.findById(spaPackage.getCategoryId());
+        if(Objects.isNull(category)){
+            return ResponseHelper.error(Notification.CATEGORY_NOT_EXISTED);
+        }
+        Spa spa = spaService.findById(spaPackage.getSpaId());
+        if(Objects.isNull(spa)){
+            return ResponseHelper.error(Notification.SPA_NOT_EXISTED);
+        }
+        SpaPackage spaPackageInsert = new SpaPackage();
+        spaPackageInsert.setName(spaPackage.getName());
+        spaPackageInsert.setSpa(spa);
+        spaPackageInsert.setCategory(category);
+        spaPackageInsert.setCreate_by(spaPackage.getCreateBy());
+        spaPackageInsert.setCreateTime(spaPackage.getCreateTime());
+        spaPackageInsert.setDescription(spaPackage.getDescription());
+        spaPackageInsert.setImage(spaPackage.getImage());
+        spaPackageInsert.setStatus(spaPackage.getStatus());
+        SpaPackage spaPackageResult = spaPackageService.insertNewSpaPackage(spaPackageInsert);
+        if(Objects.isNull(spaPackageResult)){
+            return ResponseHelper.error(Notification.SPA_PACKAGE_CREATE_FAIL);
+        }
+        for (Integer serviceId : spaPackage.getListSpaServiceId()) {
+            swp490.spa.entities.SpaService spaService = spaServiceService.findBySpaId(serviceId);
+            if(Objects.isNull(spaService)){
+                ResponseHelper.error(Notification.SPA_SERVICE_NOT_EXISTED);
+            }
+            spaServices.add(spaService);
+        }
+        spaPackageResult.addListService(spaServices);
+        if(Objects.nonNull(spaPackageService.insertNewSpaPackage(spaPackageResult))){
+            return ResponseHelper.ok(Notification.SPA_PACKAGE_SERVICE_INSERT_SUCCESS);
+        }
+        return ResponseHelper.error(Notification.SPA_PACKAGE_SERVICE_INSERT_FAIL);
     }
 }

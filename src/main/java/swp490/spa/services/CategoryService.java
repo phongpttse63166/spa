@@ -16,7 +16,8 @@ public class CategoryService {
         return this.categoryRepository.findByStatus(status, pageable);
     }
 
-//    public List<Category> findAllByStatus(String status){
-//        return this.categoryRepository.findByStatus(status);
-//    }
+    public Category findById(Integer categoryId) {
+        return this.categoryRepository.findByCategoryId(categoryId);
+    }
+
 }
