@@ -87,4 +87,16 @@ public class ManagerController {
         }
         return ResponseHelper.ok(conversion.convertToSpaTreatmentResponse(spaTreatments));
     }
+
+    @GetMapping("/spaservice/findbyspaId")
+    public Response findSpaServiceBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
+                                          @RequestParam String search, Pageable pageable){
+        Page<swp490.spa.entities.SpaService> spaServices =
+                spaServiceService.findBySpaIdAndStatus(spaId, status, search, pageable);
+        if(!spaServices.hasContent() && !spaServices.isFirst()){
+            spaServices = spaServiceService.findBySpaIdAndStatus(spaId, status, search,
+                    PageRequest.of(spaServices.getTotalPages()-1, spaServices.getSize(), spaServices.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToSpaServiceResponse(spaServices));
+    }
 }
