@@ -14,6 +14,8 @@ import swp490.spa.entities.SpaService;
 import swp490.spa.services.*;
 import swp490.spa.utils.support.Notification;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -61,6 +63,7 @@ public class ManagerController {
         }
         Spa spa = manager.getSpa();
         spaService.setSpa(spa);
+        spaService.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
         SpaService serviceResult = spaServiceService.insertNewSpaService(spaService);
         if(Objects.nonNull(serviceResult)){
             return ResponseHelper.ok(serviceResult);
@@ -123,7 +126,7 @@ public class ManagerController {
         spaPackageInsert.setSpa(spa);
         spaPackageInsert.setCategory(category);
         spaPackageInsert.setCreate_by(spaPackage.getCreateBy());
-        spaPackageInsert.setCreateTime(spaPackage.getCreateTime());
+        spaPackageInsert.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
         spaPackageInsert.setDescription(spaPackage.getDescription());
         spaPackageInsert.setImage(spaPackage.getImage());
         spaPackageInsert.setStatus(spaPackage.getStatus());
