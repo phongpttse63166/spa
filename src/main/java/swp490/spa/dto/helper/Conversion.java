@@ -113,7 +113,8 @@ public class Conversion {
                         spaPackage.getCreateTime(),
                         spaPackage.getCreate_by(),
                         spaPackage.getCategory(),
-                        spaPackage.getSpa()))
+                        spaPackage.getSpa(),
+                        spaPackage.getSpaServices()))
                 .collect(Collectors.toList());
         long totalElements = spaPackages.getTotalElements();
         return new PageImpl<>(spaPackageData, totalElements == 0 ? Pageable.unpaged() : spaPackages.getPageable(),

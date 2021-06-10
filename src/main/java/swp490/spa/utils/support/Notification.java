@@ -20,4 +20,5 @@ public class Notification {
     public static final String CATEGORY_NOT_EXISTED = "Category không tồn tại";
     public static final String SPA_NOT_EXISTED = "Spa không tồn tại";
     public static final String SPA_PACKAGE_SERVICE_INSERT_SUCCESS = "Tạo spa package-service thành công";
+    public static final String SPA_PACKAGE_NOT_EXISTED = "Spa package không tồn tại";
 }

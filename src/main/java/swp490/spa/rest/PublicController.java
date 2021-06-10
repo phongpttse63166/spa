@@ -260,4 +260,16 @@ public class PublicController {
         Integer userId = user.getId();
         return LoginResponse.createSuccessResponse(token,role,userId,spaId);
     }
+
+    @GetMapping("/spaservice/findbyspapackageid")
+    public Response findSpaServiceBySpaPackageId(@RequestParam Integer spaPackageId,
+                                                 @RequestParam Integer spaId, Pageable pageable){
+        Page<SpaPackage> spaPackages =
+                spaPackageService.findSpaServiceBySpaPackageId(spaPackageId, spaId, pageable);
+        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+            spaPackages = spaPackageService.findSpaServiceBySpaPackageId(spaPackageId, spaId,
+                    PageRequest.of(spaPackages.getTotalPages()-1, spaPackages.getSize(), spaPackages.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+    }
 }

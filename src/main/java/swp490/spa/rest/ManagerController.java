@@ -147,4 +147,16 @@ public class ManagerController {
         }
         return ResponseHelper.error(Notification.SPA_PACKAGE_SERVICE_INSERT_FAIL);
     }
+
+    @GetMapping("/spapackage/findbyserviceId")
+    public Response findSpaPackageBySpaServiceId(@RequestParam Integer spaServiceId ,
+                                                 @RequestParam Integer spaId, Pageable pageable){
+        Page<SpaPackage> spaPackages =
+                spaPackageService.findAllBySpaServiceId(spaServiceId, spaId, pageable);
+        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+            spaPackages = spaPackageService.findAllBySpaServiceId(spaServiceId, spaId,
+                    PageRequest.of(spaPackages.getTotalPages()-1, spaPackages.getSize(), spaPackages.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+    }
 }

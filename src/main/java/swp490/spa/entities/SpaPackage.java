@@ -1,14 +1,12 @@
 package swp490.spa.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -43,12 +41,13 @@ public class SpaPackage implements Serializable {
     @ManyToOne
     @JoinColumn(name = "spa_id")
     private Spa spa;
-    @ManyToMany
+    @JsonBackReference
+    @ManyToMany(cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
     @JoinTable(
             name = "spapackage_spaservice",
             joinColumns = @JoinColumn(name = "spa_package_id"),
             inverseJoinColumns = @JoinColumn(name = "spa_service_id"))
-    private Set<SpaService> spaServices = new HashSet<>();
+    private List<SpaService> spaServices = new ArrayList<>();
 
     public void addListService(List<SpaService> spaServices) {
         this.spaServices.addAll(spaServices);
