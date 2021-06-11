@@ -89,15 +89,5 @@ public class CustomerController {
         return ResponseHelper.error(Notification.CUSTOMER_NOT_EXISTED);
     }
 
-    @GetMapping("/getallspapackage")
-    public Response getAllSpaPackage(Pageable pageable){
-        Page<SpaPackage> spaPackages =
-                spaPackageService.findAllStatusAvailable(pageable);
-        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
-            spaPackages = spaPackageService
-                    .findAllStatusAvailable(PageRequest.of(spaPackages.getTotalPages()-1,
-                            spaPackages.getSize(), spaPackages.getSort()));
-        }
-        return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
-    }
+
 }
