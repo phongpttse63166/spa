@@ -150,13 +150,11 @@ public class ManagerController {
 
     @GetMapping("/spapackage/findbyserviceId")
     public Response findSpaPackageBySpaServiceId(@RequestParam Integer spaServiceId ,
-                                                 @RequestParam Integer spaId, Pageable pageable){
+                                                 @RequestParam Integer spaId,
+                                                 @RequestParam Integer page,
+                                                 @RequestParam Integer size){
         Page<SpaPackage> spaPackages =
-                spaPackageService.findAllBySpaServiceId(spaServiceId, spaId, pageable);
-        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
-            spaPackages = spaPackageService.findAllBySpaServiceId(spaServiceId, spaId,
-                    PageRequest.of(spaPackages.getTotalPages()-1, spaPackages.getSize(), spaPackages.getSort()));
-        }
+                spaPackageService.findAllBySpaServiceId(spaServiceId, spaId, page, size);
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 }

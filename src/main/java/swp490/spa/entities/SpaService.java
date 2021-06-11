@@ -49,4 +49,7 @@ public class SpaService implements Serializable {
     @ManyToMany(mappedBy = "spaServices",
             cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
     private List<SpaPackage> spaPackages = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<TreatmentService> treatmentServices = new HashSet<>();
+
 }

@@ -1,14 +1,13 @@
 package swp490.spa.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.SpaPackage;
 import swp490.spa.entities.SpaService;
 import swp490.spa.entities.Status;
 import swp490.spa.repositories.SpaPackageRepository;
+import swp490.spa.utils.support.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +36,13 @@ public class SpaPackageService {
         return this.spaPackageRepository.saveAndFlush(spaPackage);
     }
 
-    public Page<SpaPackage> findAllBySpaServiceId(Integer spaServiceId, Integer spaId , Pageable pageable){
+    public Page<SpaPackage> findAllBySpaServiceId(Integer spaServiceId, Integer spaId ,
+                                                  Integer page, Integer size){
+
+        Pageable pageableDefault = PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT, Sort.by("name"));
         List<SpaPackage> spaPackages =
                 this.spaPackageRepository.findSpaPackageBySpaIdAndStatus(spaId, Status.AVAILABLE,
-                        "", pageable)
+                        "", pageableDefault)
                         .toList();
         List<SpaPackage> result = new ArrayList<>();
         for (SpaPackage spaPackage : spaPackages) {
@@ -51,8 +53,11 @@ public class SpaPackageService {
                 }
             }
         }
-        Page<SpaPackage> page = new PageImpl<>(result);
-        return page;
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("name"));
+        int start = (int) pageRequest.getOffset();
+        int end = (start + pageRequest.getPageSize()) > result.size() ? result.size() : (start + pageRequest.getPageSize());
+        Page<SpaPackage> pageToReturn = new PageImpl<>(result.subList(start, end), pageRequest, result.size());
+        return pageToReturn;
     }
 
     public SpaPackage findBySpaPackageId(Integer spaPackageId) {
