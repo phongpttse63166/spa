@@ -16,6 +16,4 @@ public interface SpaPackageRepository extends JpaRepository<SpaPackage, Integer>
 
     Page<SpaPackage> findAllByStatus(Status status, Pageable pageable);
 
-    @Query("FROM SpaPackage s WHERE s.id = ?1")
-    Page<SpaPackage> findSpaPackageById(Integer spaPackageId, Pageable pageable);
 }

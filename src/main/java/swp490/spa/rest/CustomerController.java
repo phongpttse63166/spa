@@ -98,6 +98,6 @@ public class CustomerController {
                     .findAllStatusAvailable(PageRequest.of(spaPackages.getTotalPages()-1,
                             spaPackages.getSize(), spaPackages.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+        return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 }

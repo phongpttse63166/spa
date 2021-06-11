@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class Conversion {
 
-    public Page<CategoryResponse> convertToCategoryResponse(Page<Category> categories) {
+    public Page<CategoryResponse> convertToPageCategoryResponse(Page<Category> categories) {
         List<CategoryResponse> categoryData = categories.getContent().stream()
                 .map(category -> new CategoryResponse(category.getId(),
                         category.getName(),
@@ -30,7 +30,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<UserResponse> convertToUserResponse(Page<User> users) {
+    public Page<UserResponse> convertToPageUserResponse(Page<User> users) {
         List<UserResponse> userData = users.getContent().stream()
                 .map(user -> new UserResponse(user.getId(),
                         user.getFullname(),
@@ -49,7 +49,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<SpaResponse> convertToSpaResponse(Page<Spa> spas) {
+    public Page<SpaResponse> convertToPageSpaResponse(Page<Spa> spas) {
         List<SpaResponse> spaData = spas.getContent().stream()
                 .map(spa -> new SpaResponse(spa.getId(),
                         spa.getName(),
@@ -68,7 +68,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<SpaServiceResponse> convertToSpaServiceResponse(Page<SpaService> spaServices){
+    public Page<SpaServiceResponse> convertToPageSpaServiceResponse(Page<SpaService> spaServices){
         List<SpaServiceResponse> spaServiceData = spaServices.getContent().stream()
                 .map(spaService -> new SpaServiceResponse(spaService.getId(),
                         spaService.getName(),
@@ -86,7 +86,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<SpaTreatmentResponse> convertToSpaTreatmentResponse(Page<SpaTreatment> spaTreatments){
+    public Page<SpaTreatmentResponse> convertToPageSpaTreatmentResponse(Page<SpaTreatment> spaTreatments){
         List<SpaTreatmentResponse> spaTreatmentData = spaTreatments.getContent().stream()
                 .map(spaTreatment -> new SpaTreatmentResponse(spaTreatment.getId(),
                         spaTreatment.getName(),
@@ -101,7 +101,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<SpaPackageResponse> convertToSpaPackageResponse(Page<SpaPackage> spaPackages){
+    public Page<SpaPackageResponse> convertToPageSpaPackageResponse(Page<SpaPackage> spaPackages){
         List<SpaPackageResponse> spaPackageData = spaPackages.getContent().stream()
                 .map(spaPackage -> new SpaPackageResponse(spaPackage.getId(),
                         spaPackage.getName(),
@@ -121,7 +121,23 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<TreatmentServiceResponse> convertToTreatmentServiceResponse(Page<TreatmentService> treatmentServices) {
+    public SpaPackageResponse convertToSpaPackageResponse(SpaPackage spaPackage){
+        SpaPackageResponse spaPackageResponse = new SpaPackageResponse(spaPackage.getId(),
+                spaPackage.getName(),
+                spaPackage.getDescription(),
+                spaPackage.getImage(),
+                spaPackage.getType(),
+                spaPackage.getTotalSlot(),
+                spaPackage.getStatus(),
+                spaPackage.getCreateTime(),
+                spaPackage.getCreate_by(),
+                spaPackage.getCategory(),
+                spaPackage.getSpa(),
+                spaPackage.getSpaServices());
+        return spaPackageResponse;
+    }
+
+    public Page<TreatmentServiceResponse> convertToPageTreatmentServiceResponse(Page<TreatmentService> treatmentServices) {
         List<TreatmentServiceResponse> treatmentServiceData = treatmentServices.getContent().stream()
                 .map(treatmentService -> new TreatmentServiceResponse(treatmentService.getId(),
                         treatmentService.getOrdinal(),

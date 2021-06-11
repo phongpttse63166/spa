@@ -55,19 +55,7 @@ public class SpaPackageService {
         return page;
     }
 
-    public Page<SpaPackage> findSpaServiceBySpaPackageId(Integer spaPackageId, Integer spaId ,
-                                                         Pageable pageable) {
-        List<SpaPackage> spaPackages =
-                this.spaPackageRepository.findSpaPackageBySpaIdAndStatus(spaId, Status.AVAILABLE,
-                        "", pageable)
-                        .toList();
-        List<SpaPackage> result = new ArrayList<>();
-        for (SpaPackage spaPackage : spaPackages) {
-            if (spaPackage.getId().equals(spaPackageId)){
-                result.add(spaPackage);
-            }
-        }
-        Page<SpaPackage> page = new PageImpl<>(result);
-        return page;
+    public SpaPackage findBySpaPackageId(Integer spaPackageId) {
+        return this.spaPackageRepository.findById(spaPackageId).get();
     }
 }

@@ -83,7 +83,7 @@ public class ManagerController {
                             PageRequest.of(spaPackages.getTotalPages()-1,
                             spaPackages.getSize(), spaPackages.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+        return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
     @GetMapping("/spatreatment/findbypackageId")
@@ -95,7 +95,7 @@ public class ManagerController {
             spaTreatments = spaTreatmentService.findByPackageId(packageId, search,
                     PageRequest.of(spaTreatments.getTotalPages()-1, spaTreatments.getSize(), spaTreatments.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaTreatmentResponse(spaTreatments));
+        return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 
     @GetMapping("/spaservice/findbyspaId")
@@ -107,7 +107,7 @@ public class ManagerController {
             spaServices = spaServiceService.findBySpaIdAndStatus(spaId, status, search,
                     PageRequest.of(spaServices.getTotalPages()-1, spaServices.getSize(), spaServices.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaServiceResponse(spaServices));
+        return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
     @PutMapping("/spapackageservices/insert")
@@ -157,6 +157,6 @@ public class ManagerController {
             spaPackages = spaPackageService.findAllBySpaServiceId(spaServiceId, spaId,
                     PageRequest.of(spaPackages.getTotalPages()-1, spaPackages.getSize(), spaPackages.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+        return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 }
