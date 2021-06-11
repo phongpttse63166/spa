@@ -137,17 +137,4 @@ public class Conversion {
         return spaPackageResponse;
     }
 
-    public Page<TreatmentServiceResponse> convertToPageTreatmentServiceResponse(Page<TreatmentService> treatmentServices) {
-        List<TreatmentServiceResponse> treatmentServiceData = treatmentServices.getContent().stream()
-                .map(treatmentService -> new TreatmentServiceResponse(treatmentService.getId(),
-                        treatmentService.getOrdinal(),
-                        treatmentService.getSpaTreatment(),
-                        treatmentService.getSpaService()))
-                .collect(Collectors.toList());
-        long totalElements = treatmentServices.getTotalElements();
-        return new PageImpl<>(treatmentServiceData,
-                totalElements == 0 ? Pageable.unpaged() : treatmentServices.getPageable(),
-                totalElements);
-
-    }
 }
