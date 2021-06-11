@@ -44,7 +44,7 @@ public class StaffController {
                     PageRequest.of(treatmentServices.getTotalPages()-1,
                             treatmentServices.getSize(), treatmentServices.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToTreatmentServiceResponse(treatmentServices));
+        return ResponseHelper.ok(conversion.convertToPageTreatmentServiceResponse(treatmentServices));
 
     }
 }

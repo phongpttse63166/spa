@@ -77,7 +77,7 @@ public class PublicController {
             categories = categoryService.findAllByStatus(status,
                     PageRequest.of(categories.getTotalPages()-1, categories.getSize(), categories.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToCategoryResponse(categories));
+        return ResponseHelper.ok(conversion.convertToPageCategoryResponse(categories));
     }
 
     @GetMapping("/user")
@@ -95,7 +95,7 @@ public class PublicController {
             spaServices = spaServiceService.findBySpaIdAndStatus(spaId, status, search,
                     PageRequest.of(spaServices.getTotalPages()-1, spaServices.getSize(), spaServices.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaServiceResponse(spaServices));
+        return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
     @GetMapping("/spatreatment")
@@ -107,7 +107,7 @@ public class PublicController {
             spaTreatments = spaTreatmentService.findTreatmentBySpaId(spaId, search,
                     PageRequest.of(spaTreatments.getTotalPages()-1, spaTreatments.getSize(), spaTreatments.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaTreatmentResponse(spaTreatments));
+        return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 
     @GetMapping("/spapackage")
@@ -119,7 +119,7 @@ public class PublicController {
             spaPackages = spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status, search,
                     PageRequest.of(spaPackages.getTotalPages()-1, spaPackages.getSize(), spaPackages.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+        return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
     @PostMapping("/register")
@@ -204,7 +204,7 @@ public class PublicController {
             spas = spaService.findAllSpaByStatusAvailable(
                     PageRequest.of(spas.getTotalPages()-1, spas.getSize(), spas.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToSpaResponse(spas));
+        return ResponseHelper.ok(conversion.convertToPageSpaResponse(spas));
     }
 
     @PostMapping("/login")
@@ -262,14 +262,8 @@ public class PublicController {
     }
 
     @GetMapping("/spaservice/findbyspapackageid")
-    public Response findSpaServiceBySpaPackageId(@RequestParam Integer spaPackageId,
-                                                 @RequestParam Integer spaId, Pageable pageable){
-        Page<SpaPackage> spaPackages =
-                spaPackageService.findSpaServiceBySpaPackageId(spaPackageId, spaId, pageable);
-        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
-            spaPackages = spaPackageService.findSpaServiceBySpaPackageId(spaPackageId, spaId,
-                    PageRequest.of(spaPackages.getTotalPages()-1, spaPackages.getSize(), spaPackages.getSort()));
-        }
-        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackages));
+    public Response findSpaServiceBySpaPackageId(@RequestParam Integer spaPackageId){
+        SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
+        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackage));
     }
 }
