@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.SpaPackageCreateRequest;
+import swp490.spa.dto.requests.SpaTreatmentCreateRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.entities.SpaService;
@@ -152,9 +153,54 @@ public class ManagerController {
     public Response findSpaPackageBySpaServiceId(@RequestParam Integer spaServiceId ,
                                                  @RequestParam Integer spaId,
                                                  @RequestParam Integer page,
-                                                 @RequestParam Integer size){
+                                                 @RequestParam Integer size,
+                                                 @RequestParam String search){
         Page<SpaPackage> spaPackages =
-                spaPackageService.findAllBySpaServiceId(spaServiceId, spaId, page, size);
+                spaPackageService.findAllBySpaServiceId(spaServiceId, spaId, page, size, search);
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
+    }
+
+    @PutMapping("/spatreatmentservices/insert")
+    public Response insertNewSpaPackageWithServices(@RequestBody SpaTreatmentCreateRequest spaTreatmentRequest){
+        List<TreatmentService> treatmentServices = new ArrayList<>();
+        SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaTreatmentRequest.getPackageId());
+        if(Objects.isNull(spaPackage)){
+            return ResponseHelper.error(Notification.SPA_PACKAGE_NOT_EXISTED);
+        }
+        Spa spa = spaService.findById(spaTreatmentRequest.getSpaId());
+        if(Objects.isNull(spa)){
+            return ResponseHelper.error(Notification.SPA_NOT_EXISTED);
+        }
+        int ordinal = 1;
+        for (int i = 0; i < spaTreatmentRequest.getListSpaServiceId().size(); i++) {
+            swp490.spa.entities.SpaService spaService =
+                    spaServiceService.findBySpaId(spaTreatmentRequest.getListSpaServiceId().get(i));
+            if(Objects.isNull(spaService)){
+                ResponseHelper.error(Notification.SPA_SERVICE_NOT_EXISTED);
+            }
+            TreatmentService treatmentService = new TreatmentService(spaService,ordinal);
+            ordinal++;
+            treatmentServices.add(treatmentService);
+        }
+        SpaTreatment spaTreatmentInsert = new SpaTreatment(spaTreatmentRequest.getName(),
+                        spaTreatmentRequest.getDescription(),
+                        Date.valueOf(LocalDateTime.now().toLocalDate()),
+                        spaTreatmentRequest.getCreateBy(),
+                        spaPackage, spa, treatmentServices);
+        if(Objects.nonNull(spaTreatmentService.insertNewSpaTreatment(spaTreatmentInsert))){
+            return ResponseHelper.ok(Notification.SPA_TREATMENT_SERVICE_INSERT_SUCCESS);
+        }
+        return ResponseHelper.error(Notification.SPA_TREATMENT_SERVICE_INSERT_FAIL);
+    }
+
+    @GetMapping("/spatreatment/findbyserviceId")
+    public Response findSpaTreatmentBySpaServiceId(@RequestParam Integer spaServiceId,
+                                                   @RequestParam Integer spaId,
+                                                   @RequestParam Integer page,
+                                                   @RequestParam Integer size,
+                                                   @RequestParam String search){
+        Page<SpaTreatment> spaTreatments =
+                spaTreatmentService.findAllBySpaServiceId(spaServiceId, spaId, page, size, search);
+        return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 }

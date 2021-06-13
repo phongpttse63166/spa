@@ -70,7 +70,7 @@ public class PublicController {
         this.conversion = new Conversion();
     }
 
-    @GetMapping("/category")
+    @GetMapping("/category/findall")
     public Response findCategoryByStatus(@RequestParam String status, Pageable pageable){
         Page<Category> categories = categoryService.findAllByStatus(status, pageable);
         if (!categories.hasContent() && !categories.isFirst()) {
@@ -80,13 +80,13 @@ public class PublicController {
         return ResponseHelper.ok(conversion.convertToPageCategoryResponse(categories));
     }
 
-    @GetMapping("/user")
+    @GetMapping("/user/findbyphone")
     public Response findUserByPhone(@RequestParam String phone){
         User user = userService.findByPhone(phone);
         return ResponseHelper.ok(user);
     }
 
-    @GetMapping("/spaservice")
+    @GetMapping("/spaservice/findbyspaid")
     public Response findSpaServiceBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
                                           @RequestParam String search, Pageable pageable){
         Page<swp490.spa.entities.SpaService> spaServices =
@@ -98,7 +98,7 @@ public class PublicController {
         return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
-    @GetMapping("/spatreatment")
+    @GetMapping("/spatreatment/findbyspaid")
     public Response findSpaTreatmentBySpaId(@RequestParam Integer spaId,
                                             @RequestParam String search, Pageable pageable){
         Page<SpaTreatment> spaTreatments =
@@ -110,7 +110,7 @@ public class PublicController {
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 
-    @GetMapping("/spapackage")
+    @GetMapping("/spapackage/findbyspaid")
     public Response findSpaPackageBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
                                           @RequestParam String search, Pageable pageable){
         Page<SpaPackage> spaPackages =
@@ -197,7 +197,7 @@ public class PublicController {
         return ResponseHelper.error(Notification.VERIFY_FAIL);
     }
 
-    @GetMapping("/getallspa")
+    @GetMapping("/spa/findall")
     public Response getAllSpa(Pageable pageable){
         Page<Spa> spas = spaService.findAllSpaByStatusAvailable(pageable);
         if(!spas.hasContent() && !spas.isFirst()){

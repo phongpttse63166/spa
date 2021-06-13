@@ -37,12 +37,12 @@ public class SpaPackageService {
     }
 
     public Page<SpaPackage> findAllBySpaServiceId(Integer spaServiceId, Integer spaId ,
-                                                  Integer page, Integer size){
+                                                  Integer page, Integer size, String search){
 
         Pageable pageableDefault = PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT, Sort.by("name"));
         List<SpaPackage> spaPackages =
                 this.spaPackageRepository.findSpaPackageBySpaIdAndStatus(spaId, Status.AVAILABLE,
-                        "", pageableDefault)
+                        search, pageableDefault)
                         .toList();
         List<SpaPackage> result = new ArrayList<>();
         for (SpaPackage spaPackage : spaPackages) {

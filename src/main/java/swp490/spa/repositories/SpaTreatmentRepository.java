@@ -14,4 +14,5 @@ public interface SpaTreatmentRepository extends JpaRepository<SpaTreatment, Inte
 
     @Query("FROM SpaTreatment s WHERE s.spaPackage.id = ?1 and s.name LIKE %?2%")
     Page<SpaTreatment> findByPackageId(Integer packageId, String search, Pageable pageable);
+
 }

@@ -1,5 +1,6 @@
 package swp490.spa.dto.helper;
 
+import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -79,7 +80,8 @@ public class Conversion {
                         spaService.getType(),
                         spaService.getDurationMin(),
                         spaService.getCreateTime(),
-                        spaService.getCreateBy()))
+                        spaService.getCreateBy(),
+                        spaService.getSpa()))
                 .collect(Collectors.toList());
         long totalElements = spaServices.getTotalElements();
         return new PageImpl<>(spaServiceData, totalElements == 0 ? Pageable.unpaged() : spaServices.getPageable(),
@@ -94,7 +96,8 @@ public class Conversion {
                         spaTreatment.getCreateTime(),
                         spaTreatment.getCreateBy(),
                         spaTreatment.getSpaPackage(),
-                        spaTreatment.getSpa()))
+                        spaTreatment.getSpa(),
+                        spaTreatment.getTreatmentServices()))
                 .collect(Collectors.toList());
         long totalElements = spaTreatments.getTotalElements();
         return new PageImpl<>(spaTreatmentData, totalElements == 0 ? Pageable.unpaged() : spaTreatments.getPageable(),
