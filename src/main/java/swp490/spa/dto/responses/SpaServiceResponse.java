@@ -1,14 +1,16 @@
 package swp490.spa.dto.responses;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import swp490.spa.entities.Status;
-import swp490.spa.entities.Type;
+import swp490.spa.entities.*;
 
-import javax.persistence.Column;
 import java.sql.Date;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class SpaServiceResponse {
     private Integer id;
     @JsonProperty("name")
     private String name;
-    @Column(name = "image")
+    @JsonProperty("image")
     private String image;
     @JsonProperty("description")
     private String description;
@@ -26,12 +28,15 @@ public class SpaServiceResponse {
     private Double price;
     @JsonProperty("status")
     private Status status;
-    @Column(name = "type")
+    @JsonProperty("type")
     private Type type;
-    @Column(name = "duration_min")
+    @JsonProperty("duration_min")
     private Integer durationMin;
     @JsonProperty("create_time")
     private Date createTime;
     @JsonProperty("create_by")
     private String createBy;
+    @JsonProperty("spa")
+    @JsonIgnore
+    private Spa spa;
 }

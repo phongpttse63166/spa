@@ -45,11 +45,12 @@ public class SpaService implements Serializable {
     @ManyToOne
     @JoinColumn(name = "spa_id")
     private Spa spa;
-    @JsonBackReference
     @ManyToMany(mappedBy = "spaServices",
             cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
+    @JsonBackReference
     private List<SpaPackage> spaPackages = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<TreatmentService> treatmentServices = new HashSet<>();
 
 }
