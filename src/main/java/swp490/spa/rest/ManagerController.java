@@ -211,18 +211,10 @@ public class ManagerController {
     public Response findSpaPackageTreatmentBySpaId(@RequestParam Integer spaId,
                                                    @RequestParam String search,
                                                    Pageable pageable){
-        boolean isNotFirst = false;
         List<SpaPackageTreatmentResponse> result = new ArrayList<>();
         Page<SpaPackage> spaPackages =
                 spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search ,pageable);
-        int totalItem = spaPackages.getContent().size();
-        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
-            spaPackages = spaPackageService
-                    .findSpaPackageBySpaIdAndStatusAvailable(spaId, search,
-                            PageRequest.of(spaPackages.getTotalPages()-1,
-                                    spaPackages.getSize(), spaPackages.getSort()));
-            isNotFirst = true;
-        }
+        int totalItem = (int) spaPackages.getTotalElements();
         if(spaPackages.getContent().size()!=0 && !spaPackages.getContent().isEmpty()){
             for (SpaPackage spaPackage : spaPackages.getContent()) {
                 List<SpaTreatment> spaTreatments = new ArrayList<>();
@@ -236,13 +228,7 @@ public class ManagerController {
                 result.add(sptr);
             }
         }
-        Page<SpaPackageTreatmentResponse> page = null;
-        if(isNotFirst){
-             page = new PageImpl<>(result,
-                    PageRequest.of(spaPackages.getTotalPages()-1,
-                            spaPackages.getSize(), spaPackages.getSort()),totalItem);
-        }
-        page = new PageImpl<>(result,pageable,totalItem);
+        Page<SpaPackageTreatmentResponse> page = new PageImpl<>(result,pageable,totalItem);
         return ResponseHelper.ok(conversion.convertToPageSpaPackageTreatmentResponse(page));
     }
 }
