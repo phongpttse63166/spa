@@ -16,4 +16,6 @@ public interface SpaPackageRepository extends JpaRepository<SpaPackage, Integer>
 
     Page<SpaPackage> findAllByStatus(Status status, Pageable pageable);
 
+    @Query("FROM SpaPackage s WHERE s.category.id = ?1 AND s.name LIKE %?2% ORDER BY s.createTime DESC ")
+    Page<SpaPackage> findByCategory_IdOrderByCreateTimeDesc(Integer categoryId, Pageable pageable);
 }

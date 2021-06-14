@@ -281,7 +281,21 @@ public class PublicController {
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
-    @PostMapping("/test_upload")
+    @GetMapping("/spapackage/findbycategoryId")
+    public Response findSpaPackageByCategoryId(@RequestParam Integer categoryId,
+                                               Pageable pageable){
+        Page<SpaPackage> spaPackages =
+                spaPackageService.findByCategoryIdOrderByDate(categoryId, pageable);
+        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+            spaPackages = spaPackageService
+                    .findByCategoryIdOrderByDate(categoryId,
+                            PageRequest.of(spaPackages.getTotalPages()-1,
+                                    spaPackages.getSize(), spaPackages.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
+    }
+
+    @PostMapping("/image/upload")
     public String testUpdateImage(@RequestParam("file")MultipartFile file){
        return FunctionSupport.uploadImage(file);
     }

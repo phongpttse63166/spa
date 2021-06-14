@@ -63,4 +63,8 @@ public class SpaPackageService {
     public SpaPackage findBySpaPackageId(Integer spaPackageId) {
         return this.spaPackageRepository.findById(spaPackageId).get();
     }
+
+    public Page<SpaPackage> findByCategoryIdOrderByDate(Integer categoryId, Pageable pageable) {
+        return this.spaPackageRepository.findByCategory_IdOrderByCreateTimeDesc(categoryId, pageable);
+    }
 }
