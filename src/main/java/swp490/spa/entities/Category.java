@@ -19,6 +19,8 @@ public class Category implements Serializable {
     private Integer id;
     @Column(name = "name")
     private String name;
+    @Column(name = "icon")
+    private String icon;
     @Column(name = "description")
     private String description;
     @Column(name = "create_time")

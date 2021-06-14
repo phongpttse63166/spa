@@ -16,6 +16,8 @@ public class CategoryResponse {
     private Integer id;
     @JsonProperty("name")
     private String name;
+    @JsonProperty("icon")
+    private String icon;
     @JsonProperty("description")
     private String description;
     @JsonProperty("create_time")

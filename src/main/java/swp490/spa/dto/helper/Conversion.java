@@ -18,6 +18,7 @@ public class Conversion {
         List<CategoryResponse> categoryData = categories.getContent().stream()
                 .map(category -> new CategoryResponse(category.getId(),
                         category.getName(),
+                        category.getIcon(),
                         category.getDescription(),
                         category.getCreateTime(),
                         category.getCreateBy(),
