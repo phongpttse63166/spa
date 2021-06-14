@@ -2,6 +2,7 @@ package swp490.spa.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -9,10 +10,12 @@ import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.SpaPackageCreateRequest;
 import swp490.spa.dto.requests.SpaTreatmentCreateRequest;
+import swp490.spa.dto.responses.SpaPackageTreatmentResponse;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.entities.SpaService;
 import swp490.spa.services.*;
+import swp490.spa.utils.support.Constant;
 import swp490.spa.utils.support.Notification;
 
 import java.sql.Date;
@@ -202,5 +205,44 @@ public class ManagerController {
         Page<SpaTreatment> spaTreatments =
                 spaTreatmentService.findAllBySpaServiceId(spaServiceId, spaId, page, size, search);
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
+    }
+
+    @GetMapping("/spapackagetreatment/findbyspaId")
+    public Response findSpaPackageTreatmentBySpaId(@RequestParam Integer spaId,
+                                                   @RequestParam String search,
+                                                   Pageable pageable){
+        boolean isNotFirst = false;
+        List<SpaPackageTreatmentResponse> result = new ArrayList<>();
+        Page<SpaPackage> spaPackages =
+                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search ,pageable);
+        int totalItem = spaPackages.getContent().size();
+        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+            spaPackages = spaPackageService
+                    .findSpaPackageBySpaIdAndStatusAvailable(spaId, search,
+                            PageRequest.of(spaPackages.getTotalPages()-1,
+                                    spaPackages.getSize(), spaPackages.getSort()));
+            isNotFirst = true;
+        }
+        if(spaPackages.getContent().size()!=0 && !spaPackages.getContent().isEmpty()){
+            for (SpaPackage spaPackage : spaPackages.getContent()) {
+                List<SpaTreatment> spaTreatments = new ArrayList<>();
+                SpaPackageTreatmentResponse sptr = new SpaPackageTreatmentResponse();
+                sptr.setSpaPackage(spaPackage);
+                spaTreatments =
+                        spaTreatmentService.findByPackageId(spaPackage.getId(),
+                                Constant.SEARCH_NO_CONTENT,
+                                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT)).toList();
+                sptr.setSpaTreatments(spaTreatments);
+                result.add(sptr);
+            }
+        }
+        Page<SpaPackageTreatmentResponse> page = null;
+        if(isNotFirst){
+             page = new PageImpl<>(result,
+                    PageRequest.of(spaPackages.getTotalPages()-1,
+                            spaPackages.getSize(), spaPackages.getSort()),totalItem);
+        }
+        page = new PageImpl<>(result,pageable,totalItem);
+        return ResponseHelper.ok(conversion.convertToPageSpaPackageTreatmentResponse(page));
     }
 }

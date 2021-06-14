@@ -141,4 +141,13 @@ public class Conversion {
         return spaPackageResponse;
     }
 
+    public Page<SpaPackageTreatmentResponse> convertToPageSpaPackageTreatmentResponse(Page<SpaPackageTreatmentResponse> page) {
+        List<SpaPackageTreatmentResponse> spaPackageTreatmentData = page.getContent().stream()
+                .map(spaPackageTreatment -> new SpaPackageTreatmentResponse(spaPackageTreatment.getSpaPackage(),
+                        spaPackageTreatment.getSpaTreatments()))
+                .collect(Collectors.toList());
+        long totalElements = page.getTotalElements();
+        return new PageImpl<>(spaPackageTreatmentData, totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
+                totalElements);
+    }
 }
