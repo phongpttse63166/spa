@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.dto.requests.AuthRequest;
 import swp490.spa.dto.responses.LoginResponse;
 import swp490.spa.dto.helper.Conversion;
@@ -16,6 +17,7 @@ import swp490.spa.services.*;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
 import swp490.spa.services.SpaService;
+import swp490.spa.utils.support.FunctionSupport;
 import swp490.spa.utils.support.GenerationOTP;
 import swp490.spa.utils.support.Notification;
 
@@ -277,5 +279,10 @@ public class PublicController {
                             spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
+    }
+
+    @PostMapping("/test_upload")
+    public String testUpdateImage(@RequestParam("file")MultipartFile file){
+       return FunctionSupport.uploadImage(file);
     }
 }
