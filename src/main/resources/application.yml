@@ -4,14 +4,14 @@ server:
 
 spring:
   datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://ec2-52-86-25-51.compute-1.amazonaws.com:5432/d6qkngahebnl7l
-#    username: mqsqmlkflqivko
-#    password: 6bcaea1d1032c41c42e3319e6526327024e82fcbd9d6b83810efbc0e98637b91
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/swp490_spa
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://ec2-52-86-25-51.compute-1.amazonaws.com:5432/d6qkngahebnl7l
+    username: mqsqmlkflqivko
+    password: 6bcaea1d1032c41c42e3319e6526327024e82fcbd9d6b83810efbc0e98637b91
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://localhost:5432/swp490_spa
+#    username: postgres
+#    password: postgres
   jpa:
     database: postgresql
     generate-ddl: true
