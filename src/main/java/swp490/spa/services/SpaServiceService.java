@@ -28,6 +28,6 @@ public class SpaServiceService {
 
     public Page<SpaService> findBySpaIdAndType(Integer spaId, Type type, String search, Pageable pageable) {
         return this.spaServiceRepository
-                .findBySpa_IdAndTypeAndNameLikeAndStatus(spaId,type, search,Status.AVAILABLE,pageable);
+                .findBySpa_IdAndTypeAndNameContainingAndStatus(spaId,type, search,Status.AVAILABLE,pageable);
     }
 }
