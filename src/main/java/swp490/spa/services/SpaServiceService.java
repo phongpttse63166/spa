@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.SpaService;
 import swp490.spa.entities.Status;
+import swp490.spa.entities.Type;
 import swp490.spa.repositories.SpaServiceRepository;
 
 @Service
@@ -23,5 +24,10 @@ public class SpaServiceService {
 
     public SpaService findBySpaId(Integer serviceId) {
         return this.spaServiceRepository.findBySpaId(serviceId);
+    }
+
+    public Page<SpaService> findBySpaIdAndType(Integer spaId, Type type, String search, Pageable pageable) {
+        return this.spaServiceRepository
+                .findBySpa_IdAndTypeAndNameLikeAndStatus(spaId,type, search,Status.AVAILABLE,pageable);
     }
 }

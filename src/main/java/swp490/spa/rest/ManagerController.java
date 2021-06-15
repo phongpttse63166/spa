@@ -231,4 +231,17 @@ public class ManagerController {
         Page<SpaPackageTreatmentResponse> page = new PageImpl<>(result,pageable,totalItem);
         return ResponseHelper.ok(conversion.convertToPageSpaPackageTreatmentResponse(page));
     }
+
+    @GetMapping("/spaservice/findbyspaidandtype")
+    public Response findSpaServiceBySpaIdAndType(@RequestParam Integer spaId,
+                                                         @RequestParam Type type,
+                                                         @RequestParam String search,
+                                                         Pageable pageable){
+        Page<SpaService> spaServices = spaServiceService.findBySpaIdAndType(spaId, type, search, pageable);
+        if(!spaServices.hasContent() && !spaServices.isFirst()){
+            spaServices = spaServiceService.findBySpaIdAndType(spaId, type, search,
+                    PageRequest.of(spaServices.getTotalPages()-1, spaServices.getSize(), spaServices.getSort()));
+        }
+            return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
+    }
 }
