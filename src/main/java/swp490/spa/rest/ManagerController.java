@@ -59,7 +59,7 @@ public class ManagerController {
         return ResponseHelper.ok(manager);
     }
 
-    @PutMapping("/spaservice/create")
+    @PostMapping("/spaservice/create")
     public Response createNewSpaService(@RequestBody SpaService spaService){
         Manager manager = managerService.findManagerById(Integer.parseInt(spaService.getCreateBy()));
         if(Objects.isNull(manager)){
@@ -114,7 +114,7 @@ public class ManagerController {
         return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
-    @PutMapping("/spapackageservices/insert")
+    @PostMapping("/spapackageservices/insert")
     public Response insertNewSpaPackageWithServices(@RequestBody SpaPackageCreateRequest spaPackage){
         List<SpaService> spaServices = new ArrayList<>();
         Category category = categoryService.findById(spaPackage.getCategoryId());
@@ -163,7 +163,7 @@ public class ManagerController {
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
-    @PutMapping("/spatreatmentservices/insert")
+    @PostMapping("/spatreatmentservices/insert")
     public Response insertNewSpaPackageWithServices(@RequestBody SpaTreatmentCreateRequest spaTreatmentRequest){
         List<TreatmentService> treatmentServices = new ArrayList<>();
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaTreatmentRequest.getPackageId());
