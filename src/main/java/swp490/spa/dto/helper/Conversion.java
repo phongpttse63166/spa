@@ -41,6 +41,7 @@ public class Conversion {
                         user.getGender(),
                         user.getBirthdate(),
                         user.getEmail(),
+                        user.getImage(),
                         user.getAddress(),
                         user.isActive()))
                 .collect(Collectors.toList());

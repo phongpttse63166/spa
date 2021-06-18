@@ -39,6 +39,10 @@ public class PublicController {
     @Autowired
     private ManagerService managerService;
     @Autowired
+    private AdminService adminService;
+    @Autowired
+    private ConsultantService consultantService;
+    @Autowired
     private CategoryService categoryService;
     @Autowired
     private SpaService spaService;
@@ -57,6 +61,7 @@ public class PublicController {
     public PublicController(UserService userService, CategoryService categoryService,
                             SpaService spaService, SpaServiceService spaServiceService,
                             CustomerService customerService, StaffService staffService,
+                            AdminService adminService, ConsultantService consultantService,
                             ManagerService managerService, SpaTreatmentService spaTreatmentService,
                             SpaPackageService spaPackageService, AccountRegisterService accountRegisterService) {
         this.userService = userService;
@@ -73,61 +78,61 @@ public class PublicController {
     }
 
     @GetMapping("/category/findall")
-    public Response findCategoryByStatus(@RequestParam String status, Pageable pageable){
+    public Response findCategoryByStatus(@RequestParam String status, Pageable pageable) {
         Page<Category> categories = categoryService.findAllByStatus(status, pageable);
         if (!categories.hasContent() && !categories.isFirst()) {
             categories = categoryService.findAllByStatus(status,
-                    PageRequest.of(categories.getTotalPages()-1, categories.getSize(), categories.getSort()));
+                    PageRequest.of(categories.getTotalPages() - 1, categories.getSize(), categories.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageCategoryResponse(categories));
     }
 
     @GetMapping("/user/findbyphone")
-    public Response findUserByPhone(@RequestParam String phone){
+    public Response findUserByPhone(@RequestParam String phone) {
         User user = userService.findByPhone(phone);
         return ResponseHelper.ok(user);
     }
 
     @GetMapping("/spaservice/findbyspaid")
     public Response findSpaServiceBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
-                                          @RequestParam String search, Pageable pageable){
+                                          @RequestParam String search, Pageable pageable) {
         Page<swp490.spa.entities.SpaService> spaServices =
                 spaServiceService.findBySpaIdAndStatus(spaId, status, search, pageable);
-        if(!spaServices.hasContent() && !spaServices.isFirst()){
+        if (!spaServices.hasContent() && !spaServices.isFirst()) {
             spaServices = spaServiceService.findBySpaIdAndStatus(spaId, status, search,
-                    PageRequest.of(spaServices.getTotalPages()-1, spaServices.getSize(), spaServices.getSort()));
+                    PageRequest.of(spaServices.getTotalPages() - 1, spaServices.getSize(), spaServices.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
     @GetMapping("/spatreatment/findbyspaid")
     public Response findSpaTreatmentBySpaId(@RequestParam Integer spaId,
-                                            @RequestParam String search, Pageable pageable){
+                                            @RequestParam String search, Pageable pageable) {
         Page<SpaTreatment> spaTreatments =
                 spaTreatmentService.findTreatmentBySpaId(spaId, search, pageable);
-        if(!spaTreatments.hasContent() && !spaTreatments.isFirst()){
+        if (!spaTreatments.hasContent() && !spaTreatments.isFirst()) {
             spaTreatments = spaTreatmentService.findTreatmentBySpaId(spaId, search,
-                    PageRequest.of(spaTreatments.getTotalPages()-1, spaTreatments.getSize(), spaTreatments.getSort()));
+                    PageRequest.of(spaTreatments.getTotalPages() - 1, spaTreatments.getSize(), spaTreatments.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 
     @GetMapping("/spapackage/findbyspaid")
     public Response findSpaPackageBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
-                                          @RequestParam String search, Pageable pageable){
+                                          @RequestParam String search, Pageable pageable) {
         Page<SpaPackage> spaPackages =
                 spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status, search, pageable);
-        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+        if (!spaPackages.hasContent() && !spaPackages.isFirst()) {
             spaPackages = spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status, search,
-                    PageRequest.of(spaPackages.getTotalPages()-1, spaPackages.getSize(), spaPackages.getSort()));
+                    PageRequest.of(spaPackages.getTotalPages() - 1, spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
     @PostMapping("/register")
-    public Response registerAccount(@RequestBody AccountRegister accountRegister){
+    public Response registerAccount(@RequestBody AccountRegister accountRegister) {
         User userResult = userService.findByPhone(accountRegister.getPhone());
-        if(Objects.nonNull(userResult)){
+        if (Objects.nonNull(userResult)) {
             return ResponseHelper.error(Notification.USER_EXISTED);
         }
         LocalDateTime currentTime = LocalDateTime.now();
@@ -135,11 +140,11 @@ public class PublicController {
         Date createTime = Date.valueOf(currentTime.toLocalDate());
         Date expiredTime = Date.valueOf(expireTime.toLocalDate());
         AccountRegister result = accountRegisterService.findByPhone(accountRegister.getPhone());
-        if(Objects.nonNull(result)){
+        if (Objects.nonNull(result)) {
             result.setOtpCode(GenerationOTP.generateOTPCode(0, 9999));
             result.setCreateTime(createTime);
             result.setExpiredTime(expiredTime);
-            if(Objects.nonNull(accountRegisterService.updateAccountRegister(result))){
+            if (Objects.nonNull(accountRegisterService.updateAccountRegister(result))) {
                 return ResponseHelper.ok(result);
             }
             return ResponseHelper.error(Notification.SEND_OTP_FAIL);
@@ -162,14 +167,14 @@ public class PublicController {
     }
 
     @PostMapping("/verifyregister")
-    public Response verifyRegister(@RequestBody AccountRegister accountRegister){
+    public Response verifyRegister(@RequestBody AccountRegister accountRegister) {
         AccountRegister result = accountRegisterService.findByPhone(accountRegister.getPhone());
-        if(result!=null){
+        if (result != null) {
             Date currentTime = Date.valueOf(LocalDateTime.now().toLocalDate());
-            if(currentTime.compareTo(result.getExpiredTime())==1){
+            if (currentTime.compareTo(result.getExpiredTime()) == 1) {
                 return ResponseHelper.error(Notification.EXPIRED_VERIFY);
             }
-            if(!accountRegister.getOtpCode().equalsIgnoreCase(result.getOtpCode())){
+            if (!accountRegister.getOtpCode().equalsIgnoreCase(result.getOtpCode())) {
                 return ResponseHelper.error(Notification.OTP_NOT_MATCH);
             }
             User newUser = new User();
@@ -177,14 +182,14 @@ public class PublicController {
             newUser.setPhone(result.getPhone());
             newUser.setFullname(result.getFullname());
             newUser.setPassword(result.getPassword());
-            if(Objects.nonNull(userService.insertNewUser(newUser))){
+            if (Objects.nonNull(userService.insertNewUser(newUser))) {
                 User resultUser = userService.findByPhone(newUser.getPhone());
-                if(Objects.nonNull(resultUser)){
+                if (Objects.nonNull(resultUser)) {
                     accountRegisterService.deleteAccountRegister(result.getId());
                     Customer customer = new Customer();
                     customer.setUser(resultUser);
                     customer.setCustomType("Normal");
-                    if(Objects.nonNull(customerService.insertNewCustomer(customer))){
+                    if (Objects.nonNull(customerService.insertNewCustomer(customer))) {
                         return ResponseHelper.error(Notification.REGISTER_SUCCESS);
                     }
                 } else {
@@ -200,82 +205,93 @@ public class PublicController {
     }
 
     @GetMapping("/spa/findall")
-    public Response getAllSpa(Pageable pageable){
+    public Response getAllSpa(Pageable pageable) {
         Page<Spa> spas = spaService.findAllSpaByStatusAvailable(pageable);
-        if(!spas.hasContent() && !spas.isFirst()){
+        if (!spas.hasContent() && !spas.isFirst()) {
             spas = spaService.findAllSpaByStatusAvailable(
-                    PageRequest.of(spas.getTotalPages()-1, spas.getSize(), spas.getSort()));
+                    PageRequest.of(spas.getTotalPages() - 1, spas.getSize(), spas.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaResponse(spas));
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody AuthRequest authRequest){
+    public LoginResponse login(@RequestBody AuthRequest authRequest) {
         String phone = authRequest.getPhone().trim();
         String password = authRequest.getPassword().trim();
         String role = authRequest.getRole().name();
         Integer spaId = null;
 
-        if(phone.isEmpty() || password.isEmpty() || role.isEmpty()){
+        if (phone.isEmpty() || password.isEmpty() || role.isEmpty()) {
             return LoginResponse.createErrorResponse(LoginResponse.Error.BLANK_FIELD);
         }
 
         User user = userService.findByPhone(phone);
-        if(user == null){
+        if (user == null) {
             return LoginResponse.createErrorResponse(LoginResponse.Error.USERNAME_NOT_FOUND);
         }
-        if(!user.getPassword().equals(password)){
+        if (!user.getPassword().equals(password)) {
             return LoginResponse.createErrorResponse(LoginResponse.Error.WRONG_PASSWORD);
         }
 
         boolean isExisted = true;
 
-        switch(role){
+        switch (role) {
             case "CUSTOMER":
                 Customer customer = customerService.findByUserId(user.getId());
-                if(customer == null){
+                if (customer == null) {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.CUSTOMER_NOT_EXISTED);
                 }
                 break;
             case "STAFF":
-                // tu staff lay qua
+                Staff staff = staffService.findByStaffId(user.getId());
+                if (Objects.isNull(staff)) {
+                    return LoginResponse.createErrorResponse(LoginResponse.Error.STAFF_NOT_EXISTED);
+                }
+                spaId = staff.getSpa().getId();
                 break;
             case "MANAGER":
                 Manager manager = managerService.findManagerById(user.getId());
-                if(Objects.isNull(manager)){
+                if (Objects.isNull(manager)) {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.MANAGER_NOT_EXISTED);
                 }
                 spaId = manager.getSpa().getId();
                 break;
             case "ADMIN":
                 break;
+            case "CONSULTANT":
+                Consultant consultant = consultantService.findConsultantByUserId(user.getId());
+                if (Objects.isNull(consultant)) {
+                    return LoginResponse.createErrorResponse(LoginResponse.Error.CONSULTANT_NOT_EXISTED);
+                }
+                spaId = consultant.getSpa().getId();
+                break;
             default:
                 isExisted = false;
                 break;
         }
 
-        if(!isExisted){
+        if (!isExisted) {
             return LoginResponse.createErrorResponse(LoginResponse.Error.ROLE_NOT_EXISTED);
         }
 
         String token = jwtUtils.generateToken(user.getPhone(), role);
         Integer userId = user.getId();
-        return LoginResponse.createSuccessResponse(token,role,userId,spaId);
+        return LoginResponse.createSuccessResponse(token, role, userId, spaId);
     }
 
     @GetMapping("/spaservice/findbyspapackageid")
-    public Response findSpaServiceBySpaPackageId(@RequestParam Integer spaPackageId){
+    public Response findSpaServiceBySpaPackageId(@RequestParam Integer spaPackageId) {
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
         return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackage));
     }
 
     @GetMapping("/getallspapackage")
-    public Response getAllSpaPackage(Pageable pageable){
+    public Response getAllSpaPackage(Pageable pageable) {
         Page<SpaPackage> spaPackages =
                 spaPackageService.findAllStatusAvailable(pageable);
-        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+        if (!spaPackages.hasContent() && !spaPackages.isFirst()) {
             spaPackages = spaPackageService
-                    .findAllStatusAvailable(PageRequest.of(spaPackages.getTotalPages()-1,
+                    .findAllStatusAvailable(PageRequest.of(spaPackages.getTotalPages() - 1,
                             spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
@@ -283,20 +299,20 @@ public class PublicController {
 
     @GetMapping("/spapackage/findbycategoryId")
     public Response findSpaPackageByCategoryId(@RequestParam Integer categoryId,
-                                               Pageable pageable){
+                                               Pageable pageable) {
         Page<SpaPackage> spaPackages =
                 spaPackageService.findByCategoryIdOrderByDate(categoryId, pageable);
-        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+        if (!spaPackages.hasContent() && !spaPackages.isFirst()) {
             spaPackages = spaPackageService
                     .findByCategoryIdOrderByDate(categoryId,
-                            PageRequest.of(spaPackages.getTotalPages()-1,
+                            PageRequest.of(spaPackages.getTotalPages() - 1,
                                     spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
     @PostMapping("/image/upload")
-    public String testUpdateImage(@RequestParam("file")MultipartFile file){
-       return FunctionSupport.uploadImage(file);
+    public String testUpdateImage(@RequestParam("file") MultipartFile file) {
+        return FunctionSupport.uploadImage(file);
     }
 }

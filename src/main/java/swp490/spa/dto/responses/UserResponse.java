@@ -23,6 +23,8 @@ public class UserResponse {
     private String birthdate;
     @JsonProperty("email")
     private String email;
+    @JsonProperty("image")
+    private String image;
     @JsonProperty("address")
     private String address;
     @JsonProperty("isActive")

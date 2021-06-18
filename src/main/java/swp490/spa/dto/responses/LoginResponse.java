@@ -31,9 +31,11 @@ public class LoginResponse {
         WRONG_PASSWORD(2,"Sai mật khẩu, vui lòng kiểm tra lại"),
         ROLE_NOT_EXISTED(3,"Role này không tồn tại"),
         BLANK_FIELD(4,"Không đầy đủ field"),
-        CUSTOMER_NOT_EXISTED(5, "Nhân viên không tồn tại"),
-        MANAGER_NOT_EXISTED(5, "Quản lý không tồn tại"),
-        ADMIN_NOT_EXISTED(5, "Admin không tồn tại");
+        CUSTOMER_NOT_EXISTED(5, "Customer không tồn tại"),
+        MANAGER_NOT_EXISTED(5, "Manager không tồn tại"),
+        ADMIN_NOT_EXISTED(5, "Admin không tồn tại"),
+        CONSULTANT_NOT_EXISTED(5, "Consultant không tồn tại"),
+        STAFF_NOT_EXISTED(5, "Staff không tồn tại");
 
         private final int code;
         private final String message;
