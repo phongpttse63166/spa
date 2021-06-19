@@ -28,7 +28,7 @@ public class Category implements Serializable {
     @Column(name = "create_by")
     private Integer createBy;
     @Column(name = "status")
-    private String status;
+    private Status status;
     @ManyToOne
     @JoinColumn(name = "spa_id")
     private Spa spa;

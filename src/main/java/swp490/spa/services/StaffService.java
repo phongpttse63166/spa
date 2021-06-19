@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import swp490.spa.entities.Staff;
 import swp490.spa.repositories.StaffRepository;
 
+import java.util.List;
+
 @Service
 public class StaffService {
     @Autowired
@@ -12,5 +14,9 @@ public class StaffService {
 
     public Staff findByStaffId(Integer userId){
         return this.staffRepository.findByUserId(userId);
+    }
+
+    public List<Staff> findBySpaId(Integer spaId) {
+        return this.staffRepository.findBySpa_Id(spaId);
     }
 }

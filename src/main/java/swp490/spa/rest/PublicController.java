@@ -17,7 +17,7 @@ import swp490.spa.services.*;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
 import swp490.spa.services.SpaService;
-import swp490.spa.utils.support.FunctionSupport;
+import swp490.spa.utils.support.UploadImage;
 import swp490.spa.utils.support.GenerationOTP;
 import swp490.spa.utils.support.Notification;
 
@@ -78,7 +78,7 @@ public class PublicController {
     }
 
     @GetMapping("/category/findall")
-    public Response findCategoryByStatus(@RequestParam String status, Pageable pageable) {
+    public Response findCategoryByStatus(@RequestParam Status status, Pageable pageable) {
         Page<Category> categories = categoryService.findAllByStatus(status, pageable);
         if (!categories.hasContent() && !categories.isFirst()) {
             categories = categoryService.findAllByStatus(status,
@@ -313,6 +313,6 @@ public class PublicController {
 
     @PostMapping("/image/upload")
     public String testUpdateImage(@RequestParam("file") MultipartFile file) {
-        return FunctionSupport.uploadImage(file);
+        return UploadImage.uploadImage(file);
     }
 }

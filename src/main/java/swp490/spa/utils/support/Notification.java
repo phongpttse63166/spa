@@ -24,4 +24,5 @@ public class Notification {
     public static final String SPA_TREATMENT_SERVICE_INSERT_FAIL = "Tạo spa treatment service fail!";
     public static final String SPA_TREATMENT_SERVICE_INSERT_SUCCESS = "Tạo spa treatment-service thành công!";
     public static final String STAFF_NOT_EXISTED = "Staff không tồn tại";
+    public static final String EDIT_USER_LOCATION_FAIL = "Cập nhật user location thất bại";
 }

@@ -27,8 +27,6 @@ public class SpaPackage implements Serializable {
     private String image;
     @Column(name = "type")
     private Type type;
-    @Column(name = "total_slot")
-    private Integer totalSlot;
     @Column(name = "status")
     private Status status;
     @Column(name = "create_time")

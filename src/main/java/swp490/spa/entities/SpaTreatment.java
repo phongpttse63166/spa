@@ -29,6 +29,8 @@ public class SpaTreatment implements Serializable {
     private String name;
     @Column(name = "description")
     private String description;
+    @Column(name = "total_time")
+    private Integer totalTime;
     @Column(name = "create_time")
     private Date createTime;
     @Column(name = "create_by")
@@ -44,11 +46,12 @@ public class SpaTreatment implements Serializable {
     private Set<TreatmentService> treatmentServices;
 
     public SpaTreatment(String name, String description,
-                        Date createTime , Integer createBy,
-                        SpaPackage spaPackage, Spa spa,
-                        List<TreatmentService> treatmentServices){
+                        Integer totalTime, Date createTime ,
+                        Integer createBy, SpaPackage spaPackage,
+                        Spa spa, List<TreatmentService> treatmentServices){
         this.name = name;
         this.description = description;
+        this.totalTime = totalTime;
         this.createTime = createTime;
         this.createBy = createBy;
         this.spaPackage = spaPackage;

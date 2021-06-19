@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import swp490.spa.entities.Spa;
+import swp490.spa.entities.Status;
 
 import java.sql.Date;
 
@@ -25,7 +26,7 @@ public class CategoryResponse {
     @JsonProperty("create_by")
     private Integer createBy;
     @JsonProperty("status")
-    private String status;
+    private Status status;
     @JsonProperty("spa")
     private Spa spa;
 }

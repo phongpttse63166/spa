@@ -50,4 +50,8 @@ public class SpaTreatmentService {
         Page<SpaTreatment> pageToReturn = new PageImpl<>(result.subList(start, end), pageRequest, result.size());
         return pageToReturn;
     }
+
+    public SpaTreatment findTreatmentBySpaPackageIdWithTypeOneStep(Integer spaPackageId) {
+        return this.spaTreatmentRepository.findBySpaPackage_Id(spaPackageId);
+    }
 }

@@ -4,23 +4,17 @@ import lombok.*;
 import swp490.spa.entities.Status;
 import swp490.spa.entities.Type;
 
-import java.sql.Date;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class SpaPackageCreateRequest {
+public class SpaServiceCreateRequest {
     private String name;
     private String description;
-    private String image;
-    private Type type;
+    private Double price;
     private Status status;
-    private Date createTime;
+    private Type type;
+    private Integer durationMin;
     private Integer createBy;
-    private Integer categoryId;
-    private Integer spaId;
-    private List<Integer> listSpaServiceId;
 }

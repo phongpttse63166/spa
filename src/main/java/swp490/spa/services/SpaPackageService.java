@@ -67,4 +67,8 @@ public class SpaPackageService {
     public Page<SpaPackage> findByCategoryIdOrderByDate(Integer categoryId, Pageable pageable) {
         return this.spaPackageRepository.findByCategory_IdOrderByCreateTimeDesc(categoryId, pageable);
     }
+
+    public List<SpaPackage> findByCategoryId(Integer categoryId) {
+        return this.spaPackageRepository.findByCategory_Id(categoryId);
+    }
 }

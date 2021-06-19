@@ -17,4 +17,8 @@ public class UserLocationService {
     public UserLocation insertNewUserLocation(UserLocation userLocation){
         return this.userLocationrepository.save(userLocation);
     }
+
+    public UserLocation editUserLocation(UserLocation userLocationUpdate) {
+        return this.userLocationrepository.save(userLocationUpdate);
+    }
 }

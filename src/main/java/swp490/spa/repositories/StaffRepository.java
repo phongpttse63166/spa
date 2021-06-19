@@ -5,8 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.Staff;
 
+import java.util.List;
+
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, Integer> {
     @Query("FROM Staff s WHERE s.user.id = ?1")
     Staff findByUserId(Integer userId);
+
+    List<Staff> findBySpa_Id(Integer spaId);
 }

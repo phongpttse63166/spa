@@ -23,8 +23,6 @@ public class SpaPackageResponse {
     private String image;
     @JsonProperty("type")
     private Type type;
-    @JsonProperty("total_slot")
-    private Integer totalSlot;
     @JsonProperty("status")
     private Status status;
     @JsonProperty("create_time")
