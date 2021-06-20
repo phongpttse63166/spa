@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
+import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.Staff;
 import swp490.spa.entities.User;
@@ -53,4 +54,17 @@ public class StaffController {
         return ResponseHelper.error(Notification.STAFF_NOT_EXISTED);
     }
 
+    @PutMapping("/editpassword")
+    public Response editPassword(@RequestBody AccountPasswordRequest account){
+        Staff staff = staffService.findByStaffId(account.getId());
+        User oldUser = staff.getUser();
+        User updateUser = staff.getUser();
+        updateUser.setPassword(account.getPassword());
+        if(Objects.nonNull(userService.editUser(updateUser))){
+            return ResponseHelper.ok(updateUser);
+        } else {
+            userService.editUser(oldUser);
+            return ResponseHelper.error("");
+        }
+    }
 }

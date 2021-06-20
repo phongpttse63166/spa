@@ -16,4 +16,8 @@ public class BookingDetailStepService {
     public List<BookingDetailStep> getAllByCurrentDateBooking(Date dateBooking) {
         return this.bookingDetailStepRepository.findByDateBookingOrderByStaffAscStartTimeAsc(dateBooking);
     }
+
+    public BookingDetailStep insertBookingDetailStep(BookingDetailStep bookingDetailStep) {
+        return this.bookingDetailStepRepository.save(bookingDetailStep);
+    }
 }

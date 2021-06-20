@@ -2,23 +2,29 @@ package swp490.spa.utils.support;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import swp490.spa.entities.BookingDetailStep;
-import swp490.spa.entities.Staff;
+import swp490.spa.entities.User;
 import swp490.spa.services.BookingDetailStepService;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
 import java.util.*;
 
 public class SupportFunctions {
     @Autowired
     public BookingDetailStepService bookingDetailStepService;
 
+    public SupportFunctions() {
+    }
     public SupportFunctions(BookingDetailStepService bookingDetailStepService) {
         this.bookingDetailStepService = bookingDetailStepService;
     }
 
-    public List<String> getBookTime(Integer totalTime, List<Staff> staffList, String dateBooking) {
+    public void setBookingDetailStepService(BookingDetailStepService bookingDetailStepService) {
+        this.bookingDetailStepService = bookingDetailStepService;
+    }
+
+    public List<String> getBookTime(Integer totalTime, List<User> userList,
+                                    String dateBooking, String isStaff) {
         List<BookingDetailStep> bookingDetailStepList = new ArrayList<>();
         Map<Integer, List<BookingDetailStep>> map = new HashMap<>();
         bookingDetailStepList = bookingDetailStepService.getAllByCurrentDateBooking(Date.valueOf(dateBooking));
@@ -26,14 +32,20 @@ public class SupportFunctions {
         Time timeAdd = null;
         int loop = -1;
         if(bookingDetailStepList.size()!=0){
-            for (Staff staff : staffList) {
+            for (User user : userList) {
                 List<BookingDetailStep> listAddIntoMap = new ArrayList<>();
                 for (BookingDetailStep bookingDetailStep : bookingDetailStepList) {
-                    if (bookingDetailStep.getStaff().getId().equals(staff.getId())) {
-                        listAddIntoMap.add(bookingDetailStep);
+                    if(isStaff.equalsIgnoreCase("true")){
+                        if (bookingDetailStep.getStaff().getId().equals(user.getId())) {
+                            listAddIntoMap.add(bookingDetailStep);
+                        }
+                    } else {
+                        if (bookingDetailStep.getConsultant().getId().equals(user.getId())) {
+                            listAddIntoMap.add(bookingDetailStep);
+                        }
                     }
                 }
-                map.put(staff.getId(), listAddIntoMap);
+                map.put(user.getId(), listAddIntoMap);
             }
             for (Map.Entry<Integer, List<BookingDetailStep>> entry : map.entrySet()) {
                 String bookTimeFinal = "";

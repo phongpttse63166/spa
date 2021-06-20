@@ -5,8 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.Consultant;
 
+import java.util.List;
+
 @Repository
 public interface ConsultantRepository extends JpaRepository<Consultant, Integer>{
     @Query("FROM Consultant c WHERE c.user.id = ?1")
     Consultant findConsultantByUserId(Integer userId);
+
+    List<Consultant> findBySpa_Id(Integer spaId);
 }

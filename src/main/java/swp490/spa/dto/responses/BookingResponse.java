@@ -19,18 +19,14 @@ public class BookingResponse {
     private Integer id;
     @JsonProperty("total_price")
     private Double totalPrice;
-    @JsonProperty("total_slot")
-    private Integer totalSlot;
+    @JsonProperty("total_time")
+    private Integer totalTime;
     @JsonProperty("status_booking")
     private StatusBooking statusBooking;
-    @JsonProperty("date_booking")
-    private Date dateBooking;
     @JsonProperty("create_time")
     private Date createTime;
     @JsonProperty("customer")
     private Customer customer;
-    @JsonProperty("consultant")
-    private Consultant consultant;
-    @JsonProperty("spa_id")
+    @JsonProperty("spa")
     private Spa spa;
 }

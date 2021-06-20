@@ -259,7 +259,7 @@ public class PublicController {
             case "ADMIN":
                 break;
             case "CONSULTANT":
-                Consultant consultant = consultantService.findConsultantByUserId(user.getId());
+                Consultant consultant = consultantService.findByConsultantId(user.getId());
                 if (Objects.isNull(consultant)) {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.CONSULTANT_NOT_EXISTED);
                 }

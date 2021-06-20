@@ -23,6 +23,8 @@ public class SpaTreatmentResponse {
     private String name;
     @JsonProperty("description")
     private String description;
+    @JsonProperty("total_price")
+    private Double totalPrice;
     @JsonProperty("total_time")
     private Integer totalTime;
     @JsonProperty("create_time")

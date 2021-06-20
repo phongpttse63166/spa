@@ -25,4 +25,9 @@ public class Notification {
     public static final String SPA_TREATMENT_SERVICE_INSERT_SUCCESS = "Tạo spa treatment-service thành công!";
     public static final String STAFF_NOT_EXISTED = "Staff không tồn tại";
     public static final String EDIT_USER_LOCATION_FAIL = "Cập nhật user location thất bại";
+    public static final String SPA_TREATMENT_NOT_EXISTED = "Spa treatment không tồn tại";
+    public static final String BOOKING_CREATE_FAILED = "Tạo Booking thất bại";
+    public static final String BOOKING_DETAIL_CREATE_FAILED = "Tạo Booking Detail thất bại";
+    public static final String BOOKING_DETAIL_STEP_CREATE_FAILED = "Tạo Booking Detail Step thất bại";
+    public static final String BOOKING_CREATE_SUCCESS = "Tạo Booking thành công";
 }

@@ -5,12 +5,18 @@ import org.springframework.stereotype.Service;
 import swp490.spa.entities.Consultant;
 import swp490.spa.repositories.ConsultantRepository;
 
+import java.util.List;
+
 @Service
 public class ConsultantService {
     @Autowired
     ConsultantRepository consultantRepository;
 
-    public Consultant findConsultantByUserId(Integer userId){
-        return this.consultantRepository.findConsultantByUserId(userId);
+    public Consultant findByConsultantId(Integer consultanId){
+        return this.consultantRepository.findConsultantByUserId(consultanId);
+    }
+
+    public List<Consultant> findBySpaId(Integer spaId) {
+        return this.consultantRepository.findBySpa_Id(spaId);
     }
 }

@@ -18,8 +18,8 @@ public class BookingDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "total_slot")
-    private Integer totalSlot;
+    @Column(name = "total_time")
+    private Integer totalTime;
     @Column(name = "type")
     private Type type;
     @ManyToOne

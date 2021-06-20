@@ -1,7 +1,10 @@
 package swp490.spa.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,6 +14,8 @@ import java.sql.Time;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "booking_detail_step", schema = "public")
 public class BookingDetailStep implements Serializable {
     @Id
@@ -33,9 +38,13 @@ public class BookingDetailStep implements Serializable {
     @JoinColumn(name = "staff_id")
     private Staff staff;
     @ManyToOne
+    @JoinColumn(name = "consultant_id")
+    private Consultant consultant;
+    @ManyToOne
     @JoinColumn(name = "booking_detail_id")
     private BookingDetail bookingDetail;
     @OneToOne
+    @JsonBackReference
     private Rating rating;
 
     public Integer getId() {
@@ -100,6 +109,14 @@ public class BookingDetailStep implements Serializable {
 
     public void setStaff(Staff staff) {
         this.staff = staff;
+    }
+
+    public Consultant getConsultant() {
+        return consultant;
+    }
+
+    public void setConsultant(Consultant consultant) {
+        this.consultant = consultant;
     }
 
     public BookingDetail getBookingDetail() {

@@ -1,5 +1,7 @@
 package swp490.spa.utils.support;
 
+import java.sql.Time;
+
 public class Constant {
     public static final int PAGE_DEFAULT = 0;
     public static final int SIZE_DEFAULT = 20;
@@ -10,4 +12,5 @@ public class Constant {
     public static final String TIME_END_RELAX = "21:00:00";
     public static final int TIME_BETWEEN_TWO_BOOKING = 10;
     public static final int SIZE_MAX = 50;
+    public static final String TIME_DEFAULT = "00:00:00";
 }

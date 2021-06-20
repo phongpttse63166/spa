@@ -15,8 +15,8 @@ import swp490.spa.entities.Type;
 public class BookingDetailResponse {
     @JsonProperty("id")
     private Integer id;
-    @JsonProperty("total_slot")
-    private Integer totalSlot;
+    @JsonProperty("total_time")
+    private Integer totalTime;
     @JsonProperty("type")
     private Type type;
     @JsonProperty("booking")

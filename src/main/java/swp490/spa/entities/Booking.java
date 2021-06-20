@@ -22,20 +22,15 @@ public class Booking implements Serializable {
     private Integer id;
     @Column(name = "total_price")
     private Double totalPrice;
-    @Column(name = "total_slot")
-    private Integer totalSlot;
+    @Column(name = "total_time")
+    private Integer totalTime;
     @Column(name = "status_booking")
     private StatusBooking statusBooking;
-    @Column(name = "date_booking")
-    private Date dateBooking;
     @Column(name = "create_time")
     private Date createTime;
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
-    @ManyToOne
-    @JoinColumn(name = "consultant_id")
-    private Consultant consultant;
     @ManyToOne
     @JoinColumn(name = "spa_id")
     private Spa spa;

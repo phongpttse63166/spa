@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,7 +18,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Table(name = "treatment_service", schema = "public")
-public class TreatmentService implements Serializable {
+public class TreatmentService implements Serializable, Comparable<TreatmentService> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -50,5 +51,10 @@ public class TreatmentService implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(spaTreatment.getName(), spaService.getName(), ordinal);
+    }
+
+    @Override
+    public int compareTo(@NotNull TreatmentService treatmentService) {
+        return this.getOrdinal()-treatmentService.getOrdinal();
     }
 }

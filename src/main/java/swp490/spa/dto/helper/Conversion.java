@@ -95,6 +95,7 @@ public class Conversion {
                 .map(spaTreatment -> new SpaTreatmentResponse(spaTreatment.getId(),
                         spaTreatment.getName(),
                         spaTreatment.getDescription(),
+                        spaTreatment.getTotalPrice(),
                         spaTreatment.getTotalTime(),
                         spaTreatment.getCreateTime(),
                         spaTreatment.getCreateBy(),

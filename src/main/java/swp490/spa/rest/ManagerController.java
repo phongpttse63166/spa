@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
+import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.SpaPackageCreateRequest;
 import swp490.spa.dto.requests.SpaServiceCreateRequest;
 import swp490.spa.dto.requests.SpaTreatmentCreateRequest;
@@ -42,16 +43,19 @@ public class ManagerController {
     private swp490.spa.services.SpaService spaService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private UserService userService;
     private Conversion conversion;
 
     public ManagerController(ManagerService managerService, SpaServiceService spaServiceService,
                              SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
-                             swp490.spa.services.SpaService spaService){
+                             swp490.spa.services.SpaService spaService, UserService userService){
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
         this.spaTreatmentService = spaTreatmentService;
         this.spaService = spaService;
+        this.userService = userService;
         this.conversion = new Conversion();
     }
 
@@ -187,6 +191,7 @@ public class ManagerController {
         }
         int ordinal = 1;
         int totalTime = 0;
+        double totalPrice = 0.0;
         for (int i = 0; i < spaTreatmentRequest.getListSpaServiceId().size(); i++) {
             swp490.spa.entities.SpaService spaService =
                     spaServiceService.findBySpaId(spaTreatmentRequest.getListSpaServiceId().get(i));
@@ -197,12 +202,13 @@ public class ManagerController {
             ordinal++;
             treatmentServices.add(treatmentService);
             totalTime = totalTime + spaService.getDurationMin();
+            totalPrice = totalPrice + spaService.getPrice();
         }
         SpaTreatment spaTreatmentInsert = new SpaTreatment(spaTreatmentRequest.getName(),
                         spaTreatmentRequest.getDescription(), totalTime,
                         Date.valueOf(LocalDateTime.now().toLocalDate()),
                         spaTreatmentRequest.getCreateBy(),
-                        spaPackage, spa, treatmentServices);
+                        spaPackage, spa, treatmentServices, totalPrice);
         if(Objects.nonNull(spaTreatmentService.insertNewSpaTreatment(spaTreatmentInsert))){
             return ResponseHelper.ok(Notification.SPA_TREATMENT_SERVICE_INSERT_SUCCESS);
         }
@@ -277,5 +283,20 @@ public class ManagerController {
             return ResponseHelper.ok(pageReturn);
         }
         return ResponseHelper.error(Notification.CATEGORY_NOT_EXISTED);
+    }
+
+    @PutMapping("/editpassword")
+    public Response editPassword(@RequestBody AccountPasswordRequest account){
+        Manager manager = managerService.findManagerById(account.getId());
+        User oldUser = manager.getUser();
+        User updateUser = manager.getUser();
+        updateUser.setPassword(account.getPassword());
+        if(Objects.nonNull(userService.editUser(updateUser))){
+            return ResponseHelper.ok(updateUser);
+        } else {
+            userService.editUser(oldUser);
+            return ResponseHelper.error("");
+        }
+
     }
 }

@@ -29,6 +29,8 @@ public class SpaTreatment implements Serializable {
     private String name;
     @Column(name = "description")
     private String description;
+    @Column(name = "total_price")
+    private Double totalPrice;
     @Column(name = "total_time")
     private Integer totalTime;
     @Column(name = "create_time")
@@ -48,13 +50,15 @@ public class SpaTreatment implements Serializable {
     public SpaTreatment(String name, String description,
                         Integer totalTime, Date createTime ,
                         Integer createBy, SpaPackage spaPackage,
-                        Spa spa, List<TreatmentService> treatmentServices){
+                        Spa spa, List<TreatmentService> treatmentServices,
+                        Double totalPrice){
         this.name = name;
         this.description = description;
         this.totalTime = totalTime;
         this.createTime = createTime;
         this.createBy = createBy;
         this.spaPackage = spaPackage;
+        this.totalPrice = totalPrice;
         this.spa = spa;
         for(TreatmentService treatmentService : treatmentServices) treatmentService.setSpaTreatment(this);
         this.treatmentServices = new HashSet<>(treatmentServices);

@@ -29,6 +29,8 @@ public class BookingDetailStepResponse {
     private TreatmentService treatmentService;
     @JsonProperty("staff")
     private Staff staff;
+    @JsonProperty("consultant")
+    private Consultant consultant;
     @JsonProperty("booking_detail")
     private BookingDetail bookingDetail;
 }
