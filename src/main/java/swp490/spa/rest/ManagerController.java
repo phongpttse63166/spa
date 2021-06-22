@@ -1,5 +1,7 @@
 package swp490.spa.rest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +33,7 @@ import java.util.Objects;
 @RestController
 @CrossOrigin
 public class ManagerController {
+    Logger LOGGER = LogManager.getLogger(ManagerController.class);
     @Autowired
     private ManagerService managerService;
     @Autowired
@@ -45,30 +48,34 @@ public class ManagerController {
     private CategoryService categoryService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private DateOffService dateOffService;
     private Conversion conversion;
 
     public ManagerController(ManagerService managerService, SpaServiceService spaServiceService,
                              SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
-                             swp490.spa.services.SpaService spaService, UserService userService){
+                             swp490.spa.services.SpaService spaService, UserService userService,
+                             DateOffService dateOffService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
         this.spaTreatmentService = spaTreatmentService;
         this.spaService = spaService;
         this.userService = userService;
+        this.dateOffService = dateOffService;
         this.conversion = new Conversion();
     }
 
     @GetMapping("/search/{userId}")
-    public Response findManagerById(@PathVariable Integer userId){
+    public Response findManagerById(@PathVariable Integer userId) {
         Manager manager = managerService.findManagerById(userId);
         return ResponseHelper.ok(manager);
     }
 
     @PostMapping("/spaservice/create")
-    public Response createNewSpaService(@RequestBody SpaServiceCreateRequest spaServiceCreateRequest){
+    public Response createNewSpaService(@RequestBody SpaServiceCreateRequest spaServiceCreateRequest) {
         Manager manager = managerService.findManagerById(spaServiceCreateRequest.getCreateBy());
-        if(Objects.isNull(manager)){
+        if (Objects.isNull(manager)) {
             return ResponseHelper.error(Notification.MANAGER_NOT_EXISTED);
         }
         Spa spa = manager.getSpa();
@@ -83,7 +90,7 @@ public class ManagerController {
         spaService.setCreateBy(spaServiceCreateRequest.getCreateBy().toString());
         spaService.setSpa(spa);
         SpaService serviceResult = spaServiceService.insertNewSpaService(spaService);
-        if(Objects.nonNull(serviceResult)){
+        if (Objects.nonNull(serviceResult)) {
             return ResponseHelper.ok(serviceResult);
         }
         return ResponseHelper.error(Notification.SERVICE_CREATE_FAIL);
@@ -91,52 +98,52 @@ public class ManagerController {
 
     @GetMapping("/spapackage/findbyspaid")
     public Response getSpaPackageBySpaId(@RequestParam Integer spaId,
-                                         @RequestParam String search ,
-                                         Pageable pageable){
+                                         @RequestParam String search,
+                                         Pageable pageable) {
         Page<SpaPackage> spaPackages =
-                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search ,pageable);
-        if(!spaPackages.hasContent() && !spaPackages.isFirst()){
+                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search, pageable);
+        if (!spaPackages.hasContent() && !spaPackages.isFirst()) {
             spaPackages = spaPackageService
                     .findSpaPackageBySpaIdAndStatusAvailable(spaId, search,
-                            PageRequest.of(spaPackages.getTotalPages()-1,
-                            spaPackages.getSize(), spaPackages.getSort()));
+                            PageRequest.of(spaPackages.getTotalPages() - 1,
+                                    spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
     @GetMapping("/spatreatment/findbypackageId")
     public Response findSpaTreatmentByPackageId(@RequestParam Integer packageId,
-                                            @RequestParam String search, Pageable pageable){
+                                                @RequestParam String search, Pageable pageable) {
         Page<SpaTreatment> spaTreatments =
                 spaTreatmentService.findByPackageId(packageId, search, pageable);
-        if(!spaTreatments.hasContent() && !spaTreatments.isFirst()){
+        if (!spaTreatments.hasContent() && !spaTreatments.isFirst()) {
             spaTreatments = spaTreatmentService.findByPackageId(packageId, search,
-                    PageRequest.of(spaTreatments.getTotalPages()-1, spaTreatments.getSize(), spaTreatments.getSort()));
+                    PageRequest.of(spaTreatments.getTotalPages() - 1, spaTreatments.getSize(), spaTreatments.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 
     @GetMapping("/spaservice/findbyspaId")
     public Response findSpaServiceBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
-                                          @RequestParam String search, Pageable pageable){
+                                          @RequestParam String search, Pageable pageable) {
         Page<swp490.spa.entities.SpaService> spaServices =
                 spaServiceService.findBySpaIdAndStatus(spaId, status, search, pageable);
-        if(!spaServices.hasContent() && !spaServices.isFirst()){
+        if (!spaServices.hasContent() && !spaServices.isFirst()) {
             spaServices = spaServiceService.findBySpaIdAndStatus(spaId, status, search,
-                    PageRequest.of(spaServices.getTotalPages()-1, spaServices.getSize(), spaServices.getSort()));
+                    PageRequest.of(spaServices.getTotalPages() - 1, spaServices.getSize(), spaServices.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
     @PostMapping("/spapackageservices/insert")
-    public Response insertNewSpaPackageWithServices(@RequestBody SpaPackageCreateRequest spaPackage){
+    public Response insertNewSpaPackageWithServices(@RequestBody SpaPackageCreateRequest spaPackage) {
         List<SpaService> spaServices = new ArrayList<>();
         Category category = categoryService.findById(spaPackage.getCategoryId());
-        if(Objects.isNull(category)){
+        if (Objects.isNull(category)) {
             return ResponseHelper.error(Notification.CATEGORY_NOT_EXISTED);
         }
         Spa spa = spaService.findById(spaPackage.getSpaId());
-        if(Objects.isNull(spa)){
+        if (Objects.isNull(spa)) {
             return ResponseHelper.error(Notification.SPA_NOT_EXISTED);
         }
         SpaPackage spaPackageInsert = new SpaPackage();
@@ -150,43 +157,43 @@ public class ManagerController {
         spaPackageInsert.setType(spaPackage.getType());
         spaPackageInsert.setStatus(spaPackage.getStatus());
         SpaPackage spaPackageResult = spaPackageService.insertNewSpaPackage(spaPackageInsert);
-        if(Objects.isNull(spaPackageResult)){
+        if (Objects.isNull(spaPackageResult)) {
             return ResponseHelper.error(Notification.SPA_PACKAGE_CREATE_FAIL);
         }
         for (Integer serviceId : spaPackage.getListSpaServiceId()) {
             swp490.spa.entities.SpaService spaService = spaServiceService.findBySpaId(serviceId);
-            if(Objects.isNull(spaService)){
+            if (Objects.isNull(spaService)) {
                 ResponseHelper.error(Notification.SPA_SERVICE_NOT_EXISTED);
             }
             spaServices.add(spaService);
         }
         spaPackageResult.addListService(spaServices);
-        if(Objects.nonNull(spaPackageService.insertNewSpaPackage(spaPackageResult))){
+        if (Objects.nonNull(spaPackageService.insertNewSpaPackage(spaPackageResult))) {
             return ResponseHelper.ok(Notification.SPA_PACKAGE_SERVICE_INSERT_SUCCESS);
         }
         return ResponseHelper.error(Notification.SPA_PACKAGE_SERVICE_INSERT_FAIL);
     }
 
     @GetMapping("/spapackage/findbyserviceId")
-    public Response findSpaPackageBySpaServiceId(@RequestParam Integer spaServiceId ,
+    public Response findSpaPackageBySpaServiceId(@RequestParam Integer spaServiceId,
                                                  @RequestParam Integer spaId,
                                                  @RequestParam Integer page,
                                                  @RequestParam Integer size,
-                                                 @RequestParam String search){
+                                                 @RequestParam String search) {
         Page<SpaPackage> spaPackages =
                 spaPackageService.findAllBySpaServiceId(spaServiceId, spaId, page, size, search);
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
     @PostMapping("/spatreatmentservices/insert")
-    public Response insertNewSpaPackageWithServices(@RequestBody SpaTreatmentCreateRequest spaTreatmentRequest){
+    public Response insertNewSpaPackageWithServices(@RequestBody SpaTreatmentCreateRequest spaTreatmentRequest) {
         List<TreatmentService> treatmentServices = new ArrayList<>();
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaTreatmentRequest.getPackageId());
-        if(Objects.isNull(spaPackage)){
+        if (Objects.isNull(spaPackage)) {
             return ResponseHelper.error(Notification.SPA_PACKAGE_NOT_EXISTED);
         }
         Spa spa = spaService.findById(spaTreatmentRequest.getSpaId());
-        if(Objects.isNull(spa)){
+        if (Objects.isNull(spa)) {
             return ResponseHelper.error(Notification.SPA_NOT_EXISTED);
         }
         int ordinal = 1;
@@ -195,21 +202,21 @@ public class ManagerController {
         for (int i = 0; i < spaTreatmentRequest.getListSpaServiceId().size(); i++) {
             swp490.spa.entities.SpaService spaService =
                     spaServiceService.findBySpaId(spaTreatmentRequest.getListSpaServiceId().get(i));
-            if(Objects.isNull(spaService)){
+            if (Objects.isNull(spaService)) {
                 ResponseHelper.error(Notification.SPA_SERVICE_NOT_EXISTED);
             }
-            TreatmentService treatmentService = new TreatmentService(spaService,ordinal);
+            TreatmentService treatmentService = new TreatmentService(spaService, ordinal);
             ordinal++;
             treatmentServices.add(treatmentService);
             totalTime = totalTime + spaService.getDurationMin();
             totalPrice = totalPrice + spaService.getPrice();
         }
         SpaTreatment spaTreatmentInsert = new SpaTreatment(spaTreatmentRequest.getName(),
-                        spaTreatmentRequest.getDescription(), totalTime,
-                        Date.valueOf(LocalDateTime.now().toLocalDate()),
-                        spaTreatmentRequest.getCreateBy(),
-                        spaPackage, spa, treatmentServices, totalPrice);
-        if(Objects.nonNull(spaTreatmentService.insertNewSpaTreatment(spaTreatmentInsert))){
+                spaTreatmentRequest.getDescription(), totalTime,
+                Date.valueOf(LocalDateTime.now().toLocalDate()),
+                spaTreatmentRequest.getCreateBy(),
+                spaPackage, spa, treatmentServices, totalPrice);
+        if (Objects.nonNull(spaTreatmentService.insertNewSpaTreatment(spaTreatmentInsert))) {
             return ResponseHelper.ok(Notification.SPA_TREATMENT_SERVICE_INSERT_SUCCESS);
         }
         return ResponseHelper.error(Notification.SPA_TREATMENT_SERVICE_INSERT_FAIL);
@@ -220,7 +227,7 @@ public class ManagerController {
                                                    @RequestParam Integer spaId,
                                                    @RequestParam Integer page,
                                                    @RequestParam Integer size,
-                                                   @RequestParam String search){
+                                                   @RequestParam String search) {
         Page<SpaTreatment> spaTreatments =
                 spaTreatmentService.findAllBySpaServiceId(spaServiceId, spaId, page, size, search);
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
@@ -229,12 +236,12 @@ public class ManagerController {
     @GetMapping("/spapackagetreatment/findbyspaId")
     public Response findSpaPackageTreatmentBySpaId(@RequestParam Integer spaId,
                                                    @RequestParam String search,
-                                                   Pageable pageable){
+                                                   Pageable pageable) {
         List<SpaPackageTreatmentResponse> result = new ArrayList<>();
         Page<SpaPackage> spaPackages =
-                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search ,pageable);
+                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search, pageable);
         int totalItem = (int) spaPackages.getTotalElements();
-        if(spaPackages.getContent().size()!=0 && !spaPackages.getContent().isEmpty()){
+        if (spaPackages.getContent().size() != 0 && !spaPackages.getContent().isEmpty()) {
             for (SpaPackage spaPackage : spaPackages.getContent()) {
                 List<SpaTreatment> spaTreatments = new ArrayList<>();
                 SpaPackageTreatmentResponse sptr = new SpaPackageTreatmentResponse();
@@ -242,39 +249,39 @@ public class ManagerController {
                 spaTreatments =
                         spaTreatmentService.findByPackageId(spaPackage.getId(),
                                 Constant.SEARCH_NO_CONTENT,
-                                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT)).toList();
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT)).toList();
                 sptr.setSpaTreatments(spaTreatments);
                 result.add(sptr);
             }
         }
-        Page<SpaPackageTreatmentResponse> page = new PageImpl<>(result,pageable,totalItem);
+        Page<SpaPackageTreatmentResponse> page = new PageImpl<>(result, pageable, totalItem);
         return ResponseHelper.ok(conversion.convertToPageSpaPackageTreatmentResponse(page));
     }
 
     @GetMapping("/spaservice/findbyspaidandtype")
     public Response findSpaServiceBySpaIdAndType(@RequestParam Integer spaId,
-                                                         @RequestParam Type type,
-                                                         @RequestParam String search,
-                                                         Pageable pageable){
+                                                 @RequestParam Type type,
+                                                 @RequestParam String search,
+                                                 Pageable pageable) {
         Page<SpaService> spaServices = spaServiceService.findBySpaIdAndType(spaId, type, search, pageable);
-        if(!spaServices.hasContent() && !spaServices.isFirst()){
+        if (!spaServices.hasContent() && !spaServices.isFirst()) {
             spaServices = spaServiceService.findBySpaIdAndType(spaId, type, search,
-                    PageRequest.of(spaServices.getTotalPages()-1, spaServices.getSize(), spaServices.getSort()));
+                    PageRequest.of(spaServices.getTotalPages() - 1, spaServices.getSize(), spaServices.getSort()));
         }
-            return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
+        return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
     @GetMapping("/categoryspapackages/findbyspaId")
     public Response findCategorySpaPackagesBySpaId(@RequestParam Integer spaId,
                                                    @RequestParam Status status,
-                                                   Pageable pageable){
+                                                   Pageable pageable) {
         List<Category> categories =
                 categoryService.findCategoryBySpaId(spaId, status, pageable).getContent();
-        if(Objects.nonNull(categories)){
+        if (Objects.nonNull(categories)) {
             List<CategorySpaPackageResponse> categorySpaPackageResponses = new ArrayList<>();
             for (Category category : categories) {
                 List<SpaPackage> spaPackages = spaPackageService.findByCategoryId(category.getId());
-                CategorySpaPackageResponse cspr = new CategorySpaPackageResponse(category,spaPackages);
+                CategorySpaPackageResponse cspr = new CategorySpaPackageResponse(category, spaPackages);
                 categorySpaPackageResponses.add(cspr);
             }
             Page<CategorySpaPackageResponse> pageReturn =
@@ -286,17 +293,42 @@ public class ManagerController {
     }
 
     @PutMapping("/editpassword")
-    public Response editPassword(@RequestBody AccountPasswordRequest account){
+    public Response editPassword(@RequestBody AccountPasswordRequest account) {
         Manager manager = managerService.findManagerById(account.getId());
         User oldUser = manager.getUser();
         User updateUser = manager.getUser();
         updateUser.setPassword(account.getPassword());
-        if(Objects.nonNull(userService.editUser(updateUser))){
+        if (Objects.nonNull(userService.editUser(updateUser))) {
             return ResponseHelper.ok(updateUser);
         } else {
             userService.editUser(oldUser);
             return ResponseHelper.error("");
         }
 
+    }
+
+    @PutMapping("/dateoff/edit")
+    public Response verifyDateBook(@RequestBody List<DateOff> dateOffList) {
+        boolean isError = false;
+        for (DateOff dateOff : dateOffList) {
+            DateOff dateOffResult = dateOffService.findDateOffById(dateOff.getId());
+            if (Objects.isNull(dateOffResult)) {
+                LOGGER.info(dateOff.getId() + "is not existed");
+                isError = true;
+            } else {
+                dateOffResult.setStatusDateOff(dateOff.getStatusDateOff());
+                if (dateOff.getReasonCancel() != "" || dateOff.getReasonCancel().isEmpty()) {
+                    dateOffResult.setReasonCancel(dateOff.getReasonCancel());
+                }
+            }
+            if(Objects.isNull(dateOffService.editDateOff(dateOffResult))){
+                LOGGER.info(dateOff.getId() + "edit failed");
+                isError = true;
+            }
+        }
+        if(isError){
+            return ResponseHelper.error(Notification.DATEOFF_EDIT_FAILED);
+        }
+        return ResponseHelper.ok(Notification.DATEOFF_EDIT_SUCCESS);
     }
 }

@@ -1,5 +1,7 @@
 package swp490.spa.rest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ import java.util.*;
 @RequestMapping("/api/customer")
 @CrossOrigin
 public class CustomerController {
+    private static final Logger LOGGER = LogManager.getLogger(CustomerController.class);
     @Autowired
     private CustomerService customerService;
     @Autowired
@@ -238,9 +241,9 @@ public class CustomerController {
                                         return ResponseHelper.error(Notification.BOOKING_DETAIL_STEP_CREATE_FAILED);
                                     }
                                 }
-                                return ResponseHelper.ok(Notification.BOOKING_CREATE_SUCCESS);
+                                LOGGER.info(Notification.BOOKING_CREATE_SUCCESS + booking);
                             }
-                            return ResponseHelper.error(Notification.BOOKING_DETAIL_CREATE_FAILED);
+                            LOGGER.info(Notification.BOOKING_DETAIL_CREATE_FAILED + bookingDetail);
                         }
                     }
                 }
@@ -257,7 +260,7 @@ public class CustomerController {
                                                 .findTreatmentBySpaPackageIdWithTypeOneStep(spaPackage.getId());
                                 BookingDetail bookingDetail = new BookingDetail();
                                 bookingDetail.setBooking(bookingResult);
-                                bookingDetail.setSpaPackage(spaTreatment.getSpaPackage());
+                                bookingDetail.setSpaPackage(spaPackage);
                                 bookingDetail.setSpaTreatment(spaTreatment);
                                 bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                                 bookingDetail.setType(Type.ONESTEP);
@@ -294,16 +297,17 @@ public class CustomerController {
                                         bookingDetailStep.setStartTime(startTime);
                                         bookingDetailStep.setEndTime(endTime);
                                         if (Objects.isNull(bookingDetailStepService.insertBookingDetailStep(bookingDetailStep))) {
-                                            return ResponseHelper.error(Notification.BOOKING_DETAIL_STEP_CREATE_FAILED);
+                                            LOGGER.info(Notification.BOOKING_DETAIL_STEP_CREATE_FAILED + bookingDetailStep);
                                         }
                                     }
-                                    return ResponseHelper.ok(Notification.BOOKING_CREATE_SUCCESS);
+                                    LOGGER.info(Notification.BOOKING_CREATE_SUCCESS + bookingResult);
                                 }
-                                return ResponseHelper.error(Notification.BOOKING_DETAIL_CREATE_FAILED);
+                                LOGGER.info(Notification.BOOKING_DETAIL_CREATE_FAILED + bookingDetail);
                             } else {
                                 BookingDetail bookingDetail = new BookingDetail();
                                 bookingDetail.setBooking(bookingResult);
-                                bookingDetail.setType(Type.ONESTEP);
+                                bookingDetail.setType(Type.MORESTEP);
+                                bookingDetail.setSpaPackage(spaPackage);
                                 bookingDetailResult = bookingDetailService
                                         .insertBookingDetail(bookingDetail);
                                 if (Objects.nonNull(bookingDetailResult)) {
@@ -313,14 +317,15 @@ public class CustomerController {
                                     bookingDetailStep.setBookingDetail(bookingDetailResult);
                                     bookingDetailStep.setStartTime(bookingData.getTimeBooking());
                                     if (Objects.isNull(bookingDetailStepService.insertBookingDetailStep(bookingDetailStep))) {
-                                        return ResponseHelper.error(Notification.BOOKING_DETAIL_STEP_CREATE_FAILED);
+                                        LOGGER.info(Notification.BOOKING_DETAIL_STEP_CREATE_FAILED + bookingDetailStep);
                                     }
                                 }
-                                return ResponseHelper.ok(Notification.BOOKING_CREATE_SUCCESS);
+
                             }
                         }
                     }
                 }
+                return ResponseHelper.ok(Notification.BOOKING_CREATE_SUCCESS);
             }
         }
         return ResponseHelper.error(Notification.BOOKING_CREATE_FAILED);

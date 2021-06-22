@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor
 public class Conversion {
-
     public Page<CategoryResponse> convertToPageCategoryResponse(Page<Category> categories) {
         List<CategoryResponse> categoryData = categories.getContent().stream()
                 .map(category -> new CategoryResponse(category.getId(),
@@ -149,6 +148,21 @@ public class Conversion {
                 .collect(Collectors.toList());
         long totalElements = page.getTotalElements();
         return new PageImpl<>(spaPackageTreatmentData, totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
+                totalElements);
+    }
+
+    public Page<BookingResponse> convertToPageBookingResponse(Page<Booking> page){
+        List<BookingResponse> bookingData = page.getContent().stream()
+                .map(booking -> new BookingResponse(booking.getId(),
+                        booking.getTotalPrice(),
+                        booking.getTotalTime(),
+                        booking.getStatusBooking(),
+                        booking.getCreateTime(),
+                        booking.getCustomer(),
+                        booking.getSpa()))
+                .collect(Collectors.toList());
+        long totalElements = page.getTotalElements();
+        return new PageImpl<>(bookingData, totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
                 totalElements);
     }
 }
