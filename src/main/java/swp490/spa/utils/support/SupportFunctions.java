@@ -15,6 +15,7 @@ public class SupportFunctions {
 
     public SupportFunctions() {
     }
+
     public SupportFunctions(BookingDetailStepService bookingDetailStepService) {
         this.bookingDetailStepService = bookingDetailStepService;
     }
@@ -31,26 +32,31 @@ public class SupportFunctions {
         List<String> timeResult = new ArrayList<>();
         Time timeAdd = null;
         int loop = -1;
-        if(bookingDetailStepList.size()!=0){
+        if (bookingDetailStepList.size() != 0) {
             for (User user : userList) {
                 List<BookingDetailStep> listAddIntoMap = new ArrayList<>();
                 for (BookingDetailStep bookingDetailStep : bookingDetailStepList) {
-                    if(isStaff.equalsIgnoreCase("true")){
-                        if(Objects.nonNull(bookingDetailStep.getStaff())){
+                    if (isStaff.equalsIgnoreCase("true")) {
+                        if(Objects.isNull(bookingDetailStep.getStaff())){
+                            if(Objects.isNull(bookingDetailStep.getConsultant())){
+                                listAddIntoMap.add(bookingDetailStep);
+                            }
+                        } else {
                             if (bookingDetailStep.getStaff().getId().equals(user.getId())) {
                                 listAddIntoMap.add(bookingDetailStep);
                             }
                         }
                     } else {
-                        if(Objects.nonNull(bookingDetailStep.getConsultant())){
+                        if(Objects.isNull(bookingDetailStep.getConsultant())){
+                            if(Objects.isNull(bookingDetailStep.getStaff())){
+                                listAddIntoMap.add(bookingDetailStep);
+                            }
+                        } else {
                             if (bookingDetailStep.getConsultant().getId().equals(user.getId())) {
                                 listAddIntoMap.add(bookingDetailStep);
                             }
                         }
                     }
-                }
-                if(listAddIntoMap.size()==0){
-                    listAddIntoMap = bookingDetailStepList;
                 }
                 map.put(user.getId(), listAddIntoMap);
             }
@@ -86,7 +92,7 @@ public class SupportFunctions {
                             for (int i = 0; i <= loop; i++) {
                                 if (i == 0) {
                                     int min = endTime.getMinutes();
-                                    if((min-5)%10 == 0){
+                                    if ((min - 5) % 10 == 0) {
                                         timeAdd = Time.valueOf(endTime.toLocalTime().plusMinutes(5));
                                     } else {
                                         timeAdd = endTime;
@@ -119,7 +125,7 @@ public class SupportFunctions {
                             for (int i = 0; i <= loop; i++) {
                                 if (i == 0) {
                                     int min = endTime.getMinutes();
-                                    if((min-5)%10 == 0){
+                                    if ((min - 5) % 10 == 0) {
                                         timeAdd = Time.valueOf(endTime.toLocalTime().plusMinutes(5));
                                     } else {
                                         timeAdd = endTime;
@@ -175,7 +181,7 @@ public class SupportFunctions {
                                     for (int k = 0; k <= loop; k++) {
                                         if (k == 0) {
                                             int min = bookingFirst.getEndTime().getMinutes();
-                                            if((min-5)%10 == 0){
+                                            if ((min - 5) % 10 == 0) {
                                                 timeAdd = Time.valueOf(bookingFirst.getEndTime().toLocalTime().plusMinutes(5));
                                             } else {
                                                 timeAdd = bookingFirst.getEndTime();
@@ -194,7 +200,7 @@ public class SupportFunctions {
                                         for (int k = 0; k <= loop; k++) {
                                             if (k == 0) {
                                                 int min = bookingSecond.getEndTime().getMinutes();
-                                                if((min-5)%10 == 0){
+                                                if ((min - 5) % 10 == 0) {
                                                     timeAdd = Time.valueOf(bookingSecond.getEndTime().toLocalTime().plusMinutes(5));
                                                 } else {
                                                     timeAdd = bookingSecond.getEndTime();
@@ -244,7 +250,7 @@ public class SupportFunctions {
                                     for (int k = 0; k <= loop; k++) {
                                         if (k == 0) {
                                             int min = bookingFirst.getEndTime().getMinutes();
-                                            if((min-5)%10 == 0){
+                                            if ((min - 5) % 10 == 0) {
                                                 timeAdd = Time.valueOf(bookingFirst.getEndTime().toLocalTime().plusMinutes(5));
                                             } else {
                                                 timeAdd = bookingFirst.getEndTime();
@@ -276,7 +282,7 @@ public class SupportFunctions {
                                         for (int k = 0; k <= loop; k++) {
                                             if (k == 0) {
                                                 int min = bookingFirst.getEndTime().getMinutes();
-                                                if((min-5)%10 == 0){
+                                                if ((min - 5) % 10 == 0) {
                                                     timeAdd = Time.valueOf(bookingFirst.getEndTime().toLocalTime().plusMinutes(5));
                                                 } else {
                                                     timeAdd = bookingFirst.getEndTime();
@@ -323,7 +329,7 @@ public class SupportFunctions {
                                     for (int k = 0; k <= loop; k++) {
                                         if (k == 0) {
                                             int min = bookingFirst.getEndTime().getMinutes();
-                                            if((min-5)%10 == 0){
+                                            if ((min - 5) % 10 == 0) {
                                                 timeAdd = Time.valueOf(bookingFirst.getEndTime().toLocalTime().plusMinutes(5));
                                             } else {
                                                 timeAdd = bookingFirst.getEndTime();
@@ -342,7 +348,7 @@ public class SupportFunctions {
                                         for (int k = 0; k <= loop; k++) {
                                             if (k == 0) {
                                                 int min = bookingFirst.getEndTime().getMinutes();
-                                                if((min-5)%10 == 0){
+                                                if ((min - 5) % 10 == 0) {
                                                     timeAdd = Time.valueOf(bookingFirst.getEndTime().toLocalTime().plusMinutes(5));
                                                 } else {
                                                     timeAdd = bookingFirst.getEndTime();

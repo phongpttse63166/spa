@@ -9,6 +9,5 @@ import swp490.spa.entities.StatusBooking;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
-    Page<Booking> findByStatusBookingAndSpa_IdAndCustomer_Id(StatusBooking status, Integer spaId,
-                                                              Integer customerId, Pageable pageable);
+    Page<Booking> findByStatusBookingAndSpa_Id(StatusBooking status, Integer spaId, Pageable pageable);
 }

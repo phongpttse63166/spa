@@ -19,10 +19,16 @@ public class BookingService {
 
     public Page<Booking> findByBookingStatusAndSpa(StatusBooking statusBooking,
                                                    Integer spaId,
-                                                   Integer customerId,
                                                    Pageable pageable) {
         return this.bookingRepository
-                .findByStatusBookingAndSpa_IdAndCustomer_Id(statusBooking, spaId,
-                        customerId, pageable);
+                .findByStatusBookingAndSpa_Id(statusBooking, spaId, pageable);
+    }
+
+    public Booking findByBookingId(Integer bookingId) {
+        return this.bookingRepository.findById(bookingId).get();
+    }
+
+    public Booking editBooking(Booking booking) {
+        return this.bookingRepository.save(booking);
     }
 }

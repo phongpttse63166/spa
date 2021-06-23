@@ -34,4 +34,16 @@ public class Notification {
     public static final String DATEOFF_CREATE_SUCCESS = "Tạo DateOff thành công";
     public static final String DATEOFF_EDIT_FAILED = "Cập nhật DateOff thất bại";
     public static final String DATEOFF_EDIT_SUCCESS = "Cập nhật DateOff thành công";
+    public static final String BOOKING_NOT_EXISTED = "Booking không tồn tại";
+    public static final String BOOKING_DETAIL_NOT_EXISTED = "Booking detail không tồn tại";
+    public static final String CONSULTANT_NOT_EXISTED = "Consultant không tồn tại";
+    public static final String BOOKING_DETAIL_EDIT_FAILED = "Cập nhật booking detail thất bại";
+    public static final String BOOKING_EDIT_FAILED = "Cập nhật booking thất bại";
+    public static final String BOOKING_DETAIL_EDIT_SUCCESS = "Cập nhật booking detail thành công";
+    public static final String CANNOT_BOOKING_AT_TIME = "Không thể booking tại thời gian đó vì không có nhân viên rảnh";
+    public static final String GET_BOOKING_DETAIL_STEP_FAILED = "Lấy list booking detail step thất bại";
+    public static final String EDIT_CATEGORY_SUCCESS = "Cập nhật category thành công";
+    public static final String EDIT_CATEGORY_FAILED = "Cập nhật category thất bại";
+    public static final String REMOVE_CATEGORY_SUCCESS = "Xóa category thành công";
+    public static final String REMOVE_CATEGORY_FAILED = "Xóa category thất bại";
 }

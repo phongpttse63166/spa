@@ -165,4 +165,18 @@ public class Conversion {
         return new PageImpl<>(bookingData, totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
                 totalElements);
     }
+
+    public Page<BookingDetailResponse> convertToPageBookingDetailResponse(Page<BookingDetail> page) {
+        List<BookingDetailResponse> bookingDetailData = page.getContent().stream()
+                .map(bookingDetail -> new BookingDetailResponse(bookingDetail.getId(),
+                        bookingDetail.getTotalTime(),
+                        bookingDetail.getType(),
+                        bookingDetail.getBooking(),
+                        bookingDetail.getSpaTreatment(),
+                        bookingDetail.getSpaPackage()))
+                .collect(Collectors.toList());
+        long totalElements = page.getTotalElements();
+        return new PageImpl<>(bookingDetailData,totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
+                totalElements);
+    }
 }

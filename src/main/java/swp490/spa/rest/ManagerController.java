@@ -331,4 +331,28 @@ public class ManagerController {
         }
         return ResponseHelper.ok(Notification.DATEOFF_EDIT_SUCCESS);
     }
+
+    @PutMapping("/category/edit")
+    public Response editCategory(@RequestBody Category category){
+        Category categoryResult = categoryService.editByCategoryId(category);
+        if(Objects.nonNull(categoryResult)){
+            LOGGER.info(category + " " + Notification.EDIT_CATEGORY_SUCCESS);
+            return ResponseHelper.ok(categoryResult);
+        }
+        LOGGER.info(category + " " + Notification.EDIT_CATEGORY_FAILED);
+        return ResponseHelper.error(Notification.EDIT_CATEGORY_FAILED);
+    }
+
+    @PutMapping("/category/delete")
+    public Response removeCategory(@RequestParam Integer categoryId){
+        Category categoryResult = categoryService.findById(categoryId);
+        if(Objects.nonNull(categoryResult)){
+            categoryResult.setStatus(Status.DISABLE);
+            if(categoryService.removeCategory(categoryResult)){
+                return ResponseHelper.ok(Notification.REMOVE_CATEGORY_SUCCESS);
+            }
+        }
+        return ResponseHelper.ok(Notification.REMOVE_CATEGORY_FAILED);
+    }
+
 }
