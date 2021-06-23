@@ -36,14 +36,21 @@ public class SupportFunctions {
                 List<BookingDetailStep> listAddIntoMap = new ArrayList<>();
                 for (BookingDetailStep bookingDetailStep : bookingDetailStepList) {
                     if(isStaff.equalsIgnoreCase("true")){
-                        if (bookingDetailStep.getStaff().getId().equals(user.getId())) {
-                            listAddIntoMap.add(bookingDetailStep);
+                        if(Objects.nonNull(bookingDetailStep.getStaff())){
+                            if (bookingDetailStep.getStaff().getId().equals(user.getId())) {
+                                listAddIntoMap.add(bookingDetailStep);
+                            }
                         }
                     } else {
-                        if (bookingDetailStep.getConsultant().getId().equals(user.getId())) {
-                            listAddIntoMap.add(bookingDetailStep);
+                        if(Objects.nonNull(bookingDetailStep.getConsultant())){
+                            if (bookingDetailStep.getConsultant().getId().equals(user.getId())) {
+                                listAddIntoMap.add(bookingDetailStep);
+                            }
                         }
                     }
+                }
+                if(listAddIntoMap.size()==0){
+                    listAddIntoMap = bookingDetailStepList;
                 }
                 map.put(user.getId(), listAddIntoMap);
             }
