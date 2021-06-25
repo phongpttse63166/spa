@@ -10,12 +10,14 @@ import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.DateOff;
 import swp490.spa.entities.Staff;
+import swp490.spa.entities.StatusDateOff;
 import swp490.spa.entities.User;
 import swp490.spa.services.DateOffService;
 import swp490.spa.services.StaffService;
 import swp490.spa.services.UserService;
 import swp490.spa.utils.support.Notification;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,6 +84,7 @@ public class StaffController {
     public Response insertNewDateOff(@RequestBody List<DateOff> dateOffList){
         boolean isError = false;
         for (DateOff dateOff : dateOffList) {
+            dateOff.setStatusDateOff(StatusDateOff.WAITING);
             if(Objects.isNull(dateOffService.insertNewDateOff(dateOff))){
                 LOGGER.info(dateOff.getDateOff() + " create failed!");
                 isError = true;

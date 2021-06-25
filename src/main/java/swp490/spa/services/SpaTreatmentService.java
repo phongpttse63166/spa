@@ -54,4 +54,8 @@ public class SpaTreatmentService {
     public SpaTreatment findTreatmentBySpaPackageIdWithTypeOneStep(Integer spaPackageId) {
         return this.spaTreatmentRepository.findBySpaPackage_Id(spaPackageId);
     }
+
+    public SpaTreatment editBySpaTreatment(SpaTreatment spaTreatment) {
+        return this.spaTreatmentRepository.save(spaTreatment);
+    }
 }

@@ -46,4 +46,14 @@ public class Notification {
     public static final String EDIT_CATEGORY_FAILED = "Cập nhật category thất bại";
     public static final String REMOVE_CATEGORY_SUCCESS = "Xóa category thành công";
     public static final String REMOVE_CATEGORY_FAILED = "Xóa category thất bại";
+    public static final String EDIT_PACKAGE_SUCCESS = "Cập nhật package thành công";
+    public static final String EDIT_PACKAGE_FAILED = "Cập nhật package thất bại";
+    public static final String REMOVE_PACKAGE_SUCCESS = "Xóa Package thành công";
+    public static final String REMOVE_PACKAGE_FAILED = "Xóa Package thất bại";
+    public static final String EDIT_SERVICE_SUCCESS = "Cập nhật service thành công";
+    public static final String EDIT_SERVICE_FAILED = "Cập nhật service thất bại";
+    public static final String REMOVE_SERVICE_SUCCESS = "Xóa service thành công";
+    public static final String REMOVE_SERVICE_FAILED = "Xóa service thất bại";
+    public static final String EDIT_TREATMENT_SUCCESS = "Cập nhật treatment thành công";;
+    public static final String EDIT_TREATMENT_FAILED = "Cập nhật treatment thất bại";
 }

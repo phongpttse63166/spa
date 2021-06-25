@@ -21,7 +21,7 @@ public class BookingService {
                                                    Integer spaId,
                                                    Pageable pageable) {
         return this.bookingRepository
-                .findByStatusBookingAndSpa_Id(statusBooking, spaId, pageable);
+                .findByStatusBookingAndSpa_IdOrderByCreateTimeAsc(statusBooking, spaId, pageable);
     }
 
     public Booking findByBookingId(Integer bookingId) {

@@ -11,6 +11,7 @@ import swp490.spa.utils.support.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SpaPackageService {
@@ -70,5 +71,16 @@ public class SpaPackageService {
 
     public List<SpaPackage> findByCategoryId(Integer categoryId) {
         return this.spaPackageRepository.findByCategory_Id(categoryId);
+    }
+
+    public SpaPackage editBySpaPackageId(SpaPackage spaPackage) {
+        return this.spaPackageRepository.save(spaPackage);
+    }
+
+    public boolean removeCategory(SpaPackage spaPackageResult) {
+        if(Objects.nonNull(this.spaPackageRepository.save(spaPackageResult))){
+            return true;
+        }
+        return false;
     }
 }

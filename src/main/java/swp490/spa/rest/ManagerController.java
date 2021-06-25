@@ -14,6 +14,7 @@ import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.SpaPackageCreateRequest;
 import swp490.spa.dto.requests.SpaServiceCreateRequest;
 import swp490.spa.dto.requests.SpaTreatmentCreateRequest;
+import swp490.spa.dto.responses.BookingBookingDetailResponse;
 import swp490.spa.dto.responses.CategorySpaPackageResponse;
 import swp490.spa.dto.responses.SpaPackageTreatmentResponse;
 import swp490.spa.dto.support.Response;
@@ -50,12 +51,17 @@ public class ManagerController {
     private UserService userService;
     @Autowired
     private DateOffService dateOffService;
+    @Autowired
+    private BookingService bookingService;
+    @Autowired
+    private BookingDetailService bookingDetailService;
     private Conversion conversion;
 
     public ManagerController(ManagerService managerService, SpaServiceService spaServiceService,
                              SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
                              swp490.spa.services.SpaService spaService, UserService userService,
-                             DateOffService dateOffService) {
+                             DateOffService dateOffService, BookingService bookingService,
+                             BookingDetailService bookingDetailService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
@@ -63,6 +69,8 @@ public class ManagerController {
         this.spaService = spaService;
         this.userService = userService;
         this.dateOffService = dateOffService;
+        this.bookingService = bookingService;
+        this.bookingDetailService = bookingDetailService;
         this.conversion = new Conversion();
     }
 
@@ -321,21 +329,21 @@ public class ManagerController {
                     dateOffResult.setReasonCancel(dateOff.getReasonCancel());
                 }
             }
-            if(Objects.isNull(dateOffService.editDateOff(dateOffResult))){
+            if (Objects.isNull(dateOffService.editDateOff(dateOffResult))) {
                 LOGGER.info(dateOff.getId() + "edit failed");
                 isError = true;
             }
         }
-        if(isError){
+        if (isError) {
             return ResponseHelper.error(Notification.DATEOFF_EDIT_FAILED);
         }
         return ResponseHelper.ok(Notification.DATEOFF_EDIT_SUCCESS);
     }
 
     @PutMapping("/category/edit")
-    public Response editCategory(@RequestBody Category category){
+    public Response editCategory(@RequestBody Category category) {
         Category categoryResult = categoryService.editByCategoryId(category);
-        if(Objects.nonNull(categoryResult)){
+        if (Objects.nonNull(categoryResult)) {
             LOGGER.info(category + " " + Notification.EDIT_CATEGORY_SUCCESS);
             return ResponseHelper.ok(categoryResult);
         }
@@ -344,15 +352,102 @@ public class ManagerController {
     }
 
     @PutMapping("/category/delete")
-    public Response removeCategory(@RequestParam Integer categoryId){
+    public Response removeCategory(@RequestParam Integer categoryId) {
         Category categoryResult = categoryService.findById(categoryId);
-        if(Objects.nonNull(categoryResult)){
+        if (Objects.nonNull(categoryResult)) {
             categoryResult.setStatus(Status.DISABLE);
-            if(categoryService.removeCategory(categoryResult)){
+            if (categoryService.removeCategory(categoryResult)) {
                 return ResponseHelper.ok(Notification.REMOVE_CATEGORY_SUCCESS);
             }
         }
         return ResponseHelper.ok(Notification.REMOVE_CATEGORY_FAILED);
     }
 
+    @PutMapping("/spapackage/edit")
+    public Response editSpaPackage(@RequestBody SpaPackage spaPackage) {
+        SpaPackage spaPackageResult = spaPackageService.editBySpaPackageId(spaPackage);
+        if (Objects.nonNull(spaPackageResult)) {
+            LOGGER.info(spaPackage + " " + Notification.EDIT_PACKAGE_SUCCESS);
+            return ResponseHelper.ok(spaPackageResult);
+        }
+        LOGGER.info(spaPackage + " " + Notification.EDIT_PACKAGE_FAILED);
+        return ResponseHelper.error(Notification.EDIT_PACKAGE_FAILED);
+    }
+
+    @PutMapping("/spapackage/delete")
+    public Response removeSpaPackage(@RequestParam Integer packageId) {
+        SpaPackage spaPackageResult = spaPackageService.findBySpaPackageId(packageId);
+        if (Objects.nonNull(spaPackageResult)) {
+            spaPackageResult.setStatus(Status.DISABLE);
+            if (spaPackageService.removeCategory(spaPackageResult)) {
+                return ResponseHelper.ok(Notification.REMOVE_PACKAGE_SUCCESS);
+            }
+        }
+        return ResponseHelper.ok(Notification.REMOVE_PACKAGE_FAILED);
+    }
+
+    @PutMapping("/spaservice/edit")
+    public Response editSpaService(@RequestBody SpaService spaService) {
+        SpaService spaServiceResult = spaServiceService.editBySpaService(spaService);
+        if (Objects.nonNull(spaServiceResult)) {
+            LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_SUCCESS);
+            return ResponseHelper.ok(spaServiceResult);
+        }
+        LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_FAILED);
+        return ResponseHelper.error(Notification.EDIT_SERVICE_FAILED);
+    }
+
+    @PutMapping("/spaservice/delete")
+    public Response removeSpaService(@RequestParam Integer spaServiceId) {
+        SpaService spaServiceResult = spaServiceService.findBySpaServiceId(spaServiceId);
+        if (Objects.nonNull(spaServiceResult)) {
+            spaServiceResult.setStatus(Status.DISABLE);
+            if (spaServiceService.removeService(spaServiceResult)) {
+                return ResponseHelper.ok(Notification.REMOVE_SERVICE_SUCCESS);
+            }
+        }
+        return ResponseHelper.ok(Notification.REMOVE_SERVICE_FAILED);
+    }
+
+    @PutMapping("/spatreatment/edit")
+    public Response editSpaTreatment(@RequestBody SpaTreatment spaTreatment) {
+        SpaTreatment spaTreatmentResult = spaTreatmentService.editBySpaTreatment(spaTreatment);
+        if (Objects.nonNull(spaTreatmentResult)) {
+            LOGGER.info(spaTreatment + " " + Notification.EDIT_TREATMENT_SUCCESS);
+            return ResponseHelper.ok(spaTreatmentResult);
+        }
+        LOGGER.info(spaTreatment + " " + Notification.EDIT_TREATMENT_FAILED);
+        return ResponseHelper.error(Notification.EDIT_TREATMENT_FAILED);
+    }
+
+    @GetMapping("/booking/findbookingwithbookingdetails")
+    public Response findBookingWithBookingDetailsBySpa(@RequestParam StatusBooking statusBooking,
+                                                       @RequestParam Integer spaId,
+                                                       Pageable pageable) {
+        Page<Booking> bookingPage =
+                bookingService.findByBookingStatusAndSpa(statusBooking, spaId, pageable);
+        List<Booking> bookings = bookingPage.getContent();
+        long totalElements = bookingPage.getTotalElements();
+        List<BookingBookingDetailResponse> bookingResponses = new ArrayList<>();
+        if (Objects.nonNull(bookings)) {
+            for (Booking booking : bookings) {
+                BookingBookingDetailResponse bookingInsert = new BookingBookingDetailResponse();
+                List<BookingDetail> bookingDetails
+                        = bookingDetailService.findByBooking(booking.getId(), pageable).getContent();
+                if (Objects.nonNull(bookingDetails)) {
+                    bookingInsert.setBooking(booking);
+                    bookingInsert.setBookingDetailList(bookingDetails);
+                    bookingResponses.add(bookingInsert);
+                } else {
+                    LOGGER.info(Notification.BOOKING_DETAIL_NOT_EXISTED);
+                }
+            }
+        } else {
+            LOGGER.info(Notification.BOOKING_NOT_EXISTED);
+            return ResponseHelper.error(Notification.BOOKING_NOT_EXISTED);
+        }
+        Page<BookingBookingDetailResponse> page =
+                new PageImpl<>(bookingResponses, pageable, totalElements);
+        return ResponseHelper.ok(page);
+    }
 }
