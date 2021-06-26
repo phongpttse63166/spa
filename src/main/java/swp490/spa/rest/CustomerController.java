@@ -51,6 +51,8 @@ public class CustomerController {
     private BookingService bookingService;
     @Autowired
     private BookingDetailService bookingDetailService;
+    @Autowired
+    private DateOffService dateOffService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -59,7 +61,8 @@ public class CustomerController {
                               SpaPackageService spaPackageService, SpaService spaService,
                               BookingDetailStepService bookingDetailStepService, StaffService staffService,
                               SpaTreatmentService spaTreatmentService, ConsultantService consultantService,
-                              BookingService bookingService, BookingDetailService bookingDetailService) {
+                              BookingService bookingService, BookingDetailService bookingDetailService,
+                              DateOffService dateOffService) {
         this.customerService = customerService;
         this.userLocationService = userLocationService;
         this.accountRegisterService = accountRegisterService;
@@ -72,6 +75,8 @@ public class CustomerController {
         this.consultantService = consultantService;
         this.bookingService = bookingService;
         this.bookingDetailStepService = bookingDetailStepService;
+        this.bookingDetailService = bookingDetailService;
+        this.dateOffService = dateOffService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions();
     }
@@ -144,6 +149,19 @@ public class CustomerController {
                 userList.add(consultant.getUser());
             }
         }
+        List<DateOff> dateOffs = dateOffService.findByDateOffAndSpaAndStatus(Date.valueOf(dateBooking),
+                spaTreatment.getSpa().getId());
+        if(dateOffs.size()!=0){
+            List<User> userDateOffList = new ArrayList<>();
+            for (User user : userList) {
+                for (DateOff dateOff : dateOffs) {
+                    if(user.equals(dateOff.getEmployee())){
+                        userDateOffList.add(user);
+                    }
+                }
+            }
+            userList.removeAll(userDateOffList);
+        }
         List<String> timeBookingList =
                 supportFunctions.getBookTime(spaTreatment.getTotalTime(), userList,
                         dateBooking, isStaff);
@@ -164,6 +182,31 @@ public class CustomerController {
         for (BookingData bookingData : bookingRequest.getBookingDataList()) {
             spaPackageCheck = spaPackageService.findBySpaPackageId(bookingData.getPackageId());
             Time startTime = bookingData.getTimeBooking();
+            List<DateOff> dateOffs =
+                    dateOffService.findByDateOffAndSpaAndStatus(bookingData.getDateBooking(),
+                            spaPackageCheck.getSpa().getId());
+            List<Staff> staffBookingList = staffList;
+            List<Consultant> consultantBookingList = consultantList;
+            if (dateOffs.size()!=0) {
+                List<Staff> staffDateOffList = new ArrayList<>();
+                List<Consultant> consultantDateOffList = new ArrayList<>();
+                for (Staff staff : staffList) {
+                    for (DateOff dateOff : dateOffs) {
+                        if(staff.getUser().equals(dateOff.getEmployee())){
+                            staffDateOffList.add(staff);
+                        }
+                    }
+                }
+                staffBookingList.removeAll(staffDateOffList);
+                for (Consultant consultant : consultantList) {
+                    for (DateOff dateOff : dateOffs) {
+                        if(consultant.getUser().equals(dateOff.getEmployee())){
+                            consultantDateOffList.add(consultant);
+                        }
+                    }
+                }
+                consultantBookingList.removeAll(consultantDateOffList);
+            }
             int count = 0;
             if (spaPackageCheck.getType().equals(Type.ONESTEP)) {
                 SpaTreatment spaTreatment = spaTreatmentService
@@ -179,13 +222,13 @@ public class CustomerController {
                 } else {
                     if(bookingDetailSteps.size()!=0){
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                            for (Staff staff : staffList) {
+                            for (Staff staff : staffBookingList) {
                                 if (bookingDetailStep.getStaff().equals(staff)) {
                                     count += 1;
                                 }
                             }
                         }
-                        if (count == staffList.size()) {
+                        if (count == staffBookingList.size()) {
                             checkNoEmployForBooking = true;
                         }
                     }
@@ -202,13 +245,13 @@ public class CustomerController {
                 } else {
                     if(bookingDetailSteps.size()!=0){
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                            for (Consultant consultant : consultantList) {
+                            for (Consultant consultant : consultantBookingList) {
                                 if (bookingDetailStep.getConsultant().equals(consultant)) {
                                     count += 1;
                                 }
                             }
                         }
-                        if (count == staffList.size()) {
+                        if (count == consultantBookingList.size()) {
                             checkNoEmployForBooking = true;
                         }
                     }
