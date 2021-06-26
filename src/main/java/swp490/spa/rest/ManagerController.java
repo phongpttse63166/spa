@@ -196,7 +196,7 @@ public class ManagerController {
             }
             Page<CategorySpaPackageResponse> pageReturn =
                     new PageImpl<>(categorySpaPackageResponses, pageable,
-                            categorySpaPackageResponses.size());
+                            categories.size());
             return ResponseHelper.ok(pageReturn);
         }
         return ResponseHelper.error(Notification.CATEGORY_NOT_EXISTED);
