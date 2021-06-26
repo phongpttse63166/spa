@@ -58,4 +58,8 @@ public class SpaTreatmentService {
     public SpaTreatment editBySpaTreatment(SpaTreatment spaTreatment) {
         return this.spaTreatmentRepository.save(spaTreatment);
     }
+
+    public SpaTreatment findByTreatmentId(Integer spatreatmentId) {
+        return this.spaTreatmentRepository.findById(spatreatmentId).get();
+    }
 }

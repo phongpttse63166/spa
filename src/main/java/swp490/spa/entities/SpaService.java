@@ -47,7 +47,7 @@ public class SpaService implements Serializable {
     private Spa spa;
     @ManyToMany(mappedBy = "spaServices",
             cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
-    @JsonBackReference
+//    @JsonBackReference
     private List<SpaPackage> spaPackages = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL)
     @JsonBackReference

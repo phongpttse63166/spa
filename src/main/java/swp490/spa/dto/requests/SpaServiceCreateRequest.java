@@ -1,6 +1,7 @@
 package swp490.spa.dto.requests;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.entities.Status;
 import swp490.spa.entities.Type;
 
@@ -17,4 +18,5 @@ public class SpaServiceCreateRequest {
     private Type type;
     private Integer durationMin;
     private Integer createBy;
+    private MultipartFile file;
 }

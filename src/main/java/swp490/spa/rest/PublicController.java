@@ -29,7 +29,7 @@ import java.util.Objects;
 @RequestMapping("/api/public")
 @CrossOrigin
 public class PublicController {
-    Logger logger = LogManager.getLogger(PublicController.class);
+    Logger LOGGER = LogManager.getLogger(PublicController.class);
     @Autowired
     private UserService userService;
     @Autowired

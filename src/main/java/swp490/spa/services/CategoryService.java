@@ -38,4 +38,8 @@ public class CategoryService {
         }
         return false;
     }
+
+    public Category insertNewCategory(Category category) {
+        return this.categoryRepository.save(category);
+    }
 }

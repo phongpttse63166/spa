@@ -56,4 +56,7 @@ public class Notification {
     public static final String REMOVE_SERVICE_FAILED = "Xóa service thất bại";
     public static final String EDIT_TREATMENT_SUCCESS = "Cập nhật treatment thành công";;
     public static final String EDIT_TREATMENT_FAILED = "Cập nhật treatment thất bại";
+    public static final String FILE_NOT_EXISTED = "File không tồn tại";
+    public static final String CREATE_CATEGORY_FAILED = "Tạo category thất bại";
+    public static final String SAVE_IMAGE_FAILED = "Save file không thành công";
 }
