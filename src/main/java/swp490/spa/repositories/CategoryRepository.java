@@ -10,7 +10,7 @@ import swp490.spa.entities.Status;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
-    Page<Category> findByStatus(Status status, Pageable pageable);
+    Page<Category> findByStatusOrderById(Status status, Pageable pageable);
 
     @Query("FROM Category c WHERE c.id = ?1")
     Category findByCategoryId(Integer categoryId);

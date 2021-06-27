@@ -17,7 +17,7 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
 
     public Page<Category> findAllByStatus(Status status, Pageable pageable){
-        return this.categoryRepository.findByStatus(status, pageable);
+        return this.categoryRepository.findByStatusOrderById(status, pageable);
     }
 
     public Category findById(Integer categoryId) {

@@ -10,7 +10,7 @@ import swp490.spa.entities.BookingDetail;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ApointmentResponse {
+public class ConsultationContentResponse {
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("description")

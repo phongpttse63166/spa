@@ -11,10 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
-import swp490.spa.dto.requests.AccountPasswordRequest;
-import swp490.spa.dto.requests.SpaPackageCreateRequest;
-import swp490.spa.dto.requests.SpaServiceCreateRequest;
-import swp490.spa.dto.requests.SpaTreatmentCreateRequest;
+import swp490.spa.dto.requests.*;
 import swp490.spa.dto.responses.BookingBookingDetailResponse;
 import swp490.spa.dto.responses.CategorySpaPackageResponse;
 import swp490.spa.dto.responses.SpaPackageTreatmentResponse;
@@ -264,7 +261,7 @@ public class ManagerController {
                 LOGGER.info(Notification.SAVE_IMAGE_FAILED);
             }
         }
-        return ResponseHelper.error(Notification.SERVICE_CREATE_FAIL);
+        return ResponseHelper.error(Notification.INSERT_SERVICE_FAILED);
     }
 
     @PostMapping(value = "/spapackageservices/insert",
@@ -295,7 +292,7 @@ public class ManagerController {
                 spaPackageInsert.setStatus(spaPackage.getStatus());
                 SpaPackage spaPackageResult = spaPackageService.insertNewSpaPackage(spaPackageInsert);
                 if (Objects.isNull(spaPackageResult)) {
-                    return ResponseHelper.error(Notification.SPA_PACKAGE_CREATE_FAIL);
+                    return ResponseHelper.error(Notification.INSERT_SPA_PACKAGE_FAILED);
                 }
                 for (Integer serviceId : spaPackage.getListSpaServiceId()) {
                     swp490.spa.entities.SpaService spaService = spaServiceService.findBySpaId(serviceId);
@@ -306,11 +303,14 @@ public class ManagerController {
                 }
                 spaPackageResult.addListService(spaServices);
                 if (Objects.nonNull(spaPackageService.insertNewSpaPackage(spaPackageResult))) {
-                    return ResponseHelper.ok(Notification.SPA_PACKAGE_SERVICE_INSERT_SUCCESS);
+                    return ResponseHelper.ok(Notification.INSERT_SPA_PACKAGE_SERVICE_SUCCESS);
                 }
+            } else {
+                LOGGER.info(Notification.SAVE_IMAGE_FAILED);
             }
         }
-        return ResponseHelper.error(Notification.SPA_PACKAGE_SERVICE_INSERT_FAIL);
+        LOGGER.info(Notification.FILE_NOT_EXISTED);
+        return ResponseHelper.error(Notification.INSERT_SPA_PACKAGE_SERVICE_FAILED);
     }
 
     @PostMapping("/spatreatmentservices/insert")
@@ -345,9 +345,44 @@ public class ManagerController {
                 spaTreatmentRequest.getCreateBy(),
                 spaPackage, spa, treatmentServices, totalPrice);
         if (Objects.nonNull(spaTreatmentService.insertNewSpaTreatment(spaTreatmentInsert))) {
-            return ResponseHelper.ok(Notification.SPA_TREATMENT_SERVICE_INSERT_SUCCESS);
+            return ResponseHelper.ok(Notification.INSERT_SPA_TREATMENT_SERVICE_SUCCESS);
         }
-        return ResponseHelper.error(Notification.SPA_TREATMENT_SERVICE_INSERT_FAIL);
+        return ResponseHelper.error(Notification.INSERT_SPA_TREATMENT_SERVICE_FAILED);
+    }
+
+    @PostMapping(value = "/category/insert",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response insertNewCategory(CategoryCreateRequest categoryCreateRequest){
+        if(Objects.nonNull(categoryCreateRequest.getFile())){
+            String imageLink = UploadImage.uploadImage(categoryCreateRequest.getFile());
+            if (imageLink != "") {
+                Spa spa = spaService.findById(categoryCreateRequest.getSpaId());
+                if(Objects.nonNull(spa)){
+                    Category categoryNew = new Category();
+                    categoryNew.setName(categoryCreateRequest.getName());
+                    categoryNew.setIcon(imageLink);
+                    categoryNew.setDescription(categoryCreateRequest.getDescription());
+                    categoryNew.setStatus(Status.AVAILABLE);
+                    categoryNew.setCreateBy(categoryCreateRequest.getCreateBy());
+                    categoryNew.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
+                    categoryNew.setSpa(spa);
+                    Category categoryResult = categoryService.insertNewCategory(categoryNew);
+                    if(Objects.nonNull(categoryResult)){
+                        LOGGER.info(Notification.INSERT_CATEGORY_SUCCESS);
+                        ResponseHelper.ok(categoryResult);
+                    }
+                    LOGGER.info(Notification.INSERT_CATEGORY_FAILED);
+                } else {
+                    LOGGER.info(Notification.SPA_NOT_EXISTED);
+                }
+            } else {
+                LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+            }
+        } else {
+            LOGGER.info(Notification.FILE_NOT_EXISTED);
+        }
+        return ResponseHelper.error(Notification.INSERT_CATEGORY_FAILED);
     }
 
     @PutMapping("/editpassword")
@@ -360,9 +395,8 @@ public class ManagerController {
             return ResponseHelper.ok(updateUser);
         } else {
             userService.editUser(oldUser);
-            return ResponseHelper.error("");
+            return ResponseHelper.error(Notification.EDIT_PASSWORD_FAILED);
         }
-
     }
 
     @PutMapping("/dateoff/edit")
@@ -371,7 +405,7 @@ public class ManagerController {
         for (DateOff dateOff : dateOffList) {
             DateOff dateOffResult = dateOffService.findDateOffById(dateOff.getId());
             if (Objects.isNull(dateOffResult)) {
-                LOGGER.info(dateOff.getId() + "is not existed");
+                LOGGER.info(Notification.DATEOFF_NOT_EXISTED);
                 isError = true;
             } else {
                 dateOffResult.setStatusDateOff(dateOff.getStatusDateOff());
@@ -380,14 +414,14 @@ public class ManagerController {
                 }
             }
             if (Objects.isNull(dateOffService.editDateOff(dateOffResult))) {
-                LOGGER.info(dateOff.getId() + "edit failed");
+                LOGGER.info(Notification.EDIT_DATEOFF_FAILED);
                 isError = true;
             }
         }
         if (isError) {
-            return ResponseHelper.error(Notification.DATEOFF_EDIT_FAILED);
+            return ResponseHelper.error(Notification.EDIT_DATEOFF_FAILED);
         }
-        return ResponseHelper.ok(Notification.DATEOFF_EDIT_SUCCESS);
+        return ResponseHelper.ok(Notification.EDIT_DATEOFF_SUCCESS);
     }
 
     @PutMapping("/category/edit")

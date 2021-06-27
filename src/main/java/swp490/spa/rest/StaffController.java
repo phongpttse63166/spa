@@ -17,7 +17,6 @@ import swp490.spa.services.StaffService;
 import swp490.spa.services.UserService;
 import swp490.spa.utils.support.Notification;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -91,8 +90,8 @@ public class StaffController {
             }
         }
         if(isError){
-            return ResponseHelper.error(Notification.DATEOFF_CREATE_FAILED);
+            return ResponseHelper.error(Notification.INSERT_DATEOFF_FAILED);
         }
-        return ResponseHelper.ok(Notification.DATEOFF_CREATE_SUCCESS);
+        return ResponseHelper.ok(Notification.INSERT_DATEOFF_SUCCESS);
     }
 }

@@ -13,8 +13,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "apointment", schema = "public")
-public class Apointment implements Serializable {
+@Table(name = "consultation_content", schema = "public")
+public class ConsultationContent implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

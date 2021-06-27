@@ -101,7 +101,7 @@ public class CustomerController {
             if (Objects.nonNull(result)) {
                 return ResponseHelper.ok(userLocationUpdate);
             }
-            return ResponseHelper.error(Notification.EDIT_USER_LOCATION_FAIL);
+            return ResponseHelper.error(Notification.EDIT_USER_LOCATION_FAILED);
         }
         return ResponseHelper.error(Notification.USER_EXISTED);
     }
@@ -344,12 +344,12 @@ public class CustomerController {
                                         bookingDetailStep.setStartTime(startTime);
                                         bookingDetailStep.setEndTime(endTime);
                                         if (Objects.isNull(bookingDetailStepService.insertBookingDetailStep(bookingDetailStep))) {
-                                            return ResponseHelper.error(Notification.BOOKING_DETAIL_STEP_CREATE_FAILED);
+                                            return ResponseHelper.error(Notification.INSERT_BOOKING_DETAIL_STEP_FAILED);
                                         }
                                     }
-                                    LOGGER.info(Notification.BOOKING_CREATE_SUCCESS + booking);
+                                    LOGGER.info(Notification.INSERT_BOOKING_SUCCESS + booking);
                                 }
-                                LOGGER.info(Notification.BOOKING_DETAIL_CREATE_FAILED + bookingDetail);
+                                LOGGER.info(Notification.INSERT_BOOKING_DETAIL_FAILED + bookingDetail);
                             }
                         }
                     }
@@ -403,12 +403,12 @@ public class CustomerController {
                                             bookingDetailStep.setStartTime(startTime);
                                             bookingDetailStep.setEndTime(endTime);
                                             if (Objects.isNull(bookingDetailStepService.insertBookingDetailStep(bookingDetailStep))) {
-                                                LOGGER.info(Notification.BOOKING_DETAIL_STEP_CREATE_FAILED + bookingDetailStep);
+                                                LOGGER.info(Notification.INSERT_BOOKING_DETAIL_STEP_FAILED + bookingDetailStep);
                                             }
                                         }
-                                        LOGGER.info(Notification.BOOKING_CREATE_SUCCESS + bookingResult);
+                                        LOGGER.info(Notification.INSERT_BOOKING_SUCCESS + bookingResult);
                                     }
-                                    LOGGER.info(Notification.BOOKING_DETAIL_CREATE_FAILED + bookingDetail);
+                                    LOGGER.info(Notification.INSERT_BOOKING_DETAIL_FAILED + bookingDetail);
                                 } else {
                                     BookingDetail bookingDetail = new BookingDetail();
                                     bookingDetail.setBooking(bookingResult);
@@ -427,7 +427,7 @@ public class CustomerController {
                                                 .toLocalTime()
                                                 .plusMinutes(Constant.DURATION_OF_CONSULTATION)));
                                         if (Objects.isNull(bookingDetailStepService.insertBookingDetailStep(bookingDetailStep))) {
-                                            LOGGER.info(Notification.BOOKING_DETAIL_STEP_CREATE_FAILED + bookingDetailStep);
+                                            LOGGER.info(Notification.INSERT_BOOKING_DETAIL_STEP_FAILED + bookingDetailStep);
                                         }
                                     }
 
@@ -435,10 +435,10 @@ public class CustomerController {
                             }
                         }
                     }
-                    return ResponseHelper.ok(Notification.BOOKING_CREATE_SUCCESS);
+                    return ResponseHelper.ok(Notification.INSERT_BOOKING_SUCCESS);
                 }
             }
-            return ResponseHelper.error(Notification.BOOKING_CREATE_FAILED);
+            return ResponseHelper.error(Notification.INSERT_BOOKING_FAILED);
         }
     }
 

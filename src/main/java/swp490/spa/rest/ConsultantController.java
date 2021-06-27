@@ -83,9 +83,9 @@ public class ConsultantController {
             }
         }
         if (isError) {
-            return ResponseHelper.error(Notification.DATEOFF_CREATE_FAILED);
+            return ResponseHelper.error(Notification.INSERT_DATEOFF_FAILED);
         }
-        return ResponseHelper.ok(Notification.DATEOFF_CREATE_SUCCESS);
+        return ResponseHelper.ok(Notification.INSERT_DATEOFF_SUCCESS);
     }
 
     @GetMapping("/booking/findbybookingstatus")
@@ -124,12 +124,12 @@ public class ConsultantController {
                         .getId());
         if (Objects.isNull(bookingResult)) {
             LOGGER.info(Notification.BOOKING_NOT_EXISTED);
-            return ResponseHelper.error(Notification.BOOKING_DETAIL_EDIT_FAILED);
+            return ResponseHelper.error(Notification.EDIT_BOOKING_DETAIL_FAILED);
         }
         Consultant consultant = consultantService.findByConsultantId(bookingDetailRequest.getConsultantId());
         if (Objects.isNull(consultant)) {
             LOGGER.info(Notification.CONSULTANT_NOT_EXISTED);
-            return ResponseHelper.error(Notification.BOOKING_DETAIL_EDIT_FAILED);
+            return ResponseHelper.error(Notification.EDIT_BOOKING_DETAIL_FAILED);
         }
         List<BookingDetail> bookingDetailList = bookingDetailService
                 .findByBooking(bookingResult.getId(),
@@ -138,7 +138,7 @@ public class ConsultantController {
                                 Sort.unsorted())).getContent();
         if (Objects.isNull(bookingDetailList)) {
             LOGGER.info(Notification.BOOKING_DETAIL_NOT_EXISTED);
-            return ResponseHelper.error(Notification.BOOKING_DETAIL_EDIT_FAILED);
+            return ResponseHelper.error(Notification.EDIT_BOOKING_DETAIL_FAILED);
         }
         for (BookingDetail bookingDetail : bookingDetailList) {
             if(Objects.nonNull(bookingDetail.getSpaTreatment())){
@@ -149,14 +149,14 @@ public class ConsultantController {
         bookingResult.setTotalPrice(totalPriceBooking);
         bookingResult.setTotalTime(totalTimeBooking);
         if(Objects.isNull(bookingService.editBooking(bookingResult))){
-            LOGGER.info(bookingResult + Notification.BOOKING_EDIT_FAILED);
-            return ResponseHelper.error(Notification.BOOKING_DETAIL_EDIT_FAILED);
+            LOGGER.info(bookingResult + Notification.EDIT_BOOKING_FAILED);
+            return ResponseHelper.error(Notification.EDIT_BOOKING_DETAIL_FAILED);
         }
         if(Objects.isNull(bookingDetailService
                 .editBookingDetail(bookingDetailRequest.getBookingDetail()))){
             LOGGER.info(bookingDetailRequest.getBookingDetail() +
-                    Notification.BOOKING_DETAIL_EDIT_FAILED);
-            return ResponseHelper.error(Notification.BOOKING_DETAIL_EDIT_FAILED);
+                    Notification.EDIT_BOOKING_DETAIL_FAILED);
+            return ResponseHelper.error(Notification.EDIT_BOOKING_DETAIL_FAILED);
         } else {
             List<TreatmentService> treatmentServices =
                     new ArrayList<>(bookingDetailRequest
@@ -185,11 +185,11 @@ public class ConsultantController {
                 }
                 if(Objects.isNull(bookingDetailStepService
                         .insertBookingDetailStep(bookingDetailStep))){
-                    LOGGER.info(bookingDetailStep + Notification.BOOKING_DETAIL_STEP_CREATE_FAILED);
+                    LOGGER.info(bookingDetailStep + Notification.INSERT_BOOKING_DETAIL_STEP_FAILED);
                 }
             }
         }
-        return ResponseHelper.ok(Notification.BOOKING_DETAIL_EDIT_SUCCESS);
+        return ResponseHelper.ok(Notification.EDIT_BOOKING_DETAIL_SUCCESS);
     }
 
 
