@@ -1,22 +1,17 @@
 package swp490.spa.dto.requests;
 
 import lombok.*;
-import swp490.spa.entities.Status;
-
-import java.sql.Date;
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class SpaTreatmentCreateRequest {
+public class CategoryRequest {
     private String name;
     private String description;
-    private String image;
     private Integer createBy;
-    private Integer packageId;
     private Integer spaId;
-    private List<Integer> listSpaServiceId;
+    private MultipartFile file;
 }

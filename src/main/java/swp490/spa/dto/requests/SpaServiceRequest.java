@@ -10,7 +10,7 @@ import swp490.spa.entities.Type;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SpaServiceCreateRequest {
+public class SpaServiceRequest {
     private String name;
     private String description;
     private Double price;

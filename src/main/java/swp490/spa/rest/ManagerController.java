@@ -236,12 +236,12 @@ public class ManagerController {
     }
 
     @GetMapping("/dateoff/getalldateoffofspainweek")
-    public Response getDateOffRegisterOfSpaInOneWeek(@RequestParam Integer spaId, Pageable pageable){
+    public Response getDateOffRegisterOfSpaInOneWeek(@RequestParam Integer spaId, Pageable pageable) {
         Date monday = Date.valueOf(LocalDate.now().with(previousOrSame(DayOfWeek.MONDAY)));
         Date sunday = Date.valueOf(LocalDate.now().with(nextOrSame(DayOfWeek.SUNDAY)));
         Page<DateOff> dateOffs = dateOffService.findBySpaAndStatusInOneWeek(spaId,
                 StatusDateOff.WAITING, monday, sunday, pageable);
-        if(Objects.nonNull(dateOffs)){
+        if (Objects.nonNull(dateOffs)) {
             LOGGER.info(Notification.GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_SUCCESS);
             return ResponseHelper.ok(conversion.convertToPageDateOffResponse(dateOffs));
         }
@@ -250,25 +250,25 @@ public class ManagerController {
 
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Response createNewSpaService(SpaServiceCreateRequest spaServiceCreateRequest) {
-        if (Objects.nonNull(spaServiceCreateRequest.getFile())) {
-            String imageLink = UploadImage.uploadImage(spaServiceCreateRequest.getFile());
+    public Response createNewSpaService(SpaServiceRequest spaServiceRequest) {
+        if (Objects.nonNull(spaServiceRequest.getFile())) {
+            String imageLink = UploadImage.uploadImage(spaServiceRequest.getFile());
             if (imageLink != "") {
-                Manager manager = managerService.findManagerById(spaServiceCreateRequest.getCreateBy());
+                Manager manager = managerService.findManagerById(spaServiceRequest.getCreateBy());
                 if (Objects.isNull(manager)) {
                     LOGGER.info(Notification.MANAGER_NOT_EXISTED);
                     return ResponseHelper.error(Notification.MANAGER_NOT_EXISTED);
                 }
                 Spa spa = manager.getSpa();
                 SpaService spaService = new SpaService();
-                spaService.setName(spaServiceCreateRequest.getName());
-                spaService.setDescription(spaServiceCreateRequest.getDescription());
-                spaService.setPrice(spaServiceCreateRequest.getPrice());
-                spaService.setStatus(spaServiceCreateRequest.getStatus());
-                spaService.setType(spaServiceCreateRequest.getType());
-                spaService.setDurationMin(spaServiceCreateRequest.getDurationMin());
+                spaService.setName(spaServiceRequest.getName());
+                spaService.setDescription(spaServiceRequest.getDescription());
+                spaService.setPrice(spaServiceRequest.getPrice());
+                spaService.setStatus(spaServiceRequest.getStatus());
+                spaService.setType(spaServiceRequest.getType());
+                spaService.setDurationMin(spaServiceRequest.getDurationMin());
                 spaService.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
-                spaService.setCreateBy(spaServiceCreateRequest.getCreateBy().toString());
+                spaService.setCreateBy(spaServiceRequest.getCreateBy().toString());
                 spaService.setImage(imageLink);
                 spaService.setSpa(spa);
                 SpaService serviceResult = spaServiceService.insertNewSpaService(spaService);
@@ -286,7 +286,7 @@ public class ManagerController {
     @PostMapping(value = "/spapackageservices/insert",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Response insertNewSpaPackageWithServices(SpaPackageCreateRequest spaPackage) {
+    public Response insertNewSpaPackageWithServices(SpaPackageRequest spaPackage) {
         if (Objects.nonNull(spaPackage.getFile())) {
             String imageLink = UploadImage.uploadImage(spaPackage.getFile());
             if (imageLink != "") {
@@ -333,7 +333,7 @@ public class ManagerController {
     }
 
     @PostMapping("/spatreatmentservices/insert")
-    public Response insertNewSpaPackageWithServices(@RequestBody SpaTreatmentCreateRequest spaTreatmentRequest) {
+    public Response insertNewSpaPackageWithServices(@RequestBody SpaTreatmentRequest spaTreatmentRequest) {
         List<TreatmentService> treatmentServices = new ArrayList<>();
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaTreatmentRequest.getPackageId());
         if (Objects.isNull(spaPackage)) {
@@ -372,22 +372,22 @@ public class ManagerController {
     @PostMapping(value = "/category/insert",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Response insertNewCategory(CategoryCreateRequest categoryCreateRequest){
-        if(Objects.nonNull(categoryCreateRequest.getFile())){
-            String imageLink = UploadImage.uploadImage(categoryCreateRequest.getFile());
+    public Response insertNewCategory(CategoryRequest categoryRequest) {
+        if (Objects.nonNull(categoryRequest.getFile())) {
+            String imageLink = UploadImage.uploadImage(categoryRequest.getFile());
             if (imageLink != "") {
-                Spa spa = spaService.findById(categoryCreateRequest.getSpaId());
-                if(Objects.nonNull(spa)){
+                Spa spa = spaService.findById(categoryRequest.getSpaId());
+                if (Objects.nonNull(spa)) {
                     Category categoryNew = new Category();
-                    categoryNew.setName(categoryCreateRequest.getName());
+                    categoryNew.setName(categoryRequest.getName());
                     categoryNew.setIcon(imageLink);
-                    categoryNew.setDescription(categoryCreateRequest.getDescription());
+                    categoryNew.setDescription(categoryRequest.getDescription());
                     categoryNew.setStatus(Status.AVAILABLE);
-                    categoryNew.setCreateBy(categoryCreateRequest.getCreateBy());
+                    categoryNew.setCreateBy(categoryRequest.getCreateBy());
                     categoryNew.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
                     categoryNew.setSpa(spa);
                     Category categoryResult = categoryService.insertNewCategory(categoryNew);
-                    if(Objects.nonNull(categoryResult)){
+                    if (Objects.nonNull(categoryResult)) {
                         LOGGER.info(Notification.INSERT_CATEGORY_SUCCESS);
                         ResponseHelper.ok(categoryResult);
                     }
@@ -443,134 +443,135 @@ public class ManagerController {
         return ResponseHelper.ok(Notification.EDIT_DATE_OFF_SUCCESS);
     }
 
-    @PutMapping("/category/edit")
-    public Response editCategory(@RequestBody Category category) {
-        Category categoryEdit = categoryService.findById(category.getId());
-        if(Objects.nonNull(categoryEdit)){
-            if(Objects.nonNull(category.getName())){
-                categoryEdit.setName(category.getName());
+    @PutMapping(value = "/category/edit/{categoryId}",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editCategory(@PathVariable Integer categoryId,
+                                 CategoryRequest category) {
+        String iconLink = UploadImage.uploadImage(category.getFile());
+        if (iconLink != "") {
+            Category categoryEdit = categoryService.findById(categoryId);
+            if (Objects.nonNull(categoryEdit)) {
+                categoryEdit.setIcon(iconLink);
+                if (Objects.nonNull(category.getName())) {
+                    categoryEdit.setName(category.getName());
+                }
+                if (Objects.nonNull(category.getDescription())) {
+                    categoryEdit.setDescription(category.getDescription());
+                }
+                Category categoryResult = categoryService.editByCategoryId(categoryEdit);
+                if (Objects.nonNull(categoryResult)) {
+                    LOGGER.info(categoryResult + "-" + Notification.EDIT_CATEGORY_SUCCESS);
+                    return ResponseHelper.ok(categoryResult);
+                }
+            } else {
+                LOGGER.info(Notification.CATEGORY_NOT_EXISTED);
             }
-            if(Objects.nonNull(category.getStatus())){
-                categoryEdit.setStatus(category.getStatus());
-            }
-            if(Objects.nonNull(category.getDescription())){
-                categoryEdit.setDescription(category.getDescription());
-            }
-            if(Objects.nonNull(category.getIcon())){
-                categoryEdit.setIcon(category.getIcon());
-            }
-            if(Objects.nonNull(category.getSpa())){
-                categoryEdit.setSpa(category.getSpa());
-            }
-            Category categoryResult = categoryService.editByCategoryId(categoryEdit);
-            if (Objects.nonNull(categoryResult)) {
-                LOGGER.info(categoryEdit + " " + Notification.EDIT_CATEGORY_SUCCESS);
-                return ResponseHelper.ok(categoryResult);
-            }
+        } else {
+            LOGGER.info(Notification.SAVE_IMAGE_FAILED);
         }
-        LOGGER.info(categoryEdit + " " + Notification.EDIT_CATEGORY_FAILED);
         return ResponseHelper.error(Notification.EDIT_CATEGORY_FAILED);
     }
 
-    @PutMapping("/spapackage/edit")
-    public Response editSpaPackage(@RequestBody SpaPackage spaPackage) {
-        SpaPackage spaPackageEdit = spaPackageService.findBySpaPackageId(spaPackage.getId());{
-            if(Objects.nonNull(spaPackageEdit)){
-                if(Objects.nonNull(spaPackage.getName())){
-                    spaPackageEdit.setName(spaPackage.getName());
-                }
-                if(Objects.nonNull(spaPackage.getStatus())){
-                    spaPackageEdit.setStatus(spaPackage.getStatus());
-                }
-                if(Objects.nonNull(spaPackage.getDescription())){
-                    spaPackageEdit.setDescription(spaPackage.getDescription());
-                }
-                if(Objects.nonNull(spaPackage.getCategory())){
-                    spaPackageEdit.setCategory(spaPackage.getCategory());
-                }
-                if(Objects.nonNull(spaPackage.getImage())){
-                    spaPackageEdit.setImage(spaPackage.getImage());
-                }
-                if(Objects.nonNull(spaPackage.getSpaServices())){
-                    spaPackageEdit.setSpaServices(spaPackage.getSpaServices());
-                }
-                if(Objects.nonNull(spaPackage.getSpa())){
-                    spaPackageEdit.setSpa(spaPackage.getSpa());
-                }
-                if(Objects.nonNull(spaPackage.getType())){
-                    spaPackageEdit.setType(spaPackage.getType());
-                }
-                SpaPackage spaPackageResult = spaPackageService.editBySpaPackageId(spaPackageEdit);
-                if (Objects.nonNull(spaPackageResult)) {
-                    LOGGER.info(spaPackageEdit + " " + Notification.EDIT_PACKAGE_SUCCESS);
-                    return ResponseHelper.ok(spaPackageResult);
-                }
+    @PutMapping(value = "/spapackage/edit/{packageId}",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editSpaPackage(@PathVariable Integer packageId,
+                                   SpaPackageRequest spaPackage) {
+        SpaPackage spaPackageEdit = spaPackageService.findBySpaPackageId(packageId);
+        {
+//            if (Objects.nonNull(spaPackageEdit)) {
+//                if (Objects.nonNull(spaPackage.getName())) {
+//                    spaPackageEdit.setName(spaPackage.getName());
+//                }
+//                if (Objects.nonNull(spaPackage.getStatus())) {
+//                    spaPackageEdit.setStatus(spaPackage.getStatus());
+//                }
+//                if (Objects.nonNull(spaPackage.getDescription())) {
+//                    spaPackageEdit.setDescription(spaPackage.getDescription());
+//                }
+//                if (Objects.nonNull(spaPackage.getCategory())) {
+//                    spaPackageEdit.setCategory(spaPackage.getCategory());
+//                }
+//                if (Objects.nonNull(spaPackage.getImage())) {
+//                    spaPackageEdit.setImage(spaPackage.getImage());
+//                }
+//                if (Objects.nonNull(spaPackage.getSpaServices())) {
+//                    spaPackageEdit.setSpaServices(spaPackage.getSpaServices());
+//                }
+//                if (Objects.nonNull(spaPackage.getSpa())) {
+//                    spaPackageEdit.setSpa(spaPackage.getSpa());
+//                }
+//                if (Objects.nonNull(spaPackage.getType())) {
+//                    spaPackageEdit.setType(spaPackage.getType());
+//                }
+            SpaPackage spaPackageResult = spaPackageService.editBySpaPackageId(spaPackageEdit);
+            if (Objects.nonNull(spaPackageResult)) {
+                LOGGER.info(spaPackageEdit + " " + Notification.EDIT_PACKAGE_SUCCESS);
+                return ResponseHelper.ok(spaPackageResult);
             }
+//            }
         }
 
         LOGGER.info(spaPackageEdit + " " + Notification.EDIT_PACKAGE_FAILED);
         return ResponseHelper.error(Notification.EDIT_PACKAGE_FAILED);
     }
 
-    @PutMapping("/spaservice/edit")
-    public Response editSpaService(@RequestBody SpaService spaService) {
-        SpaService spaServiceEdit = spaServiceService.findBySpaServiceId(spaService.getId());
-        if(Objects.nonNull(spaServiceEdit)){
-            if(Objects.nonNull(spaService.getName())){
-                spaServiceEdit.setName(spaService.getName());
-            }
-            if(Objects.nonNull(spaService.getDescription())){
-                spaServiceEdit.setDescription(spaService.getDescription());
-            }
-            if(Objects.nonNull(spaService.getDurationMin())){
-                spaServiceEdit.setDurationMin(spaService.getDurationMin());
-            }
-            if(Objects.nonNull(spaService.getPrice())){
-                spaServiceEdit.setPrice(spaService.getPrice());
-            }
-            if(Objects.nonNull(spaService.getImage())){
-                spaServiceEdit.setImage(spaService.getImage());
-            }
-            if(Objects.nonNull(spaService.getType())){
-                spaServiceEdit.setType(spaService.getType());
-            }
-            if(Objects.nonNull(spaService.getStatus())){
-                spaServiceEdit.setStatus(spaService.getStatus());
-            }
-            if(Objects.nonNull(spaService.getSpaPackages())){
-                spaServiceEdit.setSpaPackages(spaService.getSpaPackages());
-            }
-            if(Objects.nonNull(spaService.getSpa())){
-                spaServiceEdit.setSpa(spaService.getSpa());
-            }
-            SpaService spaServiceResult = spaServiceService.editBySpaService(spaServiceEdit);
-            if (Objects.nonNull(spaServiceResult)) {
-                LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_SUCCESS);
-                return ResponseHelper.ok(spaServiceResult);
+    @PutMapping(value = "/spaservice/edit/{spaServiceId}",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editSpaService(@PathVariable Integer spaServiceId, SpaServiceRequest spaService) {
+        if (Objects.nonNull(spaService.getFile())) {
+            String imageLink = UploadImage.uploadImage(spaService.getFile());
+            if (imageLink != "") {
+                SpaService spaServiceEdit = spaServiceService.findBySpaServiceId(spaServiceId);
+                if (Objects.nonNull(spaServiceEdit)) {
+                    if (Objects.nonNull(spaService.getName())) {
+                        spaServiceEdit.setName(spaService.getName());
+                    }
+                    if (Objects.nonNull(spaService.getDescription())) {
+                        spaServiceEdit.setDescription(spaService.getDescription());
+                    }
+                    if (Objects.nonNull(spaService.getDurationMin())) {
+                        spaServiceEdit.setDurationMin(spaService.getDurationMin());
+                    }
+                    if (Objects.nonNull(spaService.getPrice())) {
+                        spaServiceEdit.setPrice(spaService.getPrice());
+                    }
+                    spaServiceEdit.setImage(imageLink);
+                    SpaService spaServiceResult = spaServiceService.editBySpaService(spaServiceEdit);
+                    if (Objects.nonNull(spaServiceResult)) {
+                        LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_SUCCESS);
+                        return ResponseHelper.ok(spaServiceResult);
+                    }
+                } else {
+                    LOGGER.info(Notification.SPA_SERVICE_NOT_EXISTED);
+                }
+             } else {
+                LOGGER.info(Notification.SAVE_IMAGE_FAILED);
             }
         } else {
-            LOGGER.info(Notification.SPA_SERVICE_NOT_EXISTED);
+            LOGGER.info(Notification.FILE_NOT_EXISTED);
         }
-        LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_FAILED);
         return ResponseHelper.error(Notification.EDIT_SERVICE_FAILED);
     }
 
     @PutMapping("/spatreatment/edit")
     public Response editSpaTreatment(@RequestBody SpaTreatment spaTreatment) {
         SpaTreatment spaTreatmentEdit = spaTreatmentService.findByTreatmentId(spaTreatment.getId());
-        if(Objects.nonNull(spaTreatmentEdit)){
+        if (Objects.nonNull(spaTreatmentEdit)) {
             Double totalPrice = 0.0;
             Integer totalTime = 0;
-            if(Objects.nonNull(spaTreatment.getName())){
+            if (Objects.nonNull(spaTreatment.getName())) {
                 spaTreatmentEdit.setName(spaTreatment.getName());
             }
-            if(Objects.nonNull(spaTreatment.getDescription())){
+            if (Objects.nonNull(spaTreatment.getDescription())) {
                 spaTreatmentEdit.setDescription(spaTreatment.getDescription());
             }
-            if(Objects.nonNull(spaTreatment.getTreatmentServices())){
+            if (Objects.nonNull(spaTreatment.getTreatmentServices())) {
                 for (TreatmentService treatmentService : spaTreatment.getTreatmentServices()) {
-                    totalPrice+=treatmentService.getSpaService().getPrice();
-                    totalTime+=treatmentService.getSpaService().getDurationMin();
+                    totalPrice += treatmentService.getSpaService().getPrice();
+                    totalTime += treatmentService.getSpaService().getDurationMin();
                 }
                 spaTreatmentEdit.setTotalPrice(totalPrice);
                 spaTreatmentEdit.setTotalTime(totalTime);

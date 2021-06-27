@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SpaPackageCreateRequest {
+public class SpaPackageRequest {
     private String name;
     private String description;
     private Type type;
