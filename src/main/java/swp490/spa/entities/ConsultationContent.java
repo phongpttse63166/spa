@@ -26,7 +26,7 @@ public class ConsultationContent implements Serializable {
     private String result;
     @Column(name = "note")
     private String note;
-    @ManyToOne
-    @JoinColumn(name = "booking_detail_id")
-    private BookingDetail bookingDetail;
+    @OneToOne
+    @JoinColumn(name = "booking_detail_step_id")
+    private BookingDetailStep bookingDetailStep;
 }

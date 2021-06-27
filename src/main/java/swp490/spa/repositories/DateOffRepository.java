@@ -1,5 +1,7 @@
 package swp490.spa.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.DateOff;
@@ -13,4 +15,10 @@ public interface DateOffRepository extends JpaRepository<DateOff, Integer> {
     List<DateOff> findByDateOffAndAndSpa_IdAndAndStatusDateOff(Date dateOff,
                                                                Integer spaId,
                                                                StatusDateOff approve);
+
+    Page<DateOff> findBySpa_IdAndStatusDateOffAndDateOffBetweenOrderByDateOff(Integer spaId,
+                                                                              StatusDateOff status,
+                                                                              Date monday,
+                                                                              Date sunday,
+                                                                              Pageable pageable);
 }

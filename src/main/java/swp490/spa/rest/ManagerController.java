@@ -24,10 +24,15 @@ import swp490.spa.utils.support.Notification;
 import swp490.spa.utils.support.UploadImage;
 
 import java.sql.Date;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static java.time.temporal.TemporalAdjusters.nextOrSame;
+import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
 @RequestMapping("/api/manager")
 @RestController
@@ -230,6 +235,19 @@ public class ManagerController {
         return ResponseHelper.ok(page);
     }
 
+    @GetMapping("/dateoff/getalldateoffofspainweek")
+    public Response getDateOffRegisterOfSpaInOneWeek(@RequestParam Integer spaId, Pageable pageable){
+        Date monday = Date.valueOf(LocalDate.now().with(previousOrSame(DayOfWeek.MONDAY)));
+        Date sunday = Date.valueOf(LocalDate.now().with(nextOrSame(DayOfWeek.SUNDAY)));
+        Page<DateOff> dateOffs = dateOffService.findBySpaAndStatusInOneWeek(spaId,
+                StatusDateOff.WAITING, monday, sunday, pageable);
+        if(Objects.nonNull(dateOffs)){
+            LOGGER.info(Notification.GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_SUCCESS);
+            return ResponseHelper.ok(conversion.convertToPageDateOffResponse(dateOffs));
+        }
+        return ResponseHelper.error(Notification.GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_FAILED);
+    }
+
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response createNewSpaService(SpaServiceCreateRequest spaServiceCreateRequest) {
@@ -261,6 +279,7 @@ public class ManagerController {
                 LOGGER.info(Notification.SAVE_IMAGE_FAILED);
             }
         }
+        LOGGER.info(Notification.FILE_NOT_EXISTED);
         return ResponseHelper.error(Notification.INSERT_SERVICE_FAILED);
     }
 
@@ -405,7 +424,7 @@ public class ManagerController {
         for (DateOff dateOff : dateOffList) {
             DateOff dateOffResult = dateOffService.findDateOffById(dateOff.getId());
             if (Objects.isNull(dateOffResult)) {
-                LOGGER.info(Notification.DATEOFF_NOT_EXISTED);
+                LOGGER.info(Notification.DATE_OFF_NOT_EXISTED);
                 isError = true;
             } else {
                 dateOffResult.setStatusDateOff(dateOff.getStatusDateOff());
@@ -414,14 +433,14 @@ public class ManagerController {
                 }
             }
             if (Objects.isNull(dateOffService.editDateOff(dateOffResult))) {
-                LOGGER.info(Notification.EDIT_DATEOFF_FAILED);
+                LOGGER.info(Notification.EDIT_DATE_OFF_FAILED);
                 isError = true;
             }
         }
         if (isError) {
-            return ResponseHelper.error(Notification.EDIT_DATEOFF_FAILED);
+            return ResponseHelper.error(Notification.EDIT_DATE_OFF_FAILED);
         }
-        return ResponseHelper.ok(Notification.EDIT_DATEOFF_SUCCESS);
+        return ResponseHelper.ok(Notification.EDIT_DATE_OFF_SUCCESS);
     }
 
     @PutMapping("/category/edit")

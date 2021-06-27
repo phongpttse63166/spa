@@ -90,8 +90,8 @@ public class StaffController {
             }
         }
         if(isError){
-            return ResponseHelper.error(Notification.INSERT_DATEOFF_FAILED);
+            return ResponseHelper.error(Notification.INSERT_DATE_OFF_FAILED);
         }
-        return ResponseHelper.ok(Notification.INSERT_DATEOFF_SUCCESS);
+        return ResponseHelper.ok(Notification.INSERT_DATE_OFF_SUCCESS);
     }
 }

@@ -3,6 +3,7 @@ package swp490.spa.dto.responses;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import swp490.spa.entities.BookingDetail;
+import swp490.spa.entities.BookingDetailStep;
 
 
 @Data
@@ -21,6 +22,6 @@ public class ConsultationContentResponse {
     private String result;
     @JsonProperty("note")
     private String note;
-    @JsonProperty("booking_detail_id")
-    private BookingDetail bookingDetail;
+    @JsonProperty("booking_detail_step")
+    private BookingDetailStep bookingDetailStep;
 }

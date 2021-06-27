@@ -30,10 +30,10 @@ public class Notification {
     public static final String INSERT_BOOKING_DETAIL_FAILED = "Tạo Booking Detail thất bại";
     public static final String INSERT_BOOKING_DETAIL_STEP_FAILED = "Tạo Booking Detail Step thất bại";
     public static final String INSERT_BOOKING_SUCCESS = "Tạo Booking thành công";
-    public static final String INSERT_DATEOFF_FAILED = "Tạo DateOff thất bại";
-    public static final String INSERT_DATEOFF_SUCCESS = "Tạo DateOff thành công";
-    public static final String EDIT_DATEOFF_FAILED = "Cập nhật DateOff thất bại";
-    public static final String EDIT_DATEOFF_SUCCESS = "Cập nhật DateOff thành công";
+    public static final String INSERT_DATE_OFF_FAILED = "Tạo DATE_OFF thất bại";
+    public static final String INSERT_DATE_OFF_SUCCESS = "Tạo DATE_OFF thành công";
+    public static final String EDIT_DATE_OFF_FAILED = "Cập nhật DATE_OFF thất bại";
+    public static final String EDIT_DATE_OFF_SUCCESS = "Cập nhật DATE_OFF thành công";
     public static final String BOOKING_NOT_EXISTED = "Booking không tồn tại";
     public static final String BOOKING_DETAIL_NOT_EXISTED = "Booking detail không tồn tại";
     public static final String CONSULTANT_NOT_EXISTED = "Consultant không tồn tại";
@@ -61,5 +61,14 @@ public class Notification {
     public static final String INSERT_CATEGORY_FAILED = "Tạo Category thất bại";
     public static final String INSERT_CATEGORY_SUCCESS = "Tạo Category thành công";
     public static final String EDIT_PASSWORD_FAILED = "Cập nhật password thất bại";
-    public static final String DATEOFF_NOT_EXISTED = "Date off không tồn tại";
+    public static final String DATE_OFF_NOT_EXISTED = "Date off không tồn tại";
+    public static final String INSERT_CONSULTATION_CONTENT_FAILED = "Tạo consultation content thất bại";
+    public static final String INSERT_CONSULTATION_CONTENT_SUCCESS = "Tạo consultation content thành công";
+    public static final String CONSULTANT_CONTENT_NOT_EXISTED = "Consultation content không tồn tại";
+    public static final String EDIT_CONSULTATION_CONTENT_FAILED = "Cập nhật Consultation content thất bại";
+    public static final String EDIT_CONSULTATION_CONTENT_SUCCESS = "Cập nhật Consultation content thành công";
+    public static final String GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_SUCCESS =
+            "Lấy danh sách đăng kí date off trong 1 tuần thành công";
+    public static final String GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_FAILED =
+            "Lấy danh sách đăng kí date off trong 1 tuần thất bại";
 }

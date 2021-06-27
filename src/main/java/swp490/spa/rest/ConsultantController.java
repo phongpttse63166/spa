@@ -42,13 +42,16 @@ public class ConsultantController {
     private SpaTreatmentService spaTreatmentService;
     @Autowired
     private DateOffService dateOffService;
+    @Autowired
+    private ConsultationContentService consultationContentService;
     private Conversion conversion;
 
     public ConsultantController(ConsultantService consultantService, UserService userService,
                                 DateOffService dateOffService, BookingService bookingService,
                                 BookingDetailService bookingDetailService,
                                 BookingDetailStepService bookingDetailStepService,
-                                SpaTreatmentService spaTreatmentService) {
+                                SpaTreatmentService spaTreatmentService,
+                                ConsultationContentService consultationContentService) {
         this.consultantService = consultantService;
         this.userService = userService;
         this.dateOffService = dateOffService;
@@ -56,6 +59,7 @@ public class ConsultantController {
         this.bookingDetailService = bookingDetailService;
         this.bookingDetailStepService = bookingDetailStepService;
         this.spaTreatmentService = spaTreatmentService;
+        this.consultationContentService = consultationContentService;
         this.conversion = new Conversion();
     }
 
@@ -83,9 +87,9 @@ public class ConsultantController {
             }
         }
         if (isError) {
-            return ResponseHelper.error(Notification.INSERT_DATEOFF_FAILED);
+            return ResponseHelper.error(Notification.INSERT_DATE_OFF_FAILED);
         }
-        return ResponseHelper.ok(Notification.INSERT_DATEOFF_SUCCESS);
+        return ResponseHelper.ok(Notification.INSERT_DATE_OFF_SUCCESS);
     }
 
     @GetMapping("/booking/findbybookingstatus")
@@ -109,6 +113,18 @@ public class ConsultantController {
             return ResponseHelper.ok(conversion.convertToPageBookingDetailResponse(bookingDetails));
         }
         return ResponseHelper.error(Notification.BOOKING_DETAIL_NOT_EXISTED);
+    }
+
+    @GetMapping("/spatreatment/findbyspapackage")
+    public Response findSpaTreatmentBySpaPackage(@RequestParam Integer spaPackageId,
+                                                 Pageable pageable){
+        Page<SpaTreatment> spaTreatments =
+                spaTreatmentService.findByPackageId(spaPackageId,
+                        Constant.SEARCH_NO_CONTENT, pageable);
+        if(Objects.nonNull(spaTreatments)){
+            return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
+        }
+        return ResponseHelper.error(Notification.SPA_TREATMENT_NOT_EXISTED);
     }
 
     @PostMapping("/bookingdetail/editandinsertmorestep")
@@ -183,14 +199,53 @@ public class ConsultantController {
                 } else {
                     bookingDetailStep.setStatusBooking(StatusBooking.NOT_BOOKING);
                 }
-                if(Objects.isNull(bookingDetailStepService
-                        .insertBookingDetailStep(bookingDetailStep))){
+                BookingDetailStep bookingDetailStepNew = (bookingDetailStepService
+                        .insertBookingDetailStep(bookingDetailStep));
+                if(Objects.isNull(bookingDetailStepNew)){
                     LOGGER.info(bookingDetailStep + Notification.INSERT_BOOKING_DETAIL_STEP_FAILED);
+                } else {
+                    ConsultationContent consultationContent = new ConsultationContent();
+                    consultationContent.setBookingDetailStep(bookingDetailStepNew);
+                    ConsultationContent consultationContentResult =
+                            consultationContentService.insertNewConsultationContent(consultationContent);
+                    if(Objects.nonNull(consultationContentResult)){
+                        LOGGER.info(Notification.INSERT_CONSULTATION_CONTENT_SUCCESS);
+                    } else {
+                        LOGGER.info(Notification.INSERT_CONSULTATION_CONTENT_FAILED);
+                    }
                 }
             }
         }
         return ResponseHelper.ok(Notification.EDIT_BOOKING_DETAIL_SUCCESS);
     }
 
-
+    @PutMapping("/consultationcontent/edit")
+    public Response editConsultationContent(@RequestBody ConsultationContent consultationContent){
+        ConsultationContent consultationContentEdit =
+                consultationContentService.findByConsultationContentId(consultationContent.getId());
+        if(Objects.nonNull(consultationContentEdit)){
+            if(Objects.nonNull(consultationContent.getDescription())) {
+                consultationContentEdit.setDescription(consultationContent.getDescription());
+            }
+            if(Objects.nonNull(consultationContent.getExpectation())) {
+                consultationContentEdit.setExpectation(consultationContent.getExpectation());
+            }
+            if(Objects.nonNull(consultationContent.getResult())) {
+                consultationContentEdit.setResult(consultationContent.getResult());
+            }
+            if(Objects.nonNull(consultationContent.getNote())) {
+                consultationContentEdit.setNote(consultationContent.getNote());
+            }
+            ConsultationContent consultationContentResult =
+                    consultationContentService.editByConsultationContent(consultationContentEdit);
+            if(Objects.isNull(consultationContentResult)){
+                LOGGER.info(Notification.EDIT_CONSULTATION_CONTENT_FAILED);
+            }
+            LOGGER.info(Notification.EDIT_CONSULTATION_CONTENT_SUCCESS);
+            return ResponseHelper.ok(Notification.EDIT_BOOKING_DETAIL_SUCCESS);
+        } else {
+            LOGGER.info(Notification.CONSULTANT_CONTENT_NOT_EXISTED);
+        }
+        return ResponseHelper.error(Notification.EDIT_CONSULTATION_CONTENT_FAILED);
+    }
 }

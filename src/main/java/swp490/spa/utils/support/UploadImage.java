@@ -15,21 +15,8 @@ import java.util.UUID;
 
 public class UploadImage {
 
-    private static final String imageURL = "https://storage.googleapis.com/testuploadimgae.appspot.com/%s";
-
     public static String uploadImage(MultipartFile file) {
         try {
-
-            FileInputStream serviceAccount =
-                    new FileInputStream("testuploadimgae-firebase-adminsdk-tpl07-8b469b8252.json");
-
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setStorageBucket("testuploadimgae.appspot.com")
-                    .build();
-
-            FirebaseApp.initializeApp(options);
-
             String fileName = save(file);
             String imageUrl = getImageUrl(fileName);
 
@@ -60,7 +47,7 @@ public class UploadImage {
     }
 
     private static String getImageUrl(String name) {
-        return String.format(imageURL, name);
+        return String.format(Constant.STORAGE_URL, name);
     }
 
 }

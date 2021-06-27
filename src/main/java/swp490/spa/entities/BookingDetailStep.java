@@ -46,6 +46,9 @@ public class BookingDetailStep implements Serializable {
     @OneToOne
     @JsonBackReference
     private Rating rating;
+    @OneToOne
+    @JsonBackReference
+    private ConsultationContent consultationContent;
 
     public Integer getId() {
         return id;
@@ -133,5 +136,13 @@ public class BookingDetailStep implements Serializable {
 
     public void setRating(Rating rating) {
         this.rating = rating;
+    }
+
+    public ConsultationContent getConsultationContent() {
+        return consultationContent;
+    }
+
+    public void setConsultationContent(ConsultationContent consultationContent) {
+        this.consultationContent = consultationContent;
     }
 }

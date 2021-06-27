@@ -1,6 +1,8 @@
 package swp490.spa.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.DateOff;
 import swp490.spa.entities.StatusDateOff;
@@ -27,6 +29,14 @@ public class DateOffService {
     }
 
     public List<DateOff> findByDateOffAndSpaAndStatus(Date dateOff, Integer spaId) {
-        return this.dateOffRepository.findByDateOffAndAndSpa_IdAndAndStatusDateOff(dateOff, spaId, StatusDateOff.APPROVE);
+        return this.dateOffRepository
+                .findByDateOffAndAndSpa_IdAndAndStatusDateOff(dateOff, spaId, StatusDateOff.APPROVE);
+    }
+
+    public Page<DateOff> findBySpaAndStatusInOneWeek(Integer spaId, StatusDateOff waiting,
+                                                     Date monday, Date sunday, Pageable pageable) {
+        return this.dateOffRepository
+                .findBySpa_IdAndStatusDateOffAndDateOffBetweenOrderByDateOff(spaId, waiting,
+                        monday, sunday, pageable);
     }
 }

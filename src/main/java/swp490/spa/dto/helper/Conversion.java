@@ -179,4 +179,20 @@ public class Conversion {
         return new PageImpl<>(bookingDetailData,totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
                 totalElements);
     }
+
+    public Page<DateOffResponse> convertToPageDateOffResponse(Page<DateOff> dateOffPage) {
+        List<DateOffResponse> dateOffData = dateOffPage.getContent().stream()
+                .map(dateOff -> new DateOffResponse(dateOff.getId(),
+                        dateOff.getDateOff(),
+                        dateOff.getStatusDateOff(),
+                        dateOff.getReasonDateOff(),
+                        dateOff.getReasonCancel(),
+                        dateOff.getManager(),
+                        dateOff.getEmployee(),
+                        dateOff.getSpa()))
+                .collect(Collectors.toList());
+        long totalElements = dateOffPage.getTotalElements();
+        return new PageImpl<>(dateOffData,totalElements == 0 ? Pageable.unpaged() : dateOffPage.getPageable(),
+                totalElements);
+    }
 }

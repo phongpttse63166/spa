@@ -12,4 +12,7 @@ public class Constant {
     public static final int SIZE_MAX = 50;
     public static final String TIME_DEFAULT = "00:00:00";
     public static final int DURATION_OF_CONSULTATION = 30;
+    public static final String STORAGE_URL = "https://storage.googleapis.com/testuploadimgae.appspot.com/%s";
+    public static final String FILE_JSON = "testuploadimgae-firebase-adminsdk-tpl07-8b469b8252.json";
+    public static final String STORAGE_BUCKET = "testuploadimgae.appspot.com";
 }
