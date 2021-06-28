@@ -24,8 +24,10 @@ public class CategoryService {
         return this.categoryRepository.findByCategoryId(categoryId);
     }
 
-    public Page<Category> findCategoryBySpaId(Integer spaId, Status status, Pageable pageable) {
-        return this.categoryRepository.findBySpa_IdAndStatusOrderById(spaId, status, pageable);
+    public Page<Category> findCategoryBySpaId(Integer spaId, Status status,
+                                              String search, Pageable pageable) {
+        return this.categoryRepository
+                .findBySpa_IdAndStatusAndNameLikeOrderById(spaId, status, search, pageable);
     }
 
     public Category editByCategoryId(Category category) {

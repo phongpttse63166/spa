@@ -183,13 +183,14 @@ public class ManagerController {
     @GetMapping("/categoryspapackages/findbyspaId")
     public Response findCategorySpaPackagesBySpaId(@RequestParam Integer spaId,
                                                    @RequestParam Status status,
+                                                   @RequestParam String search,
                                                    Pageable pageable) {
         long totalItem =
-                categoryService.findCategoryBySpaId(spaId, status,
+                categoryService.findCategoryBySpaId(spaId, status, search,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                         .getContent().size();
         List<Category> categories =
-                categoryService.findCategoryBySpaId(spaId, status, pageable).getContent();
+                categoryService.findCategoryBySpaId(spaId, status, search, pageable).getContent();
         if (Objects.nonNull(categories)) {
             List<CategorySpaPackageResponse> categorySpaPackageResponses = new ArrayList<>();
             for (Category category : categories) {
