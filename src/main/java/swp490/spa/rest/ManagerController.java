@@ -3,10 +3,7 @@ package swp490.spa.rest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
@@ -187,6 +184,10 @@ public class ManagerController {
     public Response findCategorySpaPackagesBySpaId(@RequestParam Integer spaId,
                                                    @RequestParam Status status,
                                                    Pageable pageable) {
+        long totalItem =
+                categoryService.findCategoryBySpaId(spaId, status,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                        .getContent().size();
         List<Category> categories =
                 categoryService.findCategoryBySpaId(spaId, status, pageable).getContent();
         if (Objects.nonNull(categories)) {
@@ -198,7 +199,7 @@ public class ManagerController {
             }
             Page<CategorySpaPackageResponse> pageReturn =
                     new PageImpl<>(categorySpaPackageResponses, pageable,
-                            categories.size());
+                            totalItem);
             return ResponseHelper.ok(pageReturn);
         }
         return ResponseHelper.error(Notification.CATEGORY_NOT_EXISTED);
