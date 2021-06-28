@@ -450,7 +450,7 @@ public class ManagerController {
                                  CategoryRequest category) {
         Category categoryEdit = categoryService.findById(categoryId);
         if (Objects.nonNull(categoryEdit)) {
-            if (Objects.nonNull(category.getFile())) {
+            if (!category.getFile().getOriginalFilename().equals("")) {
                 String iconLink = UploadImage.uploadImage(category.getFile());
                 if (iconLink != "") {
                     categoryEdit.setIcon(iconLink);
@@ -526,7 +526,7 @@ public class ManagerController {
     public Response editSpaService(@PathVariable Integer spaServiceId, SpaServiceRequest spaService) {
         SpaService spaServiceEdit = spaServiceService.findBySpaServiceId(spaServiceId);
         if (Objects.nonNull(spaServiceEdit)) {
-            if (Objects.nonNull(spaService.getFile())) {
+            if (!spaService.getFile().getOriginalFilename().equals("")) {
                 String imageLink = UploadImage.uploadImage(spaService.getFile());
                 if (imageLink != "") {
                     spaServiceEdit.setImage(imageLink);
@@ -534,23 +534,23 @@ public class ManagerController {
                     LOGGER.info(Notification.SAVE_IMAGE_FAILED);
                     return ResponseHelper.error(Notification.SAVE_IMAGE_FAILED);
                 }
-                if (Objects.nonNull(spaService.getName())) {
-                    spaServiceEdit.setName(spaService.getName());
-                }
-                if (Objects.nonNull(spaService.getDescription())) {
-                    spaServiceEdit.setDescription(spaService.getDescription());
-                }
-                if (Objects.nonNull(spaService.getDurationMin())) {
-                    spaServiceEdit.setDurationMin(spaService.getDurationMin());
-                }
-                if (Objects.nonNull(spaService.getPrice())) {
-                    spaServiceEdit.setPrice(spaService.getPrice());
-                }
-                SpaService spaServiceResult = spaServiceService.editBySpaService(spaServiceEdit);
-                if (Objects.nonNull(spaServiceResult)) {
-                    LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_SUCCESS);
-                    return ResponseHelper.ok(spaServiceResult);
-                }
+            }
+            if (Objects.nonNull(spaService.getName())) {
+                spaServiceEdit.setName(spaService.getName());
+            }
+            if (Objects.nonNull(spaService.getDescription())) {
+                spaServiceEdit.setDescription(spaService.getDescription());
+            }
+            if (Objects.nonNull(spaService.getDurationMin())) {
+                spaServiceEdit.setDurationMin(spaService.getDurationMin());
+            }
+            if (Objects.nonNull(spaService.getPrice())) {
+                spaServiceEdit.setPrice(spaService.getPrice());
+            }
+            SpaService spaServiceResult = spaServiceService.editBySpaService(spaServiceEdit);
+            if (Objects.nonNull(spaServiceResult)) {
+                LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_SUCCESS);
+                return ResponseHelper.ok(spaServiceResult);
             }
         } else {
             LOGGER.info(Notification.SPA_SERVICE_NOT_EXISTED);
