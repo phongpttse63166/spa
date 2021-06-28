@@ -402,7 +402,7 @@ public class ManagerController {
                     Category categoryResult = categoryService.insertNewCategory(categoryNew);
                     if (Objects.nonNull(categoryResult)) {
                         LOGGER.info(Notification.INSERT_CATEGORY_SUCCESS);
-                        ResponseHelper.ok(categoryResult);
+                        return ResponseHelper.ok(categoryResult);
                     }
                     LOGGER.info(Notification.INSERT_CATEGORY_FAILED);
                 } else {
