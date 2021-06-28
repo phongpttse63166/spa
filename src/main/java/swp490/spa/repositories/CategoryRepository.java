@@ -15,7 +15,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("FROM Category c WHERE c.id = ?1")
     Category findByCategoryId(Integer categoryId);
 
-    Page<Category> findBySpa_IdAndStatusAndNameLikeOrderById(Integer spaId, Status status,
+    Page<Category> findBySpa_IdAndStatusAndNameContainingOrderById(Integer spaId, Status status,
                                                   String search, Pageable pageable);
 
     Page<Category> findBySpa_IdAndStatusOrderById(Integer spaId, Status status, Pageable pageable);

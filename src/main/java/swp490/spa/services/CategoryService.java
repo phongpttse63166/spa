@@ -29,7 +29,7 @@ public class CategoryService {
     public Page<Category> findCategoryBySpaId(Integer spaId, Status status,
                                               String search, Pageable pageable) {
         return this.categoryRepository
-                .findBySpa_IdAndStatusAndNameLikeOrderById(spaId, status, search, pageable);
+                .findBySpa_IdAndStatusAndNameContainingOrderById(spaId, status, search, pageable);
     }
 
     public Category editByCategoryId(Category category) {
