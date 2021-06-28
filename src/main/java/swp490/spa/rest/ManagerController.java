@@ -251,7 +251,7 @@ public class ManagerController {
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response createNewSpaService(SpaServiceRequest spaServiceRequest) {
-        if (!spaServiceRequest.getFile().getOriginalFilename().equals("")) {
+        if (Objects.nonNull(spaServiceRequest.getFile())) {
             String imageLink = UploadImage.uploadImage(spaServiceRequest.getFile());
             if (imageLink != "") {
                 Manager manager = managerService.findManagerById(spaServiceRequest.getCreateBy());
@@ -288,7 +288,7 @@ public class ManagerController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response insertNewSpaPackageWithServices(SpaPackageRequest spaPackage) {
-        if (!spaPackage.getFile().getOriginalFilename().equals("")) {
+        if (Objects.nonNull(spaPackage.getFile())) {
             String imageLink = UploadImage.uploadImage(spaPackage.getFile());
             if (imageLink != "") {
                 List<SpaService> spaServices = new ArrayList<>();
@@ -375,7 +375,7 @@ public class ManagerController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response insertNewCategory(CategoryRequest categoryRequest) {
-        if (!categoryRequest.getFile().getOriginalFilename().equals("")) {
+        if (Objects.nonNull(categoryRequest.getFile())) {
             String imageLink = UploadImage.uploadImage(categoryRequest.getFile());
             if (imageLink != "") {
                 Spa spa = spaService.findById(categoryRequest.getSpaId());
@@ -452,7 +452,7 @@ public class ManagerController {
                                  CategoryRequest category) {
         Category categoryEdit = categoryService.findById(categoryId);
         if (Objects.nonNull(categoryEdit)) {
-            if (!category.getFile().getOriginalFilename().equals("")) {
+            if (Objects.nonNull(category.getFile())) {
                 String iconLink = UploadImage.uploadImage(category.getFile());
                 if (iconLink != "") {
                     categoryEdit.setIcon(iconLink);
@@ -528,7 +528,7 @@ public class ManagerController {
     public Response editSpaService(@PathVariable Integer spaServiceId, SpaServiceRequest spaService) {
         SpaService spaServiceEdit = spaServiceService.findBySpaServiceId(spaServiceId);
         if (Objects.nonNull(spaServiceEdit)) {
-            if (!spaService.getFile().getOriginalFilename().equals("")) {
+            if (Objects.nonNull(spaService.getFile())) {
                 String imageLink = UploadImage.uploadImage(spaService.getFile());
                 if (imageLink != "") {
                     spaServiceEdit.setImage(imageLink);
