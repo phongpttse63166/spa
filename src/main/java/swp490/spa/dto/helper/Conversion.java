@@ -171,6 +171,7 @@ public class Conversion {
                 .map(bookingDetail -> new BookingDetailResponse(bookingDetail.getId(),
                         bookingDetail.getTotalTime(),
                         bookingDetail.getType(),
+                        bookingDetail.getTotalPrice(),
                         bookingDetail.getBooking(),
                         bookingDetail.getSpaTreatment(),
                         bookingDetail.getSpaPackage()))

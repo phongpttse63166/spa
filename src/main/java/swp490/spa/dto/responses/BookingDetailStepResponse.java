@@ -21,6 +21,8 @@ public class BookingDetailStepResponse {
     private Time startTime;
     @JsonProperty("end_time")
     private Time endTime;
+    @JsonProperty("booking_price")
+    private Double bookingPrice;
     @JsonProperty("status_booking")
     private StatusBooking statusBooking;
     @JsonProperty("reason_cancel")

@@ -19,6 +19,8 @@ public class BookingDetailResponse {
     private Integer totalTime;
     @JsonProperty("type")
     private Type type;
+    @JsonProperty("total_price")
+    private Double totalPrice;
     @JsonProperty("booking")
     private Booking booking;
     @JsonProperty("treatment")

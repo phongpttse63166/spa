@@ -22,6 +22,8 @@ public class BookingDetail implements Serializable {
     private Integer totalTime;
     @Column(name = "type")
     private Type type;
+    @Column(name = "total_price")
+    private Double totalPrice;
     @ManyToOne
     @JoinColumn(name = "booking_id")
     private Booking booking;

@@ -308,6 +308,7 @@ public class CustomerController {
                                 BookingDetail bookingDetail = new BookingDetail();
                                 bookingDetail.setBooking(bookingResult);
                                 bookingDetail.setSpaPackage(spaTreatment.getSpaPackage());
+                                bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
                                 bookingDetail.setSpaTreatment(spaTreatment);
                                 bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                                 bookingDetail.setType(spaTreatment.getSpaPackage().getType());
@@ -323,6 +324,8 @@ public class CustomerController {
                                         BookingDetailStep bookingDetailStep = new BookingDetailStep();
                                         bookingDetailStep.setDateBooking(bookingData.getDateBooking());
                                         bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                                        bookingDetailStep.setBookingPrice(treatmentServices.get(i)
+                                                .getSpaService().getPrice());
                                         bookingDetailStep.setTreatmentService(treatmentServices.get(i));
                                         bookingDetailStep.setBookingDetail(bookingDetailResult);
                                         if (i == 0) {
@@ -368,6 +371,7 @@ public class CustomerController {
                                     bookingDetail.setBooking(bookingResult);
                                     bookingDetail.setSpaPackage(spaPackage);
                                     bookingDetail.setSpaTreatment(spaTreatment);
+                                    bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
                                     bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                                     bookingDetail.setType(Type.ONESTEP);
                                     bookingDetailResult = bookingDetailService
@@ -383,6 +387,8 @@ public class CustomerController {
                                             bookingDetailStep.setDateBooking(bookingData.getDateBooking());
                                             bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
                                             bookingDetailStep.setTreatmentService(treatmentServices.get(i));
+                                            bookingDetailStep.setBookingPrice(treatmentServices.get(i)
+                                                    .getSpaService().getPrice());
                                             bookingDetailStep.setBookingDetail(bookingDetailResult);
                                             if (i == 0) {
                                                 startTime = bookingData.getTimeBooking();

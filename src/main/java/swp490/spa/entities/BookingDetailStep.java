@@ -27,6 +27,8 @@ public class BookingDetailStep implements Serializable {
     private Time startTime;
     @Column(name = "end_time")
     private Time endTime;
+    @Column(name = "booking_price")
+    private Double bookingPrice;
     @Column(name = "status_booking")
     private StatusBooking statusBooking;
     @Column(name = "reason_cancel")
@@ -80,6 +82,14 @@ public class BookingDetailStep implements Serializable {
 
     public void setEndTime(Time endTime) {
         this.endTime = endTime;
+    }
+
+    public Double getBookingPrice() {
+        return bookingPrice;
+    }
+
+    public void setBookingPrice(Double bookingPrice) {
+        this.bookingPrice = bookingPrice;
     }
 
     public StatusBooking getStatusBooking() {

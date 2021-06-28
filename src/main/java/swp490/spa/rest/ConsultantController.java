@@ -127,6 +127,7 @@ public class ConsultantController {
         return ResponseHelper.error(Notification.SPA_TREATMENT_NOT_EXISTED);
     }
 
+    // Cho nay con check lai nha
     @PostMapping("/bookingdetail/editandinsertmorestep")
     public Response editBookingDetail(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
         Double totalPriceBooking = bookingDetailRequest.getBookingDetail().
