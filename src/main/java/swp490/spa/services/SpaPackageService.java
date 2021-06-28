@@ -24,11 +24,11 @@ public class SpaPackageService {
     }
 
     public Page<SpaPackage> findAllStatusAvailable(Pageable pageable){
-        return this.spaPackageRepository.findAllByStatus(Status.AVAILABLE, pageable);
+        return this.spaPackageRepository.findAllByStatusOrderById(Status.AVAILABLE, pageable);
     }
 
-    public Page<SpaPackage> findSpaPackageBySpaIdAndStatusAvailable(Integer spaId,
-                                                                    String search, Pageable pageable){
+    public Page<SpaPackage> findSpaPackageBySpaIdAndStatusAvailable(Integer spaId, String search,
+                                                                    Pageable pageable){
         return this.spaPackageRepository
                 .findSpaPackageBySpaIdAndStatus(spaId, Status.AVAILABLE, search ,pageable);
     }
@@ -70,7 +70,7 @@ public class SpaPackageService {
     }
 
     public List<SpaPackage> findByCategoryId(Integer categoryId) {
-        return this.spaPackageRepository.findByCategory_Id(categoryId);
+        return this.spaPackageRepository.findByCategory_IdOrderById(categoryId);
     }
 
     public SpaPackage editBySpaPackageId(SpaPackage spaPackage) {

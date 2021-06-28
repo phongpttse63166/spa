@@ -59,7 +59,7 @@ public class SpaTreatmentService {
         return this.spaTreatmentRepository.save(spaTreatment);
     }
 
-    public SpaTreatment findByTreatmentId(Integer spatreatmentId) {
-        return this.spaTreatmentRepository.findById(spatreatmentId).get();
+    public SpaTreatment findByTreatmentId(Integer spaTreatmentId) {
+        return this.spaTreatmentRepository.findById(spaTreatmentId).get();
     }
 }

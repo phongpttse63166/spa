@@ -448,27 +448,30 @@ public class ManagerController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response editCategory(@PathVariable Integer categoryId,
                                  CategoryRequest category) {
-        String iconLink = UploadImage.uploadImage(category.getFile());
-        if (iconLink != "") {
-            Category categoryEdit = categoryService.findById(categoryId);
-            if (Objects.nonNull(categoryEdit)) {
-                categoryEdit.setIcon(iconLink);
-                if (Objects.nonNull(category.getName())) {
-                    categoryEdit.setName(category.getName());
+        Category categoryEdit = categoryService.findById(categoryId);
+        if (Objects.nonNull(categoryEdit)) {
+            if (Objects.nonNull(category.getFile())) {
+                String iconLink = UploadImage.uploadImage(category.getFile());
+                if (iconLink != "") {
+                    categoryEdit.setIcon(iconLink);
+                } else {
+                    LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(Notification.SAVE_IMAGE_FAILED);
                 }
-                if (Objects.nonNull(category.getDescription())) {
-                    categoryEdit.setDescription(category.getDescription());
-                }
-                Category categoryResult = categoryService.editByCategoryId(categoryEdit);
-                if (Objects.nonNull(categoryResult)) {
-                    LOGGER.info(categoryResult + "-" + Notification.EDIT_CATEGORY_SUCCESS);
-                    return ResponseHelper.ok(categoryResult);
-                }
-            } else {
-                LOGGER.info(Notification.CATEGORY_NOT_EXISTED);
+            }
+            if (Objects.nonNull(category.getName())) {
+                categoryEdit.setName(category.getName());
+            }
+            if (Objects.nonNull(category.getDescription())) {
+                categoryEdit.setDescription(category.getDescription());
+            }
+            Category categoryResult = categoryService.editByCategoryId(categoryEdit);
+            if (Objects.nonNull(categoryResult)) {
+                LOGGER.info(categoryResult + "-" + Notification.EDIT_CATEGORY_SUCCESS);
+                return ResponseHelper.ok(categoryResult);
             }
         } else {
-            LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+            LOGGER.info(Notification.CATEGORY_NOT_EXISTED);
         }
         return ResponseHelper.error(Notification.EDIT_CATEGORY_FAILED);
     }
@@ -521,37 +524,36 @@ public class ManagerController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response editSpaService(@PathVariable Integer spaServiceId, SpaServiceRequest spaService) {
-        if (Objects.nonNull(spaService.getFile())) {
-            String imageLink = UploadImage.uploadImage(spaService.getFile());
-            if (imageLink != "") {
-                SpaService spaServiceEdit = spaServiceService.findBySpaServiceId(spaServiceId);
-                if (Objects.nonNull(spaServiceEdit)) {
-                    if (Objects.nonNull(spaService.getName())) {
-                        spaServiceEdit.setName(spaService.getName());
-                    }
-                    if (Objects.nonNull(spaService.getDescription())) {
-                        spaServiceEdit.setDescription(spaService.getDescription());
-                    }
-                    if (Objects.nonNull(spaService.getDurationMin())) {
-                        spaServiceEdit.setDurationMin(spaService.getDurationMin());
-                    }
-                    if (Objects.nonNull(spaService.getPrice())) {
-                        spaServiceEdit.setPrice(spaService.getPrice());
-                    }
+        SpaService spaServiceEdit = spaServiceService.findBySpaServiceId(spaServiceId);
+        if (Objects.nonNull(spaServiceEdit)) {
+            if (Objects.nonNull(spaService.getFile())) {
+                String imageLink = UploadImage.uploadImage(spaService.getFile());
+                if (imageLink != "") {
                     spaServiceEdit.setImage(imageLink);
-                    SpaService spaServiceResult = spaServiceService.editBySpaService(spaServiceEdit);
-                    if (Objects.nonNull(spaServiceResult)) {
-                        LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_SUCCESS);
-                        return ResponseHelper.ok(spaServiceResult);
-                    }
                 } else {
-                    LOGGER.info(Notification.SPA_SERVICE_NOT_EXISTED);
+                    LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(Notification.SAVE_IMAGE_FAILED);
                 }
-             } else {
-                LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+                if (Objects.nonNull(spaService.getName())) {
+                    spaServiceEdit.setName(spaService.getName());
+                }
+                if (Objects.nonNull(spaService.getDescription())) {
+                    spaServiceEdit.setDescription(spaService.getDescription());
+                }
+                if (Objects.nonNull(spaService.getDurationMin())) {
+                    spaServiceEdit.setDurationMin(spaService.getDurationMin());
+                }
+                if (Objects.nonNull(spaService.getPrice())) {
+                    spaServiceEdit.setPrice(spaService.getPrice());
+                }
+                SpaService spaServiceResult = spaServiceService.editBySpaService(spaServiceEdit);
+                if (Objects.nonNull(spaServiceResult)) {
+                    LOGGER.info(spaService + " " + Notification.EDIT_SERVICE_SUCCESS);
+                    return ResponseHelper.ok(spaServiceResult);
+                }
             }
         } else {
-            LOGGER.info(Notification.FILE_NOT_EXISTED);
+            LOGGER.info(Notification.SPA_SERVICE_NOT_EXISTED);
         }
         return ResponseHelper.error(Notification.EDIT_SERVICE_FAILED);
     }

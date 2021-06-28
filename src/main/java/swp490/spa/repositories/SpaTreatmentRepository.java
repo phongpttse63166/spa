@@ -9,10 +9,10 @@ import swp490.spa.entities.SpaTreatment;
 
 @Repository
 public interface SpaTreatmentRepository extends JpaRepository<SpaTreatment, Integer> {
-    @Query("FROM SpaTreatment s WHERE s.spa.id = ?1 and s.name LIKE %?2%")
+    @Query("FROM SpaTreatment s WHERE s.spa.id = ?1 and s.name LIKE %?2% ORDER BY s.id ASC")
     Page<SpaTreatment> findTreatmentBySpaId(Integer spaId, String search, Pageable pageable);
 
-    @Query("FROM SpaTreatment s WHERE s.spaPackage.id = ?1 and s.name LIKE %?2%")
+    @Query("FROM SpaTreatment s WHERE s.spaPackage.id = ?1 and s.name LIKE %?2% ORDER BY s.id ASC")
     Page<SpaTreatment> findByPackageId(Integer packageId, String search, Pageable pageable);
 
     SpaTreatment findBySpaPackage_Id(Integer packageId);
