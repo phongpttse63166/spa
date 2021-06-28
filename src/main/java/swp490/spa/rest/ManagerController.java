@@ -56,13 +56,15 @@ public class ManagerController {
     private BookingService bookingService;
     @Autowired
     private BookingDetailService bookingDetailService;
+    @Autowired
+    private StaffService staffService;
     private Conversion conversion;
 
     public ManagerController(ManagerService managerService, SpaServiceService spaServiceService,
                              SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
                              swp490.spa.services.SpaService spaService, UserService userService,
                              DateOffService dateOffService, BookingService bookingService,
-                             BookingDetailService bookingDetailService) {
+                             BookingDetailService bookingDetailService, StaffService staffService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
@@ -72,6 +74,7 @@ public class ManagerController {
         this.dateOffService = dateOffService;
         this.bookingService = bookingService;
         this.bookingDetailService = bookingDetailService;
+        this.staffService = staffService;
         this.conversion = new Conversion();
     }
 
@@ -247,7 +250,7 @@ public class ManagerController {
     }
 
     @GetMapping("/dateoff/getalldateoffofspainweek")
-    public Response getDateOffRegisterOfSpaInOneWeek(@RequestParam Integer spaId, Pageable pageable) {
+    public Response findDateOffRegisterOfSpaInOneWeek(@RequestParam Integer spaId, Pageable pageable) {
         Date monday = Date.valueOf(LocalDate.now().with(previousOrSame(DayOfWeek.MONDAY)));
         Date sunday = Date.valueOf(LocalDate.now().with(nextOrSame(DayOfWeek.SUNDAY)));
         Page<DateOff> dateOffs = dateOffService.findBySpaAndStatusInOneWeek(spaId,
@@ -257,6 +260,18 @@ public class ManagerController {
             return ResponseHelper.ok(conversion.convertToPageDateOffResponse(dateOffs));
         }
         return ResponseHelper.error(Notification.GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_FAILED);
+    }
+
+    @GetMapping("/staff/findbyspa")
+    public Response findStaffBySpaId(@RequestParam Integer spaId,
+                                     @RequestParam String search,
+                                     Pageable pageable){
+        Page<Staff> staffs = staffService.findBySpaIdAndNameLike(spaId, search, pageable);
+        if (!staffs.hasContent() && !staffs.isFirst()) {
+            staffs = staffService.findBySpaIdAndNameLike(spaId, search,
+                    PageRequest.of(staffs.getTotalPages() - 1, staffs.getSize(), staffs.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToPageStaffResponse(staffs));
     }
 
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},

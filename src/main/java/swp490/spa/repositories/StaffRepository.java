@@ -1,5 +1,7 @@
 package swp490.spa.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,4 +15,7 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
     Staff findByUserId(Integer userId);
 
     List<Staff> findBySpa_Id(Integer spaId);
+
+    @Query("FROM Staff s WHERE s.spa.id = ?1 AND s.user.fullname LIKE %?2% ORDER BY s.id")
+    Page<Staff> findStaffBySpaIdAndNameLike(Integer spaId, String search, Pageable pageable);
 }

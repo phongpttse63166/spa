@@ -195,4 +195,14 @@ public class Conversion {
         return new PageImpl<>(dateOffData,totalElements == 0 ? Pageable.unpaged() : dateOffPage.getPageable(),
                 totalElements);
     }
+
+    public Page<StaffResponse> convertToPageStaffResponse(Page<Staff> staffs) {
+        List<StaffResponse> staffData = staffs.getContent().stream()
+                .map(staff -> new StaffResponse(staff.getUser(),
+                        staff.getSpa()))
+                .collect(Collectors.toList());
+        long totalElements = staffs.getTotalElements();
+        return new PageImpl<>(staffData,totalElements == 0 ? Pageable.unpaged() : staffs.getPageable(),
+                totalElements);
+    }
 }

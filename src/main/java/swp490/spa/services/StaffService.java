@@ -1,6 +1,8 @@
 package swp490.spa.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.Staff;
 import swp490.spa.repositories.StaffRepository;
@@ -18,5 +20,9 @@ public class StaffService {
 
     public List<Staff> findBySpaId(Integer spaId) {
         return this.staffRepository.findBySpa_Id(spaId);
+    }
+
+    public Page<Staff> findBySpaIdAndNameLike(Integer spaId, String search, Pageable pageable) {
+        return this.staffRepository.findStaffBySpaIdAndNameLike(spaId, search, pageable);
     }
 }
