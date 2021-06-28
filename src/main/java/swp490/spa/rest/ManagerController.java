@@ -251,7 +251,7 @@ public class ManagerController {
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response createNewSpaService(SpaServiceRequest spaServiceRequest) {
-        if (Objects.nonNull(spaServiceRequest.getFile())) {
+        if (!spaServiceRequest.getFile().getOriginalFilename().equals("")) {
             String imageLink = UploadImage.uploadImage(spaServiceRequest.getFile());
             if (imageLink != "") {
                 Manager manager = managerService.findManagerById(spaServiceRequest.getCreateBy());
@@ -278,8 +278,9 @@ public class ManagerController {
             } else {
                 LOGGER.info(Notification.SAVE_IMAGE_FAILED);
             }
+        } else {
+            LOGGER.info(Notification.FILE_NOT_EXISTED);
         }
-        LOGGER.info(Notification.FILE_NOT_EXISTED);
         return ResponseHelper.error(Notification.INSERT_SERVICE_FAILED);
     }
 
@@ -287,7 +288,7 @@ public class ManagerController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response insertNewSpaPackageWithServices(SpaPackageRequest spaPackage) {
-        if (Objects.nonNull(spaPackage.getFile())) {
+        if (!spaPackage.getFile().getOriginalFilename().equals("")) {
             String imageLink = UploadImage.uploadImage(spaPackage.getFile());
             if (imageLink != "") {
                 List<SpaService> spaServices = new ArrayList<>();
@@ -327,8 +328,9 @@ public class ManagerController {
             } else {
                 LOGGER.info(Notification.SAVE_IMAGE_FAILED);
             }
+        } else {
+            LOGGER.info(Notification.FILE_NOT_EXISTED);
         }
-        LOGGER.info(Notification.FILE_NOT_EXISTED);
         return ResponseHelper.error(Notification.INSERT_SPA_PACKAGE_SERVICE_FAILED);
     }
 
@@ -373,7 +375,7 @@ public class ManagerController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response insertNewCategory(CategoryRequest categoryRequest) {
-        if (Objects.nonNull(categoryRequest.getFile())) {
+        if (!categoryRequest.getFile().getOriginalFilename().equals("")) {
             String imageLink = UploadImage.uploadImage(categoryRequest.getFile());
             if (imageLink != "") {
                 Spa spa = spaService.findById(categoryRequest.getSpaId());
