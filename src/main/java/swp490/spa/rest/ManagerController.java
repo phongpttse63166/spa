@@ -185,12 +185,21 @@ public class ManagerController {
                                                    @RequestParam Status status,
                                                    @RequestParam String search,
                                                    Pageable pageable) {
-        long totalItem =
-                categoryService.findCategoryBySpaId(spaId, status, search,
-                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-                        .getContent().size();
-        List<Category> categories =
-                categoryService.findCategoryBySpaId(spaId, status, search, pageable).getContent();
+        List<Category> categories;
+        long totalItem = 0;
+        if (search == "") {
+            totalItem = categoryService.findBySpaIdAndStatusNoSearch(spaId, status,
+                    PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                    .getContent().size();
+            categories = categoryService.findBySpaIdAndStatusNoSearch(spaId, status, pageable)
+                    .getContent();
+        } else {
+            totalItem =
+                    categoryService.findCategoryBySpaId(spaId, status, search,
+                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                            .getContent().size();
+            categories = categoryService.findCategoryBySpaId(spaId, status, search, pageable).getContent();
+        }
         if (Objects.nonNull(categories)) {
             List<CategorySpaPackageResponse> categorySpaPackageResponses = new ArrayList<>();
             for (Category category : categories) {

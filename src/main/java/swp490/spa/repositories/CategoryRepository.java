@@ -17,4 +17,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     Page<Category> findBySpa_IdAndStatusAndNameLikeOrderById(Integer spaId, Status status,
                                                   String search, Pageable pageable);
+
+    Page<Category> findBySpa_IdAndStatusOrderById(Integer spaId, Status status, Pageable pageable);
 }

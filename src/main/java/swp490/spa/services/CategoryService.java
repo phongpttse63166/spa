@@ -2,12 +2,14 @@ package swp490.spa.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.Category;
 import swp490.spa.entities.Status;
 import swp490.spa.repositories.CategoryRepository;
 
+import java.net.ContentHandler;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,5 +45,9 @@ public class CategoryService {
 
     public Category insertNewCategory(Category category) {
         return this.categoryRepository.save(category);
+    }
+
+    public Page<Category> findBySpaIdAndStatusNoSearch(Integer spaId, Status status, Pageable pageable) {
+        return this.categoryRepository.findBySpa_IdAndStatusOrderById(spaId, status, pageable);
     }
 }
