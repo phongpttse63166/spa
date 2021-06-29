@@ -152,7 +152,11 @@ public class ManagerController {
         List<SpaPackageTreatmentResponse> result = new ArrayList<>();
         Page<SpaPackage> spaPackages =
                 spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search, pageable);
-        int totalItem = (int) spaPackages.getTotalElements();
+        long totalItem =
+                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId,
+                        Constant.SEARCH_NO_CONTENT,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                .getTotalElements();
         if (spaPackages.getContent().size() != 0 && !spaPackages.getContent().isEmpty()) {
             for (SpaPackage spaPackage : spaPackages.getContent()) {
                 List<SpaTreatment> spaTreatments = new ArrayList<>();
