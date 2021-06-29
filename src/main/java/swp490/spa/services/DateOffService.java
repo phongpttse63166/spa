@@ -33,10 +33,10 @@ public class DateOffService {
                 .findByDateOffAndAndSpa_IdAndAndStatusDateOff(dateOff, spaId, StatusDateOff.APPROVE);
     }
 
-    public Page<DateOff> findBySpaAndStatusInOneWeek(Integer spaId, StatusDateOff waiting,
-                                                     Date monday, Date sunday, Pageable pageable) {
+    public Page<DateOff> findBySpaAndStatusInRangeDate(Integer spaId, StatusDateOff waiting,
+                                                       Date fromDate, Date toDate, Pageable pageable) {
         return this.dateOffRepository
                 .findBySpa_IdAndStatusDateOffAndDateOffBetweenOrderByDateOff(spaId, waiting,
-                        monday, sunday, pageable);
+                        fromDate, toDate, pageable);
     }
 }

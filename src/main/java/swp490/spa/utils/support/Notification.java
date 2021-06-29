@@ -67,8 +67,8 @@ public class Notification {
     public static final String CONSULTANT_CONTENT_NOT_EXISTED = "Consultation content không tồn tại";
     public static final String EDIT_CONSULTATION_CONTENT_FAILED = "Cập nhật Consultation content thất bại";
     public static final String EDIT_CONSULTATION_CONTENT_SUCCESS = "Cập nhật Consultation content thành công";
-    public static final String GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_SUCCESS =
+    public static final String GET_DATE_OFF_BY_STATUS_AND_SPA_ONE_WEEK_SUCCESS =
             "Lấy danh sách đăng kí date off trong 1 tuần thành công";
-    public static final String GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_FAILED =
+    public static final String GET_DATE_OFF_BY_STATUS_AND_SPA_ONE_WEEK_FAILED =
             "Lấy danh sách đăng kí date off trong 1 tuần thất bại";
 }

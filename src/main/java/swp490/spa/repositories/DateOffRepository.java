@@ -18,7 +18,7 @@ public interface DateOffRepository extends JpaRepository<DateOff, Integer> {
 
     Page<DateOff> findBySpa_IdAndStatusDateOffAndDateOffBetweenOrderByDateOff(Integer spaId,
                                                                               StatusDateOff status,
-                                                                              Date monday,
-                                                                              Date sunday,
+                                                                              Date fromDate,
+                                                                              Date toDate,
                                                                               Pageable pageable);
 }

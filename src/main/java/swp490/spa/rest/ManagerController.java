@@ -21,15 +21,10 @@ import swp490.spa.utils.support.Notification;
 import swp490.spa.utils.support.UploadImage;
 
 import java.sql.Date;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static java.time.temporal.TemporalAdjusters.nextOrSame;
-import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
 @RequestMapping("/api/manager")
 @RestController
@@ -253,17 +248,19 @@ public class ManagerController {
         return ResponseHelper.ok(page);
     }
 
-    @GetMapping("/dateoff/getalldateoffofspainweek")
-    public Response findDateOffRegisterOfSpaInOneWeek(@RequestParam Integer spaId, Pageable pageable) {
-        Date monday = Date.valueOf(LocalDate.now().with(previousOrSame(DayOfWeek.MONDAY)));
-        Date sunday = Date.valueOf(LocalDate.now().with(nextOrSame(DayOfWeek.SUNDAY)));
-        Page<DateOff> dateOffs = dateOffService.findBySpaAndStatusInOneWeek(spaId,
-                StatusDateOff.WAITING, monday, sunday, pageable);
+    @GetMapping("/dateoff/getalldateoffinrangedate")
+    public Response findDateOffBySpaAndStatusInRangeDate(@RequestParam Integer spaId,
+                                                      @RequestParam String fromDate,
+                                                      @RequestParam String toDate,
+                                                      @RequestParam StatusDateOff statusDateOff,
+                                                      Pageable pageable) {
+        Page<DateOff> dateOffs = dateOffService.findBySpaAndStatusInRangeDate(spaId,
+                statusDateOff, Date.valueOf(fromDate), Date.valueOf(toDate), pageable);
         if (Objects.nonNull(dateOffs)) {
-            LOGGER.info(Notification.GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_SUCCESS);
+            LOGGER.info(Notification.GET_DATE_OFF_BY_STATUS_AND_SPA_ONE_WEEK_SUCCESS);
             return ResponseHelper.ok(conversion.convertToPageDateOffResponse(dateOffs));
         }
-        return ResponseHelper.error(Notification.GET_DATE_OFF_STATUS_WAITING_ONE_WEEK_FAILED);
+        return ResponseHelper.error(Notification.GET_DATE_OFF_BY_STATUS_AND_SPA_ONE_WEEK_FAILED);
     }
 
     @GetMapping("/staff/findbyspa")
