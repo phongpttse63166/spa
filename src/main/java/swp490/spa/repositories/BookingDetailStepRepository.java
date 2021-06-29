@@ -1,5 +1,7 @@
 package swp490.spa.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,4 +23,6 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     List<BookingDetailStep> findByStartTimeAndEndTimeAndDateBooking(Time startTime,
                                                                     Time endTime,
                                                                     Date dateBooking);
+
+    Page<BookingDetailStep> findByBookingDetail_IdOrderById(Integer bookingDetailId, Pageable pageable);
 }

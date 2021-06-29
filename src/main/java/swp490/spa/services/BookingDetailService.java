@@ -23,4 +23,8 @@ public class BookingDetailService {
     public BookingDetail editBookingDetail(BookingDetail bookingDetail) {
         return this.bookingDetailRepository.save(bookingDetail);
     }
+
+    public void removeDB(Integer bookingDetailId) {
+        this.bookingDetailRepository.deleteById(bookingDetailId);
+    }
 }

@@ -31,4 +31,8 @@ public class BookingService {
     public Booking editBooking(Booking booking) {
         return this.bookingRepository.save(booking);
     }
+
+    public void removeDB(Integer bookingId) {
+        this.bookingRepository.deleteById(bookingId);
+    }
 }

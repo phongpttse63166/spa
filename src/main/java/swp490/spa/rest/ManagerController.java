@@ -52,6 +52,8 @@ public class ManagerController {
     @Autowired
     private BookingDetailService bookingDetailService;
     @Autowired
+    private TreatmentServiceService treatmentServiceService;
+    @Autowired
     private StaffService staffService;
     private Conversion conversion;
 
@@ -59,7 +61,8 @@ public class ManagerController {
                              SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
                              swp490.spa.services.SpaService spaService, UserService userService,
                              DateOffService dateOffService, BookingService bookingService,
-                             BookingDetailService bookingDetailService, StaffService staffService) {
+                             BookingDetailService bookingDetailService, StaffService staffService,
+                             TreatmentServiceService treatmentServiceService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
@@ -70,6 +73,7 @@ public class ManagerController {
         this.bookingService = bookingService;
         this.bookingDetailService = bookingDetailService;
         this.staffService = staffService;
+        this.treatmentServiceService = treatmentServiceService;
         this.conversion = new Conversion();
     }
 
@@ -393,6 +397,17 @@ public class ManagerController {
                 spaTreatmentRequest.getCreateBy(),
                 spaPackage, spa, treatmentServices, totalPrice);
         if (Objects.nonNull(spaTreatmentService.insertNewSpaTreatment(spaTreatmentInsert))) {
+            for (TreatmentService treatmentService : treatmentServices) {
+                treatmentService.setSpaTreatment(spaTreatmentInsert);
+                TreatmentService treatmentServiceResult =
+                        treatmentServiceService.insertNewTreatmentService(treatmentService);
+                if(Objects.isNull(treatmentServiceResult)){
+                    LOGGER.info(Notification.INSERT_TREATMENT_SERVICE_FAILED);
+                    return ResponseHelper.error(Notification.INSERT_TREATMENT_SERVICE_FAILED);
+                } else {
+                    LOGGER.info(Notification.INSERT_TREATMENT_SERVICE_SUCCESS);
+                }
+            }
             return ResponseHelper.ok(Notification.INSERT_SPA_TREATMENT_SERVICE_SUCCESS);
         }
         return ResponseHelper.error(Notification.INSERT_SPA_TREATMENT_SERVICE_FAILED);

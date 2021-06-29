@@ -71,4 +71,6 @@ public class Notification {
             "Lấy danh sách đăng kí date off trong 1 tuần thành công";
     public static final String GET_DATE_OFF_BY_STATUS_AND_SPA_ONE_WEEK_FAILED =
             "Lấy danh sách đăng kí date off trong 1 tuần thất bại";
+    public static final String INSERT_TREATMENT_SERVICE_FAILED = "Thêm Treatment service thất bại";
+    public static final String INSERT_TREATMENT_SERVICE_SUCCESS = "Thêm Treatment service thành công";
 }

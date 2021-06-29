@@ -20,6 +20,7 @@ import swp490.spa.utils.support.SupportFunctions;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @RestController
@@ -151,11 +152,11 @@ public class CustomerController {
         }
         List<DateOff> dateOffs = dateOffService.findByDateOffAndSpaAndStatus(Date.valueOf(dateBooking),
                 spaTreatment.getSpa().getId());
-        if(dateOffs.size()!=0){
+        if (dateOffs.size() != 0) {
             List<User> userDateOffList = new ArrayList<>();
             for (User user : userList) {
                 for (DateOff dateOff : dateOffs) {
-                    if(user.equals(dateOff.getEmployee())){
+                    if (user.equals(dateOff.getEmployee())) {
                         userDateOffList.add(user);
                     }
                 }
@@ -187,12 +188,12 @@ public class CustomerController {
                             spaPackageCheck.getSpa().getId());
             List<Staff> staffBookingList = staffList;
             List<Consultant> consultantBookingList = consultantList;
-            if (dateOffs.size()!=0) {
+            if (dateOffs.size() != 0) {
                 List<Staff> staffDateOffList = new ArrayList<>();
                 List<Consultant> consultantDateOffList = new ArrayList<>();
                 for (Staff staff : staffList) {
                     for (DateOff dateOff : dateOffs) {
-                        if(staff.getUser().equals(dateOff.getEmployee())){
+                        if (staff.getUser().equals(dateOff.getEmployee())) {
                             staffDateOffList.add(staff);
                         }
                     }
@@ -200,7 +201,7 @@ public class CustomerController {
                 staffBookingList.removeAll(staffDateOffList);
                 for (Consultant consultant : consultantList) {
                     for (DateOff dateOff : dateOffs) {
-                        if(consultant.getUser().equals(dateOff.getEmployee())){
+                        if (consultant.getUser().equals(dateOff.getEmployee())) {
                             consultantDateOffList.add(consultant);
                         }
                     }
@@ -216,11 +217,11 @@ public class CustomerController {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByStartTimeAndEndTimeAndDateBooking(startTime,
                                 endTime, bookingData.getDateBooking());
-                if(Objects.isNull(bookingDetailSteps)){
+                if (Objects.isNull(bookingDetailSteps)) {
                     LOGGER.info(Notification.GET_BOOKING_DETAIL_STEP_FAILED);
                     return ResponseHelper.error(Notification.GET_BOOKING_DETAIL_STEP_FAILED);
                 } else {
-                    if(bookingDetailSteps.size()!=0){
+                    if (bookingDetailSteps.size() != 0) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                             for (Staff staff : staffBookingList) {
                                 if (bookingDetailStep.getStaff().equals(staff)) {
@@ -239,11 +240,11 @@ public class CustomerController {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByStartTimeAndEndTimeAndDateBooking(startTime,
                                 endTime, bookingData.getDateBooking());
-                if(Objects.isNull(bookingDetailSteps)){
+                if (Objects.isNull(bookingDetailSteps)) {
                     LOGGER.info(Notification.GET_BOOKING_DETAIL_STEP_FAILED);
                     return ResponseHelper.error(Notification.GET_BOOKING_DETAIL_STEP_FAILED);
                 } else {
-                    if(bookingDetailSteps.size()!=0){
+                    if (bookingDetailSteps.size() != 0) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                             for (Consultant consultant : consultantBookingList) {
                                 if (bookingDetailStep.getConsultant().equals(consultant)) {
@@ -266,8 +267,10 @@ public class CustomerController {
             List<SpaTreatment> spaTreatmentList = new ArrayList<>();
             SpaPackage spaPackageSearchResult = null;
             Booking bookingResult = null;
-            BookingDetail bookingDetailResult = null;
+            List<BookingDetail> bookingDetailResultList = new ArrayList<>();
+            List<BookingDetailStep> bookingDetailStepResultList = new ArrayList<>();
             boolean isOnlyOneStep = true;
+            boolean checkCanInsert = true;
             Double totalPrice = 0.0;
             Integer totalTime = 0;
             Spa spa = null;
@@ -300,148 +303,180 @@ public class CustomerController {
                 }
                 booking.setTotalPrice(totalPrice);
                 booking.setTotalTime(totalTime);
-                bookingResult = bookingService.insertNewBooking(booking);
-                if (Objects.nonNull(bookingResult)) {
-                    for (BookingData bookingData : bookingDataList) {
-                        for (SpaTreatment spaTreatment : spaTreatmentList) {
-                            if (spaTreatment.getSpaPackage().getId().equals(bookingData.getPackageId())) {
-                                BookingDetail bookingDetail = new BookingDetail();
-                                bookingDetail.setBooking(bookingResult);
-                                bookingDetail.setSpaPackage(spaTreatment.getSpaPackage());
-                                bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
-                                bookingDetail.setSpaTreatment(spaTreatment);
-                                bookingDetail.setTotalTime(spaTreatment.getTotalTime());
-                                bookingDetail.setType(spaTreatment.getSpaPackage().getType());
-                                bookingDetailResult = bookingDetailService
-                                        .insertBookingDetail(bookingDetail);
-                                if (Objects.nonNull(bookingDetailResult)) {
-                                    List<TreatmentService> treatmentServices =
-                                            new ArrayList<>(spaTreatment.getTreatmentServices());
-                                    Collections.sort(treatmentServices);
-                                    Time startTime;
-                                    Time endTime = Time.valueOf(Constant.TIME_DEFAULT);
-                                    for (int i = 0; i < treatmentServices.size(); i++) {
-                                        BookingDetailStep bookingDetailStep = new BookingDetailStep();
-                                        bookingDetailStep.setDateBooking(bookingData.getDateBooking());
-                                        bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
-                                        bookingDetailStep.setBookingPrice(treatmentServices.get(i)
-                                                .getSpaService().getPrice());
-                                        bookingDetailStep.setTreatmentService(treatmentServices.get(i));
-                                        bookingDetailStep.setBookingDetail(bookingDetailResult);
-                                        if (i == 0) {
-                                            startTime = bookingData.getTimeBooking();
-                                            endTime =
-                                                    Time.valueOf(bookingData
-                                                            .getTimeBooking().toLocalTime()
-                                                            .plusMinutes(treatmentServices.get(i)
-                                                                    .getSpaService()
-                                                                    .getDurationMin()));
-                                        } else {
-                                            startTime = endTime;
-                                            endTime = Time.valueOf(bookingData
+                bookingResult = booking;
+                for (BookingData bookingData : bookingDataList) {
+                    for (SpaTreatment spaTreatment : spaTreatmentList) {
+                        if (spaTreatment.getSpaPackage().getId().equals(bookingData.getPackageId())) {
+                            BookingDetail bookingDetail = new BookingDetail();
+                            bookingDetail.setBooking(bookingResult);
+                            bookingDetail.setSpaPackage(spaTreatment.getSpaPackage());
+                            bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
+                            bookingDetail.setSpaTreatment(spaTreatment);
+                            bookingDetail.setTotalTime(spaTreatment.getTotalTime());
+                            bookingDetail.setType(spaTreatment.getSpaPackage().getType());
+                            bookingDetailResultList.add(bookingDetail);
+                            List<TreatmentService> treatmentServices =
+                                    new ArrayList<>(spaTreatment.getTreatmentServices());
+                            Collections.sort(treatmentServices);
+                            Time startTime;
+                            Time endTime = Time.valueOf(Constant.TIME_DEFAULT);
+                            for (int i = 0; i < treatmentServices.size(); i++) {
+                                BookingDetailStep bookingDetailStep = new BookingDetailStep();
+                                bookingDetailStep.setDateBooking(bookingData.getDateBooking());
+                                bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                                bookingDetailStep.setBookingPrice(treatmentServices.get(i)
+                                        .getSpaService().getPrice());
+                                bookingDetailStep.setTreatmentService(treatmentServices.get(i));
+                                bookingDetailStep.setBookingDetail(bookingDetail);
+                                if (i == 0) {
+                                    startTime = bookingData.getTimeBooking();
+                                    endTime =
+                                            Time.valueOf(bookingData
                                                     .getTimeBooking().toLocalTime()
                                                     .plusMinutes(treatmentServices.get(i)
                                                             .getSpaService()
                                                             .getDurationMin()));
-                                        }
-                                        bookingDetailStep.setStartTime(startTime);
-                                        bookingDetailStep.setEndTime(endTime);
-                                        if (Objects.isNull(bookingDetailStepService.insertBookingDetailStep(bookingDetailStep))) {
-                                            return ResponseHelper.error(Notification.INSERT_BOOKING_DETAIL_STEP_FAILED);
-                                        }
-                                    }
-                                    LOGGER.info(Notification.INSERT_BOOKING_SUCCESS + booking);
+                                } else {
+                                    startTime = endTime;
+                                    endTime = Time.valueOf(startTime.toLocalTime()
+                                            .plusMinutes(treatmentServices.get(i)
+                                                    .getSpaService()
+                                                    .getDurationMin()));
                                 }
-                                LOGGER.info(Notification.INSERT_BOOKING_DETAIL_FAILED + bookingDetail);
+                                bookingDetailStep.setStartTime(startTime);
+                                bookingDetailStep.setEndTime(endTime);
+                                bookingDetailStepResultList.add(bookingDetailStep);
                             }
                         }
                     }
                 }
             } else {
-                bookingResult = bookingService.insertNewBooking(booking);
-                if (Objects.nonNull(bookingResult)) {
-                    for (BookingData bookingData : bookingDataList) {
-                        for (SpaPackage spaPackage : spaPackageList) {
-                            if (spaPackage.getId().equals(bookingData.getPackageId())) {
-                                if (spaPackage.getType().equals(Type.ONESTEP)) {
-                                    SpaTreatment spaTreatment =
-                                            spaTreatmentService
-                                                    .findTreatmentBySpaPackageIdWithTypeOneStep(spaPackage.getId());
-                                    BookingDetail bookingDetail = new BookingDetail();
-                                    bookingDetail.setBooking(bookingResult);
-                                    bookingDetail.setSpaPackage(spaPackage);
-                                    bookingDetail.setSpaTreatment(spaTreatment);
-                                    bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
-                                    bookingDetail.setTotalTime(spaTreatment.getTotalTime());
-                                    bookingDetail.setType(Type.ONESTEP);
-                                    bookingDetailResult = bookingDetailService
-                                            .insertBookingDetail(bookingDetail);
-                                    if (Objects.nonNull(bookingDetailResult)) {
-                                        List<TreatmentService> treatmentServices =
-                                                new ArrayList<>(spaTreatment.getTreatmentServices());
-                                        Collections.sort(treatmentServices);
-                                        Time startTime;
-                                        Time endTime = Time.valueOf(Constant.TIME_DEFAULT);
-                                        for (int i = 0; i < treatmentServices.size(); i++) {
-                                            BookingDetailStep bookingDetailStep = new BookingDetailStep();
-                                            bookingDetailStep.setDateBooking(bookingData.getDateBooking());
-                                            bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
-                                            bookingDetailStep.setTreatmentService(treatmentServices.get(i));
-                                            bookingDetailStep.setBookingPrice(treatmentServices.get(i)
-                                                    .getSpaService().getPrice());
-                                            bookingDetailStep.setBookingDetail(bookingDetailResult);
-                                            if (i == 0) {
-                                                startTime = bookingData.getTimeBooking();
-                                                endTime =
-                                                        Time.valueOf(bookingData
-                                                                .getTimeBooking().toLocalTime()
-                                                                .plusMinutes(treatmentServices.get(i)
-                                                                        .getSpaService()
-                                                                        .getDurationMin()));
-                                            } else {
-                                                startTime = endTime;
-                                                endTime = Time.valueOf(bookingData
-                                                        .getTimeBooking().toLocalTime()
-                                                        .plusMinutes(treatmentServices.get(i)
-                                                                .getSpaService()
-                                                                .getDurationMin()));
-                                            }
-                                            bookingDetailStep.setStartTime(startTime);
-                                            bookingDetailStep.setEndTime(endTime);
-                                            if (Objects.isNull(bookingDetailStepService.insertBookingDetailStep(bookingDetailStep))) {
-                                                LOGGER.info(Notification.INSERT_BOOKING_DETAIL_STEP_FAILED + bookingDetailStep);
-                                            }
-                                        }
-                                        LOGGER.info(Notification.INSERT_BOOKING_SUCCESS + bookingResult);
+                bookingResult = booking;
+                for (BookingData bookingData : bookingDataList) {
+                    for (SpaPackage spaPackage : spaPackageList) {
+                        if (spaPackage.getId().equals(bookingData.getPackageId())) {
+                            if (spaPackage.getType().equals(Type.ONESTEP)) {
+                                SpaTreatment spaTreatment =
+                                        spaTreatmentService
+                                                .findTreatmentBySpaPackageIdWithTypeOneStep(spaPackage.getId());
+                                BookingDetail bookingDetail = new BookingDetail();
+                                bookingDetail.setBooking(bookingResult);
+                                bookingDetail.setSpaPackage(spaPackage);
+                                bookingDetail.setSpaTreatment(spaTreatment);
+                                bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
+                                bookingDetail.setTotalTime(spaTreatment.getTotalTime());
+                                bookingDetail.setType(Type.ONESTEP);
+                                bookingDetailResultList.add(bookingDetail);
+                                List<TreatmentService> treatmentServices =
+                                        new ArrayList<>(spaTreatment.getTreatmentServices());
+                                Collections.sort(treatmentServices);
+                                Time startTime;
+                                Time endTime = Time.valueOf(Constant.TIME_DEFAULT);
+                                for (int i = 0; i < treatmentServices.size(); i++) {
+                                    BookingDetailStep bookingDetailStep = new BookingDetailStep();
+                                    bookingDetailStep.setDateBooking(bookingData.getDateBooking());
+                                    bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                                    bookingDetailStep.setTreatmentService(treatmentServices.get(i));
+                                    bookingDetailStep.setBookingPrice(treatmentServices.get(i)
+                                            .getSpaService().getPrice());
+                                    bookingDetailStep.setBookingDetail(bookingDetail);
+                                    if (i == 0) {
+                                        startTime = bookingData.getTimeBooking();
+                                        endTime = Time.valueOf(bookingData
+                                                .getTimeBooking().toLocalTime()
+                                                .plusMinutes(treatmentServices.get(i)
+                                                        .getSpaService()
+                                                        .getDurationMin()));
+                                    } else {
+                                        startTime = endTime;
+                                        endTime = Time.valueOf(startTime.toLocalTime()
+                                                .plusMinutes(treatmentServices.get(i)
+                                                        .getSpaService()
+                                                        .getDurationMin()));
                                     }
-                                    LOGGER.info(Notification.INSERT_BOOKING_DETAIL_FAILED + bookingDetail);
-                                } else {
-                                    BookingDetail bookingDetail = new BookingDetail();
-                                    bookingDetail.setBooking(bookingResult);
-                                    bookingDetail.setType(Type.MORESTEP);
-                                    bookingDetail.setSpaPackage(spaPackage);
-                                    bookingDetailResult = bookingDetailService
-                                            .insertBookingDetail(bookingDetail);
-                                    if (Objects.nonNull(bookingDetailResult)) {
-                                        BookingDetailStep bookingDetailStep = new BookingDetailStep();
-                                        bookingDetailStep.setDateBooking(bookingData.getDateBooking());
-                                        bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
-                                        bookingDetailStep.setBookingDetail(bookingDetailResult);
-                                        bookingDetailStep.setStartTime(bookingData.getTimeBooking());
-                                        bookingDetailStep.setEndTime(Time.valueOf(bookingData
-                                                .getTimeBooking()
-                                                .toLocalTime()
-                                                .plusMinutes(Constant.DURATION_OF_CONSULTATION)));
-                                        if (Objects.isNull(bookingDetailStepService.insertBookingDetailStep(bookingDetailStep))) {
-                                            LOGGER.info(Notification.INSERT_BOOKING_DETAIL_STEP_FAILED + bookingDetailStep);
-                                        }
-                                    }
-
+                                    bookingDetailStep.setStartTime(startTime);
+                                    bookingDetailStep.setEndTime(endTime);
+                                    bookingDetailStepResultList.add(bookingDetailStep);
                                 }
+                            } else {
+                                BookingDetail bookingDetail = new BookingDetail();
+                                bookingDetail.setBooking(bookingResult);
+                                bookingDetail.setType(Type.MORESTEP);
+                                bookingDetail.setSpaPackage(spaPackage);
+                                bookingDetailResultList.add(bookingDetail);
+                                BookingDetailStep bookingDetailStep = new BookingDetailStep();
+                                bookingDetailStep.setDateBooking(bookingData.getDateBooking());
+                                bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                                bookingDetailStep.setBookingDetail(bookingDetail);
+                                bookingDetailStep.setStartTime(bookingData.getTimeBooking());
+                                bookingDetailStep.setEndTime(Time.valueOf(bookingData
+                                        .getTimeBooking()
+                                        .toLocalTime()
+                                        .plusMinutes(Constant.DURATION_OF_CONSULTATION)));
+                                bookingDetailStepResultList.add(bookingDetailStep);
                             }
                         }
                     }
+                }
+            }
+            for (BookingDetailStep bookingDetailStep : bookingDetailStepResultList) {
+                Time endTime = bookingDetailStep.getEndTime();
+                if ((endTime.toLocalTime().isAfter(LocalTime.parse(Constant.TIME_START_RELAX))
+                        && endTime.toLocalTime().isBefore(LocalTime.parse(Constant.TIME_END_RELAX)))
+                        || endTime.toLocalTime().isAfter(LocalTime.parse(Constant.TIME_END_DATE))) {
+                    checkCanInsert = false;
+                }
+            }
+            if (checkCanInsert) {
+                Booking bookingInsert = bookingService.insertNewBooking(bookingResult);
+                if (Objects.nonNull(bookingInsert)) {
+                    for (BookingDetail bookingDetail : bookingDetailResultList) {
+                        BookingDetail bookingDetailCheck = bookingDetail;
+                        bookingDetail.setBooking(bookingInsert);
+                        BookingDetail bookingDetailInsert =
+                                bookingDetailService.insertBookingDetail(bookingDetail);
+                        if (Objects.nonNull(bookingDetailInsert)) {
+                            for (BookingDetailStep bookingDetailStep : bookingDetailStepResultList) {
+                                if (bookingDetailStep.getBookingDetail().equals(bookingDetailCheck)) {
+                                    bookingDetailStep.setBookingDetail(bookingDetailInsert);
+                                    BookingDetailStep bookingDetailStepInsert =
+                                            bookingDetailStepService
+                                                    .insertBookingDetailStep(bookingDetailStep);
+                                    if (Objects.isNull(bookingDetailStepInsert)) {
+                                        LOGGER.info(Notification.INSERT_BOOKING_DETAIL_STEP_FAILED);
+                                        // delete booking + bookingDetail + bookingDetailStep inserted
+                                        List<BookingDetail> bookingDetailDeleteList =
+                                                bookingDetailService
+                                                        .findByBooking(bookingDetailInsert.getId(),
+                                                                PageRequest.of(Constant.PAGE_DEFAULT,
+                                                                        Constant.SIZE_DEFAULT,
+                                                                        Sort.unsorted()))
+                                                        .toList();
+                                        for (BookingDetail bdd : bookingDetailDeleteList) {
+                                            List<BookingDetailStep> bookingDetailStepDeleteList =
+                                                    bookingDetailStepService
+                                                            .findByBookingDetail(bdd.getId(),
+                                                                    PageRequest.of(Constant.PAGE_DEFAULT,
+                                                                            Constant.SIZE_DEFAULT,
+                                                                            Sort.unsorted()))
+                                                            .toList();
+                                            for (BookingDetailStep bdsd : bookingDetailStepDeleteList) {
+                                                bookingDetailStepService.removeDB(bdsd.getId());
+                                            }
+                                            bookingDetailService.removeDB(bdd.getId());
+                                        }
+                                        bookingService.removeDB(bookingInsert.getId());
+                                        return ResponseHelper.error(Notification.INSERT_BOOKING_FAILED);
+                                    }
+                                }
+                            }
+                        } else {
+                            LOGGER.info(Notification.INSERT_BOOKING_DETAIL_FAILED);
+                        }
+                    }
                     return ResponseHelper.ok(Notification.INSERT_BOOKING_SUCCESS);
+                } else {
+                    LOGGER.info(Notification.INSERT_BOOKING_FAILED);
                 }
             }
             return ResponseHelper.error(Notification.INSERT_BOOKING_FAILED);
