@@ -63,4 +63,8 @@ public class SpaTreatment implements Serializable {
         for(TreatmentService treatmentService : treatmentServices) treatmentService.setSpaTreatment(this);
         this.treatmentServices = new HashSet<>(treatmentServices);
     }
+
+    public void setTreatmentServices(Set<TreatmentService> treatmentServices) {
+        this.treatmentServices = treatmentServices;
+    }
 }

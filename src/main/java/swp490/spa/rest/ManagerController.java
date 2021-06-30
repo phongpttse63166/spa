@@ -22,9 +22,7 @@ import swp490.spa.utils.support.UploadImage;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RequestMapping("/api/manager")
 @RestController
@@ -101,13 +99,31 @@ public class ManagerController {
     @GetMapping("/spatreatment/findbypackageId")
     public Response findSpaTreatmentByPackageId(@RequestParam Integer packageId,
                                                 @RequestParam String search, Pageable pageable) {
+        long totalItem = spaTreatmentService.findByPackageId(packageId, Constant.SEARCH_NO_CONTENT,
+                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                .getTotalElements();
         Page<SpaTreatment> spaTreatments =
                 spaTreatmentService.findByPackageId(packageId, search, pageable);
         if (!spaTreatments.hasContent() && !spaTreatments.isFirst()) {
             spaTreatments = spaTreatmentService.findByPackageId(packageId, search,
                     PageRequest.of(spaTreatments.getTotalPages() - 1, spaTreatments.getSize(), spaTreatments.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
+        List<SpaTreatment> spaTreatmentList = new ArrayList<>();
+        List<SpaTreatment> spaTreatmentCheckList = spaTreatments.getContent();
+        for (int i = 0; i < spaTreatmentCheckList.size(); i++) {
+            SpaTreatment spaTreatmentCheck = spaTreatmentCheckList.get(i);
+            List<TreatmentService> treatmentServices =
+                    new ArrayList<>(spaTreatmentCheck.getTreatmentServices());
+            spaTreatmentCheck.setTreatmentServices(new TreeSet<>());
+            Collections.sort(treatmentServices);
+            for (TreatmentService treatmentService : treatmentServices) {
+                spaTreatmentCheck.getTreatmentServices().add(treatmentService);
+            }
+            spaTreatmentList.add(spaTreatmentCheck);
+            System.out.println("aaaaaaaaaaaaa");
+        }
+        Page<SpaTreatment> pageResult = new PageImpl<>(spaTreatmentList,pageable,totalItem);
+        return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(pageResult));
     }
 
     @GetMapping("/spaservice/findbyspaId")
