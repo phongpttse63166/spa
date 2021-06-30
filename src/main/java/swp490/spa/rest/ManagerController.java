@@ -122,7 +122,7 @@ public class ManagerController {
             spaTreatmentList.add(spaTreatmentCheck);
             System.out.println("aaaaaaaaaaaaa");
         }
-        Page<SpaTreatment> pageResult = new PageImpl<>(spaTreatmentList,pageable,totalItem);
+        Page<SpaTreatment> pageResult = new PageImpl<>(spaTreatmentList, pageable, totalItem);
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(pageResult));
     }
 
@@ -171,7 +171,7 @@ public class ManagerController {
                 spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId,
                         Constant.SEARCH_NO_CONTENT,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-                .getTotalElements();
+                        .getTotalElements();
         if (spaPackages.getContent().size() != 0 && !spaPackages.getContent().isEmpty()) {
             for (SpaPackage spaPackage : spaPackages.getContent()) {
                 List<SpaTreatment> spaTreatments = new ArrayList<>();
@@ -270,10 +270,10 @@ public class ManagerController {
 
     @GetMapping("/dateoff/getalldateoffinrangedate")
     public Response findDateOffBySpaAndStatusInRangeDate(@RequestParam Integer spaId,
-                                                      @RequestParam String fromDate,
-                                                      @RequestParam String toDate,
-                                                      @RequestParam StatusDateOff statusDateOff,
-                                                      Pageable pageable) {
+                                                         @RequestParam String fromDate,
+                                                         @RequestParam String toDate,
+                                                         @RequestParam StatusDateOff statusDateOff,
+                                                         Pageable pageable) {
         Page<DateOff> dateOffs = dateOffService.findBySpaAndStatusInRangeDate(spaId,
                 statusDateOff, Date.valueOf(fromDate), Date.valueOf(toDate), pageable);
         if (Objects.nonNull(dateOffs)) {
@@ -286,7 +286,7 @@ public class ManagerController {
     @GetMapping("/staff/findbyspa")
     public Response findStaffBySpaId(@RequestParam Integer spaId,
                                      @RequestParam String search,
-                                     Pageable pageable){
+                                     Pageable pageable) {
         Page<Staff> staffs = staffService.findBySpaIdAndNameLike(spaId, search, pageable);
         if (!staffs.hasContent() && !staffs.isFirst()) {
             staffs = staffService.findBySpaIdAndNameLike(spaId, search,
@@ -417,7 +417,7 @@ public class ManagerController {
                 treatmentService.setSpaTreatment(spaTreatmentInsert);
                 TreatmentService treatmentServiceResult =
                         treatmentServiceService.insertNewTreatmentService(treatmentService);
-                if(Objects.isNull(treatmentServiceResult)){
+                if (Objects.isNull(treatmentServiceResult)) {
                     LOGGER.info(Notification.INSERT_TREATMENT_SERVICE_FAILED);
                     return ResponseHelper.error(Notification.INSERT_TREATMENT_SERVICE_FAILED);
                 } else {
@@ -542,41 +542,30 @@ public class ManagerController {
     public Response editSpaPackage(@PathVariable Integer packageId,
                                    SpaPackageRequest spaPackage) {
         SpaPackage spaPackageEdit = spaPackageService.findBySpaPackageId(packageId);
-        {
-//            if (Objects.nonNull(spaPackageEdit)) {
-//                if (Objects.nonNull(spaPackage.getName())) {
-//                    spaPackageEdit.setName(spaPackage.getName());
-//                }
-//                if (Objects.nonNull(spaPackage.getStatus())) {
-//                    spaPackageEdit.setStatus(spaPackage.getStatus());
-//                }
-//                if (Objects.nonNull(spaPackage.getDescription())) {
-//                    spaPackageEdit.setDescription(spaPackage.getDescription());
-//                }
-//                if (Objects.nonNull(spaPackage.getCategory())) {
-//                    spaPackageEdit.setCategory(spaPackage.getCategory());
-//                }
-//                if (Objects.nonNull(spaPackage.getImage())) {
-//                    spaPackageEdit.setImage(spaPackage.getImage());
-//                }
-//                if (Objects.nonNull(spaPackage.getSpaServices())) {
-//                    spaPackageEdit.setSpaServices(spaPackage.getSpaServices());
-//                }
-//                if (Objects.nonNull(spaPackage.getSpa())) {
-//                    spaPackageEdit.setSpa(spaPackage.getSpa());
-//                }
-//                if (Objects.nonNull(spaPackage.getType())) {
-//                    spaPackageEdit.setType(spaPackage.getType());
-//                }
+        if (Objects.nonNull(spaPackageEdit)) {
+            if (Objects.nonNull(spaPackage.getFile())) {
+                String imageLink = UploadImage.uploadImage(spaPackage.getFile());
+                if (imageLink != "") {
+                    spaPackageEdit.setImage(imageLink);
+                } else {
+                    LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(Notification.SAVE_IMAGE_FAILED);
+                }
+            }
+            if (Objects.nonNull(spaPackage.getName())) {
+                spaPackageEdit.setName(spaPackage.getName());
+            }
+            if (Objects.nonNull(spaPackage.getDescription())) {
+                spaPackageEdit.setDescription(spaPackage.getDescription());
+            }
             SpaPackage spaPackageResult = spaPackageService.editBySpaPackageId(spaPackageEdit);
             if (Objects.nonNull(spaPackageResult)) {
-                LOGGER.info(spaPackageEdit + " " + Notification.EDIT_PACKAGE_SUCCESS);
+                LOGGER.info(spaPackageResult + " " + Notification.EDIT_PACKAGE_SUCCESS);
                 return ResponseHelper.ok(spaPackageResult);
             }
-//            }
+        } else {
+            LOGGER.info(Notification.SPA_PACKAGE_NOT_EXISTED);
         }
-
-        LOGGER.info(spaPackageEdit + " " + Notification.EDIT_PACKAGE_FAILED);
         return ResponseHelper.error(Notification.EDIT_PACKAGE_FAILED);
     }
 
