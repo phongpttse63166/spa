@@ -609,7 +609,7 @@ public class ManagerController {
 
     @PutMapping("/spatreatment/edit/{spaTreatmentId}")
     public Response editSpaTreatment(@PathVariable Integer spaTreatmentId,
-                                     @RequestBody SpaTreatment spaTreatment) {
+                                     @RequestBody SpaTreatmentRequest spaTreatment) {
         SpaTreatment spaTreatmentEdit = spaTreatmentService.findByTreatmentId(spaTreatmentId);
         if (Objects.nonNull(spaTreatmentEdit)) {
             if (Objects.nonNull(spaTreatment.getName())) {
@@ -618,13 +618,13 @@ public class ManagerController {
             if (Objects.nonNull(spaTreatment.getDescription())) {
                 spaTreatmentEdit.setDescription(spaTreatment.getDescription());
             }
-            SpaTreatment spaTreatmentResult = spaTreatmentService.editBySpaTreatment(spaTreatment);
+            SpaTreatment spaTreatmentResult = spaTreatmentService.editBySpaTreatment(spaTreatmentEdit);
             if (Objects.nonNull(spaTreatmentResult)) {
-                LOGGER.info(spaTreatment + " " + Notification.EDIT_TREATMENT_SUCCESS);
+                LOGGER.info(spaTreatmentEdit + " " + Notification.EDIT_TREATMENT_SUCCESS);
                 return ResponseHelper.ok(spaTreatmentResult);
             }
         }
-        LOGGER.info(spaTreatment + " " + Notification.EDIT_TREATMENT_FAILED);
+        LOGGER.info(spaTreatmentEdit + " " + Notification.EDIT_TREATMENT_FAILED);
         return ResponseHelper.error(Notification.EDIT_TREATMENT_FAILED);
     }
 
