@@ -31,7 +31,7 @@ public class BookingDetailStep implements Serializable {
     private Double bookingPrice;
     @Column(name = "status_booking")
     private StatusBooking statusBooking;
-    @Column(name = "reason_cancel")
+    @Column(name = "reason_cancel" , length = 65355)
     private String reasonCancel;
     @Column(name = "is_consultation")
     private IsConsultation isConsultation;

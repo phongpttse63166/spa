@@ -28,7 +28,7 @@ public class SpaService implements Serializable {
     private String name;
     @Column(name = "image")
     private String image;
-    @Column(name = "description")
+    @Column(name = "description", length = 65355)
     private String description;
     @Column(name = "price")
     private Double price;

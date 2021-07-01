@@ -22,9 +22,9 @@ public class DateOff  implements Serializable {
     private Date dateOff;
     @Column(name = "status_date_off")
     private StatusDateOff statusDateOff;
-    @Column(name = "reason_date_off")
+    @Column(name = "reason_date_off", length = 65355)
     private String reasonDateOff;
-    @Column(name = "reason_cancel")
+    @Column(name = "reason_cancel", length = 65355)
     private String reasonCancel;
     @ManyToOne
     @JoinColumn(name = "manager_id")

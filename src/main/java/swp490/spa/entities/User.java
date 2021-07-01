@@ -32,7 +32,7 @@ public class User implements Serializable {
     private String email;
     @Column(name = "image")
     private String image;
-    @Column(name = "address")
+    @Column(name = "address", length = 65355)
     private String address;
     @Column(name = "isActive")
     private boolean isActive;

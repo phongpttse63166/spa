@@ -21,7 +21,7 @@ public class Rating implements Serializable {
     private Integer id;
     @Column(name = "rate")
     private Double rate;
-    @Column(name = "comment")
+    @Column(name = "comment", length = 65355)
     private String comment;
     @Column(name = "create_time")
     private Date createTime;

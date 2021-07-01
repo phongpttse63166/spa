@@ -27,7 +27,7 @@ public class SpaTreatment implements Serializable {
     private Integer id;
     @Column(name = "name")
     private String name;
-    @Column(name = "description")
+    @Column(name = "description", length = 65355)
     private String description;
     @Column(name = "total_price")
     private Double totalPrice;

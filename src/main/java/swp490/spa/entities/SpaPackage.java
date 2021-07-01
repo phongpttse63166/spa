@@ -21,7 +21,7 @@ public class SpaPackage implements Serializable {
     private Integer id;
     @Column(name = "name")
     private String name;
-    @Column(name = "description")
+    @Column(name = "description", length = 65355)
     private String description;
     @Column(name = "image")
     private String image;

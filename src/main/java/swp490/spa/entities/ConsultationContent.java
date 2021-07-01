@@ -18,13 +18,13 @@ public class ConsultationContent implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "description")
+    @Column(name = "description", length = 65355)
     private String description;
-    @Column(name = "expectation")
+    @Column(name = "expectation", length = 65355)
     private String expectation;
-    @Column(name = "result")
+    @Column(name = "result", length = 65355)
     private String result;
-    @Column(name = "note")
+    @Column(name = "note", length = 65355)
     private String note;
     @OneToOne
     @JoinColumn(name = "booking_detail_step_id")

@@ -147,10 +147,14 @@ public class CustomerController {
                 staffs = staffService.findBySpaId(spaPackage.getSpa().getId());
                 List<Staff> staffDateOff = new ArrayList<>();
                 for (Staff staff : staffs) {
-                    for (DateOff dateOff : dateOffs) {
-                        if (staff.getUser().equals(dateOff.getEmployee())) {
-                            staffDateOff.add(staff);
+                    if (staff.getUser().isActive() == true) {
+                        for (DateOff dateOff : dateOffs) {
+                            if (staff.getUser().equals(dateOff.getEmployee())) {
+                                staffDateOff.add(staff);
+                            }
                         }
+                    } else {
+                        staffDateOff.add(staff);
                     }
                 }
                 staffs.removeAll(staffDateOff);
@@ -165,10 +169,14 @@ public class CustomerController {
                         consultantService.findBySpaId(spaPackage.getSpa().getId());
                 List<Consultant> consultantDateOff = new ArrayList<>();
                 for (Consultant consultant : consultants) {
-                    for (DateOff dateOff : dateOffs) {
-                        if (consultant.getUser().equals(dateOff.getEmployee())) {
-                            consultantDateOff.add(consultant);
+                    if (consultant.getUser().isActive() == true) {
+                        for (DateOff dateOff : dateOffs) {
+                            if (consultant.getUser().equals(dateOff.getEmployee())) {
+                                consultantDateOff.add(consultant);
+                            }
                         }
+                    } else {
+                        consultantDateOff.add(consultant);
                     }
                 }
                 consultants.removeAll(consultantDateOff);
@@ -238,7 +246,7 @@ public class CustomerController {
             }
             int check = countEmployee - count;
             List<String> timeBookingList = null;
-            if(spaPackage.getType().equals(Type.ONESTEP)){
+            if (spaPackage.getType().equals(Type.ONESTEP)) {
                 SpaTreatment spaTreatment =
                         spaTreatmentService.findTreatmentBySpaPackageIdWithTypeOneStep(spaPackageId);
                 timeBookingList =
@@ -247,7 +255,7 @@ public class CustomerController {
                 timeBookingList =
                         supportFunctions.getBookTime(Constant.DURATION_OF_CONSULTATION, map, check);
             }
-            if(timeBookingList.size()!=0){
+            if (timeBookingList.size() != 0) {
                 Page<String> page = new PageImpl<>(timeBookingList,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
                         timeBookingList.size());
@@ -279,10 +287,14 @@ public class CustomerController {
                 List<Staff> staffDateOffList = new ArrayList<>();
                 List<Consultant> consultantDateOffList = new ArrayList<>();
                 for (Staff staff : staffList) {
-                    for (DateOff dateOff : dateOffs) {
-                        if (staff.getUser().equals(dateOff.getEmployee())) {
-                            staffDateOffList.add(staff);
+                    if (staff.getUser().isActive() == true) {
+                        for (DateOff dateOff : dateOffs) {
+                            if (staff.getUser().equals(dateOff.getEmployee())) {
+                                staffDateOffList.add(staff);
+                            }
                         }
+                    } else {
+                        staffDateOffList.add(staff);
                     }
                 }
                 staffBookingList.removeAll(staffDateOffList);
@@ -428,8 +440,7 @@ public class CustomerController {
                                     startTime = endTime;
                                     endTime = Time.valueOf(startTime.toLocalTime()
                                             .plusMinutes(treatmentServices.get(i)
-                                                    .getSpaService()
-                                                    .getDurationMin()));
+                                                    .getSpaService().getDurationMin()));
                                 }
                                 bookingDetailStep.setStartTime(startTime);
                                 bookingDetailStep.setEndTime(endTime);
@@ -480,8 +491,7 @@ public class CustomerController {
                                         startTime = endTime;
                                         endTime = Time.valueOf(startTime.toLocalTime()
                                                 .plusMinutes(treatmentServices.get(i)
-                                                        .getSpaService()
-                                                        .getDurationMin()));
+                                                        .getSpaService().getDurationMin()));
                                     }
                                     bookingDetailStep.setStartTime(startTime);
                                     bookingDetailStep.setEndTime(endTime);
