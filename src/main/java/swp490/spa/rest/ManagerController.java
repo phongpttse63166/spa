@@ -607,25 +607,16 @@ public class ManagerController {
         return ResponseHelper.error(Notification.EDIT_SERVICE_FAILED);
     }
 
-    @PutMapping("/spatreatment/edit")
-    public Response editSpaTreatment(@RequestBody SpaTreatment spaTreatment) {
-        SpaTreatment spaTreatmentEdit = spaTreatmentService.findByTreatmentId(spaTreatment.getId());
+    @PutMapping("/spatreatment/edit/{spaTreatmentId}")
+    public Response editSpaTreatment(@PathVariable Integer spaTreatmentId,
+                                     @RequestBody SpaTreatment spaTreatment) {
+        SpaTreatment spaTreatmentEdit = spaTreatmentService.findByTreatmentId(spaTreatmentId);
         if (Objects.nonNull(spaTreatmentEdit)) {
-            Double totalPrice = 0.0;
-            Integer totalTime = 0;
             if (Objects.nonNull(spaTreatment.getName())) {
                 spaTreatmentEdit.setName(spaTreatment.getName());
             }
             if (Objects.nonNull(spaTreatment.getDescription())) {
                 spaTreatmentEdit.setDescription(spaTreatment.getDescription());
-            }
-            if (Objects.nonNull(spaTreatment.getTreatmentServices())) {
-                for (TreatmentService treatmentService : spaTreatment.getTreatmentServices()) {
-                    totalPrice += treatmentService.getSpaService().getPrice();
-                    totalTime += treatmentService.getSpaService().getDurationMin();
-                }
-                spaTreatmentEdit.setTotalPrice(totalPrice);
-                spaTreatmentEdit.setTotalTime(totalTime);
             }
             SpaTreatment spaTreatmentResult = spaTreatmentService.editBySpaTreatment(spaTreatment);
             if (Objects.nonNull(spaTreatmentResult)) {
@@ -633,7 +624,6 @@ public class ManagerController {
                 return ResponseHelper.ok(spaTreatmentResult);
             }
         }
-
         LOGGER.info(spaTreatment + " " + Notification.EDIT_TREATMENT_FAILED);
         return ResponseHelper.error(Notification.EDIT_TREATMENT_FAILED);
     }
