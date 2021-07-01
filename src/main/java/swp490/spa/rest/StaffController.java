@@ -41,13 +41,13 @@ public class StaffController {
         this.conversion = new Conversion();
     }
 
-    @GetMapping("/staff/findbyId")
+    @GetMapping("/findbyId")
     public Response findStaffById(@RequestParam Integer userId){
         Staff staff = staffService.findByStaffId(userId);
         return ResponseHelper.ok(staff);
     }
 
-    @PutMapping("/staff/editprofile")
+    @PutMapping("/editprofile")
     public Response editProfileStaff(@RequestBody User user){
         Staff staffResult = staffService.findByStaffId(user.getId());
         if(Objects.nonNull(staffResult)){
