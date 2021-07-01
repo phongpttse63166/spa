@@ -24,42 +24,12 @@ public class SupportFunctions {
         this.bookingDetailStepService = bookingDetailStepService;
     }
 
-    public List<String> getBookTime(Integer totalTime, List<User> userList,
-                                    String dateBooking, String isStaff) {
-        List<BookingDetailStep> bookingDetailStepList = new ArrayList<>();
-        Map<Integer, List<BookingDetailStep>> map = new HashMap<>();
-        bookingDetailStepList = bookingDetailStepService.getAllByCurrentDateBooking(Date.valueOf(dateBooking));
+    public List<String> getBookTime(Integer totalTime, Map<Integer, List<BookingDetailStep>> map,
+                                    Integer check) {
         List<String> timeResult = new ArrayList<>();
         Time timeAdd = null;
         int loop = -1;
-        if (bookingDetailStepList.size() != 0) {
-            for (User user : userList) {
-                List<BookingDetailStep> listAddIntoMap = new ArrayList<>();
-                for (BookingDetailStep bookingDetailStep : bookingDetailStepList) {
-                    if (isStaff.equalsIgnoreCase("true")) {
-                        if(Objects.isNull(bookingDetailStep.getStaff())){
-                            if(Objects.isNull(bookingDetailStep.getConsultant())){
-                                listAddIntoMap.add(bookingDetailStep);
-                            }
-                        } else {
-                            if (bookingDetailStep.getStaff().getId().equals(user.getId())) {
-                                listAddIntoMap.add(bookingDetailStep);
-                            }
-                        }
-                    } else {
-                        if(Objects.isNull(bookingDetailStep.getConsultant())){
-                            if(Objects.isNull(bookingDetailStep.getStaff())){
-                                listAddIntoMap.add(bookingDetailStep);
-                            }
-                        } else {
-                            if (bookingDetailStep.getConsultant().getId().equals(user.getId())) {
-                                listAddIntoMap.add(bookingDetailStep);
-                            }
-                        }
-                    }
-                }
-                map.put(user.getId(), listAddIntoMap);
-            }
+        if (check == 0) {
             for (Map.Entry<Integer, List<BookingDetailStep>> entry : map.entrySet()) {
                 String bookTimeFinal = "";
                 if (entry.getValue().size() < 2) {
@@ -379,7 +349,7 @@ public class SupportFunctions {
                     }
                 }
             }
-        } else {
+        } else if (check > 0) {
             String bookTimeFinal = "";
             loop = calculateTimeDuration(Time.valueOf(Constant.TIME_START_RELAX),
                     Time.valueOf(Constant.TIME_START_DATE), totalTime);
@@ -406,6 +376,8 @@ public class SupportFunctions {
                 }
             }
             timeResult = Arrays.asList(bookTimeFinal.split("-"));
+        } else {
+            timeResult = new ArrayList<>();
         }
         return timeResult;
     }

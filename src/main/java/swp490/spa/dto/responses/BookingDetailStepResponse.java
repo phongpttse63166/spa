@@ -27,6 +27,8 @@ public class BookingDetailStepResponse {
     private StatusBooking statusBooking;
     @JsonProperty("reason_cancel")
     private String reasonCancel;
+    @JsonProperty("is_consultation")
+    private IsConsultation isConsultation;
     @JsonProperty("treatment_service")
     private TreatmentService treatmentService;
     @JsonProperty("staff")

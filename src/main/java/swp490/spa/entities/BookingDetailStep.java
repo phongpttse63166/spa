@@ -33,6 +33,8 @@ public class BookingDetailStep implements Serializable {
     private StatusBooking statusBooking;
     @Column(name = "reason_cancel")
     private String reasonCancel;
+    @Column(name = "is_consultation")
+    private IsConsultation isConsultation;
     @ManyToOne
     @JoinColumn(name = "treatment_service_id")
     private TreatmentService treatmentService;

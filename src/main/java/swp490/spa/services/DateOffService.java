@@ -28,7 +28,7 @@ public class DateOffService {
         return this.dateOffRepository.save(dateOff);
     }
 
-    public List<DateOff> findByDateOffAndSpaAndStatus(Date dateOff, Integer spaId) {
+    public List<DateOff> findByDateOffAndSpaAndStatusApprove(Date dateOff, Integer spaId) {
         return this.dateOffRepository
                 .findByDateOffAndAndSpa_IdAndAndStatusDateOff(dateOff, spaId, StatusDateOff.APPROVE);
     }

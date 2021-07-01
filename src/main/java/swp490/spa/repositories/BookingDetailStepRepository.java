@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.BookingDetailStep;
+import swp490.spa.entities.IsConsultation;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -25,4 +26,10 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                     Date dateBooking);
 
     Page<BookingDetailStep> findByBookingDetail_IdOrderById(Integer bookingDetailId, Pageable pageable);
+
+    Page<BookingDetailStep> findByDateBookingAndIsConsultationOrderByBookingDetailAscStartTimeAsc(Date dateBooking,
+                                                                                                  IsConsultation isConsultation,
+                                                                                                  Pageable pageable);
+
+
 }

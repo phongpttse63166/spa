@@ -6,8 +6,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.BookingDetailStep;
+import swp490.spa.entities.IsConsultation;
 import swp490.spa.repositories.BookingDetailStepRepository;
 
+import java.net.ContentHandler;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
@@ -39,5 +41,13 @@ public class BookingDetailStepService {
 
     public void removeDB(Integer bookingDetailStepId) {
         this.bookingDetailStepRepository.deleteById(bookingDetailStepId);
+    }
+
+    public Page<BookingDetailStep> findByDateBookingAndIsConsultation(Date dateBooking,
+                                                                      IsConsultation isConsultation,
+                                                                      Pageable pageable) {
+        return this.bookingDetailStepRepository
+                .findByDateBookingAndIsConsultationOrderByBookingDetailAscStartTimeAsc(dateBooking,
+                        isConsultation, pageable);
     }
 }

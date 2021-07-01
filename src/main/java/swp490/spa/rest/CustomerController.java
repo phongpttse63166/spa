@@ -131,45 +131,132 @@ public class CustomerController {
     }
 
     @GetMapping("/getlisttimebook")
-    public Response getListTimeToBook(@RequestParam Integer spaPackageId,
-                                      @RequestParam String dateBooking,
-                                      @RequestParam String isStaff) {
-        List<User> userList = new ArrayList<>();
+    public Response getListTimeBookingTest(@RequestParam Integer spaPackageId,
+                                           @RequestParam String dateBooking) {
         supportFunctions.setBookingDetailStepService(bookingDetailStepService);
-        SpaTreatment spaTreatment
-                = spaTreatmentService.findTreatmentBySpaPackageIdWithTypeOneStep(spaPackageId);
-        if (isStaff.equalsIgnoreCase("true")) {
-            List<Staff> staffList = staffService.findBySpaId(spaTreatment.getSpa().getId());
-            for (Staff staff : staffList) {
-                userList.add(staff.getUser());
-            }
-        } else {
-            List<Consultant> consultantList =
-                    consultantService.findBySpaId(spaTreatment.getSpa().getId());
-            for (Consultant consultant : consultantList) {
-                userList.add(consultant.getUser());
-            }
-        }
-        List<DateOff> dateOffs = dateOffService.findByDateOffAndSpaAndStatus(Date.valueOf(dateBooking),
-                spaTreatment.getSpa().getId());
-        if (dateOffs.size() != 0) {
-            List<User> userDateOffList = new ArrayList<>();
-            for (User user : userList) {
-                for (DateOff dateOff : dateOffs) {
-                    if (user.equals(dateOff.getEmployee())) {
-                        userDateOffList.add(user);
+        int countEmployee = 0;
+        List<DateOff> dateOffs = null;
+        List<Staff> staffs = null;
+        List<Consultant> consultants = null;
+        List<BookingDetailStep> bookingDetailSteps = null;
+        SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
+        if (Objects.nonNull(spaPackage)) {
+            dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
+                    spaPackage.getSpa().getId());
+            if (spaPackage.getType().equals(Type.ONESTEP)) {
+                staffs = staffService.findBySpaId(spaPackage.getSpa().getId());
+                List<Staff> staffDateOff = new ArrayList<>();
+                for (Staff staff : staffs) {
+                    for (DateOff dateOff : dateOffs) {
+                        if (staff.getUser().equals(dateOff.getEmployee())) {
+                            staffDateOff.add(staff);
+                        }
                     }
                 }
+                staffs.removeAll(staffDateOff);
+                countEmployee = staffs.size();
+                bookingDetailSteps = bookingDetailStepService
+                        .findByDateBookingAndIsConsultation(Date.valueOf(dateBooking),
+                                IsConsultation.FALSE,
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
+                        .getContent();
+            } else {
+                consultants =
+                        consultantService.findBySpaId(spaPackage.getSpa().getId());
+                List<Consultant> consultantDateOff = new ArrayList<>();
+                for (Consultant consultant : consultants) {
+                    for (DateOff dateOff : dateOffs) {
+                        if (consultant.getUser().equals(dateOff.getEmployee())) {
+                            consultantDateOff.add(consultant);
+                        }
+                    }
+                }
+                consultants.removeAll(consultantDateOff);
+                countEmployee = consultants.size();
+                bookingDetailSteps = bookingDetailStepService
+                        .findByDateBookingAndIsConsultation(Date.valueOf(dateBooking),
+                                IsConsultation.TRUE,
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
+                        .getContent();
             }
-            userList.removeAll(userDateOffList);
+            List<BookingDetailStep> bookingDetailStepCheckList = bookingDetailSteps;
+            Map<Integer, List<BookingDetailStep>> map = new HashMap<>();
+            int count = 0;
+            int oldBookingDetailId = 0;
+            int newBookingDetailId = 0;
+            int checkIgnore = -1;
+            boolean checkFinish = false;
+            BookingDetailStep oldBookingDetailStep = null;
+            while (!checkFinish) {
+                List<BookingDetailStep> bookingDetailStepDraftList = bookingDetailStepCheckList;
+                bookingDetailStepCheckList = new ArrayList<>();
+                List<BookingDetailStep> list = new ArrayList<>();
+                for (BookingDetailStep bookingDetailStep : bookingDetailStepDraftList) {
+                    oldBookingDetailId = newBookingDetailId;
+                    newBookingDetailId = bookingDetailStep.getBookingDetail().getId();
+                    if (checkIgnore != newBookingDetailId) {
+                        if (oldBookingDetailId == 0) {
+                            list.add(bookingDetailStep);
+                            oldBookingDetailStep = bookingDetailStep;
+                        } else if (!bookingDetailStepDraftList.get(bookingDetailStepDraftList.size() - 1).equals(bookingDetailStep)) {
+                            if (oldBookingDetailId == newBookingDetailId) {
+                                list.add(bookingDetailStep);
+                                oldBookingDetailStep = bookingDetailStep;
+                            } else {
+                                if (oldBookingDetailStep.getStartTime()
+                                        .compareTo(bookingDetailStep.getStartTime()) > 0) {
+                                    checkIgnore = newBookingDetailId;
+                                    bookingDetailStepCheckList.add(bookingDetailStep);
+                                } else {
+                                    list.add(bookingDetailStep);
+                                    oldBookingDetailStep = bookingDetailStep;
+                                }
+                            }
+                        } else {
+                            if (oldBookingDetailId == newBookingDetailId) {
+                                list.add(bookingDetailStep);
+                            } else {
+                                if (oldBookingDetailStep.getStartTime().toLocalTime()
+                                        .isBefore(bookingDetailStep.getEndTime().toLocalTime())) {
+                                    bookingDetailStepCheckList.add(bookingDetailStep);
+                                } else {
+                                    list.add(bookingDetailStep);
+                                }
+                            }
+                            count++;
+                            checkIgnore = -1;
+                            newBookingDetailId = 0;
+                            map.put(count, list);
+                        }
+                    } else {
+                        bookingDetailStepCheckList.add(bookingDetailStep);
+                    }
+                }
+                if (bookingDetailStepCheckList.size() == 0) {
+                    checkFinish = true;
+                }
+            }
+            int check = countEmployee - count;
+            List<String> timeBookingList = null;
+            if(spaPackage.getType().equals(Type.ONESTEP)){
+                SpaTreatment spaTreatment =
+                        spaTreatmentService.findTreatmentBySpaPackageIdWithTypeOneStep(spaPackageId);
+                timeBookingList =
+                        supportFunctions.getBookTime(spaTreatment.getTotalTime(), map, check);
+            } else {
+                timeBookingList =
+                        supportFunctions.getBookTime(Constant.DURATION_OF_CONSULTATION, map, check);
+            }
+            if(timeBookingList.size()!=0){
+                Page<String> page = new PageImpl<>(timeBookingList,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
+                        timeBookingList.size());
+                return ResponseHelper.ok(page);
+            }
+            return ResponseHelper.ok(Notification.NO_EMPLOYEE_FREE);
+        } else {
+            return ResponseHelper.error(Notification.SPA_PACKAGE_NOT_EXISTED);
         }
-        List<String> timeBookingList =
-                supportFunctions.getBookTime(spaTreatment.getTotalTime(), userList,
-                        dateBooking, isStaff);
-        Page<String> page = new PageImpl<>(timeBookingList,
-                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
-                timeBookingList.size());
-        return ResponseHelper.ok(page);
     }
 
     @PostMapping("/booking/create")
@@ -184,7 +271,7 @@ public class CustomerController {
             spaPackageCheck = spaPackageService.findBySpaPackageId(bookingData.getPackageId());
             Time startTime = bookingData.getTimeBooking();
             List<DateOff> dateOffs =
-                    dateOffService.findByDateOffAndSpaAndStatus(bookingData.getDateBooking(),
+                    dateOffService.findByDateOffAndSpaAndStatusApprove(bookingData.getDateBooking(),
                             spaPackageCheck.getSpa().getId());
             List<Staff> staffBookingList = staffList;
             List<Consultant> consultantBookingList = consultantList;
@@ -328,6 +415,7 @@ public class CustomerController {
                                         .getSpaService().getPrice());
                                 bookingDetailStep.setTreatmentService(treatmentServices.get(i));
                                 bookingDetailStep.setBookingDetail(bookingDetail);
+                                bookingDetailStep.setIsConsultation(IsConsultation.FALSE);
                                 if (i == 0) {
                                     startTime = bookingData.getTimeBooking();
                                     endTime =
@@ -379,6 +467,7 @@ public class CustomerController {
                                     bookingDetailStep.setTreatmentService(treatmentServices.get(i));
                                     bookingDetailStep.setBookingPrice(treatmentServices.get(i)
                                             .getSpaService().getPrice());
+                                    bookingDetailStep.setIsConsultation(IsConsultation.FALSE);
                                     bookingDetailStep.setBookingDetail(bookingDetail);
                                     if (i == 0) {
                                         startTime = bookingData.getTimeBooking();
@@ -407,6 +496,7 @@ public class CustomerController {
                                 BookingDetailStep bookingDetailStep = new BookingDetailStep();
                                 bookingDetailStep.setDateBooking(bookingData.getDateBooking());
                                 bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                                bookingDetailStep.setIsConsultation(IsConsultation.TRUE);
                                 bookingDetailStep.setBookingDetail(bookingDetail);
                                 bookingDetailStep.setStartTime(bookingData.getTimeBooking());
                                 bookingDetailStep.setEndTime(Time.valueOf(bookingData

@@ -1,5 +1,7 @@
 package swp490.spa.utils.support;
 
+import org.springframework.data.domain.Page;
+
 public class Notification {
     public static final String USER_EXISTED = "Đã có tài khoản";
     public static final String REGISTER_FAIL = "Đăng kí thất bại";
@@ -73,4 +75,5 @@ public class Notification {
             "Lấy danh sách đăng kí date off trong 1 tuần thất bại";
     public static final String INSERT_TREATMENT_SERVICE_FAILED = "Thêm Treatment service thất bại";
     public static final String INSERT_TREATMENT_SERVICE_SUCCESS = "Thêm Treatment service thành công";
+    public static final String NO_EMPLOYEE_FREE = "Không có nhân viên rảnh";
 }
