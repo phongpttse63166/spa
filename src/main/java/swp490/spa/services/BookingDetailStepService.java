@@ -50,4 +50,18 @@ public class BookingDetailStepService {
                 .findByDateBookingAndIsConsultationOrderByBookingDetailAscStartTimeAsc(dateBooking,
                         isConsultation, pageable);
     }
+
+    public Page<BookingDetailStep> findByStaffIdAndDateBooking(Integer staffId,
+                                                               Date dateBooking,
+                                                               Pageable pageable) {
+        return this.bookingDetailStepRepository
+                .findByStaff_IdAndDateBookingOrderByStartTimeAsc(staffId, dateBooking, pageable);
+    }
+
+    public Page<BookingDetailStep> findByConsultantIdAndDateBooking(Integer consultantId,
+                                                               Date dateBooking,
+                                                               Pageable pageable) {
+        return this.bookingDetailStepRepository
+                .findByConsultant_IdAndAndDateBookingOrderByStartTimeAsc(consultantId, dateBooking, pageable);
+    }
 }

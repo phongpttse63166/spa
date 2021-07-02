@@ -3,20 +3,22 @@ package swp490.spa.rest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.support.Response;
-import swp490.spa.entities.DateOff;
-import swp490.spa.entities.Staff;
-import swp490.spa.entities.StatusDateOff;
-import swp490.spa.entities.User;
-import swp490.spa.services.DateOffService;
-import swp490.spa.services.StaffService;
-import swp490.spa.services.UserService;
+import swp490.spa.entities.*;
+import swp490.spa.services.*;
+import swp490.spa.utils.support.Constant;
 import swp490.spa.utils.support.Notification;
+import swp490.spa.utils.support.SupportFunctions;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,14 +33,20 @@ public class StaffController {
     private UserService userService;
     @Autowired
     private DateOffService dateOffService;
+    @Autowired
+    private BookingDetailStepService bookingDetailStepService;
     private Conversion conversion;
+    private SupportFunctions supportFunctions;
 
     public StaffController(StaffService staffService, UserService userService,
-                           DateOffService dateOffService) {
+                           DateOffService dateOffService,
+                           BookingDetailStepService bookingDetailStepService) {
         this.staffService = staffService;
         this.userService = userService;
         this.dateOffService = dateOffService;
+        this.bookingDetailStepService = bookingDetailStepService;
         this.conversion = new Conversion();
+        this.supportFunctions = new SupportFunctions();
     }
 
     @GetMapping("/findbyId")
@@ -60,9 +68,9 @@ public class StaffController {
             if(Objects.nonNull(userService.editUser(user))){
                 return ResponseHelper.ok(userResult);
             }
-            return ResponseHelper.error(Notification.EDIT_PROFILE_FAIL);
+            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.PROFILE));
         }
-        return ResponseHelper.error(Notification.STAFF_NOT_EXISTED);
+        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.STAFF));
     }
 
     @PutMapping("/editpassword")
@@ -81,17 +89,40 @@ public class StaffController {
 
     @PostMapping("/dateoff/create")
     public Response insertNewDateOff(@RequestBody List<DateOff> dateOffList){
-        boolean isError = false;
+        List<DateOff> dateOffs = new ArrayList<>();
+        DateOff dateOffResult = null;
         for (DateOff dateOff : dateOffList) {
-            dateOff.setStatusDateOff(StatusDateOff.WAITING);
-            if(Objects.isNull(dateOffService.insertNewDateOff(dateOff))){
-                LOGGER.info(dateOff.getDateOff() + " create failed!");
-                isError = true;
+            dateOffResult = dateOffService.insertNewDateOff(dateOff);
+            if (Objects.isNull(dateOffResult)) {
+                for (DateOff dateOffRemove : dateOffs) {
+                    dateOffService.removeDateOff(dateOffRemove.getId());
+                }
+                return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.DATE_OFF));
+            } else {
+                dateOffs.add(dateOff);
             }
         }
-        if(isError){
-            return ResponseHelper.error(Notification.INSERT_DATE_OFF_FAILED);
-        }
-        return ResponseHelper.ok(Notification.INSERT_DATE_OFF_SUCCESS);
+        return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS, Constant.DATE_OFF));
     }
+
+    @GetMapping("/workingofstaff/findbydatechosen/{staffId}")
+    public Response findWorkingOfStaffByDateChosen(@PathVariable Integer staffId,
+                                                    @RequestParam String dateChosen){
+        Staff staff = staffService.findByStaffId(staffId);
+        if(Objects.nonNull(staff)){
+            Page<BookingDetailStep> bookingDetailSteps =
+                    bookingDetailStepService.findByStaffIdAndDateBooking(staffId, Date.valueOf(dateChosen),
+                            PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT, Sort.unsorted()));
+            if(Objects.nonNull(bookingDetailSteps)){
+                return ResponseHelper.ok(conversion.convertToPageBookingDetailStepResponse(bookingDetailSteps));
+            } else {
+                LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+            }
+        } else {
+            LOGGER.info(String.format(Notification.GET_FAILED, Constant.STAFF));
+            return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.STAFF));
+        }
+    }
+
 }

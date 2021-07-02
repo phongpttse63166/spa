@@ -17,6 +17,7 @@ import swp490.spa.services.*;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
 import swp490.spa.services.SpaService;
+import swp490.spa.utils.support.Constant;
 import swp490.spa.utils.support.UploadImage;
 import swp490.spa.utils.support.GenerationOTP;
 import swp490.spa.utils.support.Notification;
@@ -147,7 +148,7 @@ public class PublicController {
             if (Objects.nonNull(accountRegisterService.updateAccountRegister(result))) {
                 return ResponseHelper.ok(result);
             }
-            return ResponseHelper.error(Notification.SEND_OTP_FAIL);
+            return ResponseHelper.error(Notification.SEND_OTP_FAILED);
         } else {
             User user = userService.findByPhone(accountRegister.getPhone());
             if (Objects.isNull(user)) {
@@ -163,7 +164,7 @@ public class PublicController {
                 return ResponseHelper.error(Notification.USER_EXISTED);
             }
         }
-        return ResponseHelper.error(Notification.REGISTER_FAIL);
+        return ResponseHelper.error(Notification.REGISTER_FAILED);
     }
 
     @PostMapping("/verifyregister")
@@ -193,15 +194,15 @@ public class PublicController {
                         return ResponseHelper.error(Notification.REGISTER_SUCCESS);
                     }
                 } else {
-                    return ResponseHelper.error(Notification.NO_DATA_USER);
+                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.USER));
                 }
             } else {
-                return ResponseHelper.error(Notification.INSERT_USER_FAIL);
+                return ResponseHelper.error(String.format(Notification.INSERT_SUCCESS, newUser.getFullname()));
             }
 
 
         }
-        return ResponseHelper.error(Notification.VERIFY_FAIL);
+        return ResponseHelper.error(Notification.VERIFY_FAILED);
     }
 
     @GetMapping("/spa/findall")

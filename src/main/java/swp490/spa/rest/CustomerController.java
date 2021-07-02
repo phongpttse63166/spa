@@ -102,7 +102,8 @@ public class CustomerController {
             if (Objects.nonNull(result)) {
                 return ResponseHelper.ok(userLocationUpdate);
             }
-            return ResponseHelper.error(Notification.EDIT_USER_LOCATION_FAILED);
+            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.USER_LOCATION
+            ));
         }
         return ResponseHelper.error(Notification.USER_EXISTED);
     }
@@ -118,7 +119,7 @@ public class CustomerController {
                 return ResponseHelper.ok(userResult);
             }
         }
-        return ResponseHelper.error(Notification.EDIT_PROFILE_FAIL);
+        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.PROFILE));
     }
 
     @GetMapping("/getprofile")
@@ -127,7 +128,7 @@ public class CustomerController {
         if (Objects.nonNull(customer)) {
             return ResponseHelper.ok(customer);
         }
-        return ResponseHelper.error(Notification.CUSTOMER_NOT_EXISTED);
+        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.CUSTOMER));
     }
 
     @GetMapping("/getlisttimebook")
@@ -263,7 +264,7 @@ public class CustomerController {
             }
             return ResponseHelper.ok(Notification.NO_EMPLOYEE_FREE);
         } else {
-            return ResponseHelper.error(Notification.SPA_PACKAGE_NOT_EXISTED);
+            return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SPA_PACKAGE));
         }
     }
 
@@ -317,8 +318,8 @@ public class CustomerController {
                         bookingDetailStepService.findByStartTimeAndEndTimeAndDateBooking(startTime,
                                 endTime, bookingData.getDateBooking());
                 if (Objects.isNull(bookingDetailSteps)) {
-                    LOGGER.info(Notification.GET_BOOKING_DETAIL_STEP_FAILED);
-                    return ResponseHelper.error(Notification.GET_BOOKING_DETAIL_STEP_FAILED);
+                    LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
                 } else {
                     if (bookingDetailSteps.size() != 0) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
@@ -340,8 +341,8 @@ public class CustomerController {
                         bookingDetailStepService.findByStartTimeAndEndTimeAndDateBooking(startTime,
                                 endTime, bookingData.getDateBooking());
                 if (Objects.isNull(bookingDetailSteps)) {
-                    LOGGER.info(Notification.GET_BOOKING_DETAIL_STEP_FAILED);
-                    return ResponseHelper.error(Notification.GET_BOOKING_DETAIL_STEP_FAILED);
+                    LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
                 } else {
                     if (bookingDetailSteps.size() != 0) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
@@ -375,7 +376,7 @@ public class CustomerController {
             Spa spa = null;
             Customer customer = customerService.findByUserId(bookingRequest.getCustomerId());
             if (Objects.isNull(customer)) {
-                ResponseHelper.error(Notification.CUSTOMER_NOT_EXISTED);
+                ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.CUSTOMER));
             }
             for (BookingData bookingData : bookingDataList) {
                 spaPackageSearchResult = spaPackageService.findBySpaPackageId(bookingData.getPackageId());
@@ -543,7 +544,7 @@ public class CustomerController {
                                             bookingDetailStepService
                                                     .insertBookingDetailStep(bookingDetailStep);
                                     if (Objects.isNull(bookingDetailStepInsert)) {
-                                        LOGGER.info(Notification.INSERT_BOOKING_DETAIL_STEP_FAILED);
+                                        LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.BOOKING_DETAIL_STEP));
                                         // delete booking + bookingDetail + bookingDetailStep inserted
                                         List<BookingDetail> bookingDetailDeleteList =
                                                 bookingDetailService
@@ -566,20 +567,20 @@ public class CustomerController {
                                             bookingDetailService.removeDB(bdd.getId());
                                         }
                                         bookingService.removeDB(bookingInsert.getId());
-                                        return ResponseHelper.error(Notification.INSERT_BOOKING_FAILED);
+                                        return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.BOOKING));
                                     }
                                 }
                             }
                         } else {
-                            LOGGER.info(Notification.INSERT_BOOKING_DETAIL_FAILED);
+                            LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.BOOKING_DETAIL));
                         }
                     }
-                    return ResponseHelper.ok(Notification.INSERT_BOOKING_SUCCESS);
+                    return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS,Constant.BOOKING));
                 } else {
-                    LOGGER.info(Notification.INSERT_BOOKING_FAILED);
+                    LOGGER.info(String.format(Notification.INSERT_FAILED,Constant.BOOKING));
                 }
             }
-            return ResponseHelper.error(Notification.INSERT_BOOKING_FAILED);
+            return ResponseHelper.error(String.format(Notification.INSERT_FAILED,Constant.BOOKING));
         }
     }
 

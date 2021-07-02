@@ -206,4 +206,25 @@ public class Conversion {
         return new PageImpl<>(staffData,totalElements == 0 ? Pageable.unpaged() : staffs.getPageable(),
                 totalElements);
     }
+
+    public Page<BookingDetailStepResponse> convertToPageBookingDetailStepResponse(Page<BookingDetailStep> bookingDetailSteps) {
+        List<BookingDetailStepResponse> bookingDetailStepData = bookingDetailSteps.getContent().stream()
+                .map(bookingDetailStep -> new BookingDetailStepResponse(bookingDetailStep.getId(),
+                        bookingDetailStep.getDateBooking(),
+                        bookingDetailStep.getStartTime(),
+                        bookingDetailStep.getEndTime(),
+                        bookingDetailStep.getBookingPrice(),
+                        bookingDetailStep.getStatusBooking(),
+                        bookingDetailStep.getReasonCancel(),
+                        bookingDetailStep.getIsConsultation(),
+                        bookingDetailStep.getTreatmentService(),
+                        bookingDetailStep.getStaff(),
+                        bookingDetailStep.getConsultant(),
+                        bookingDetailStep.getBookingDetail()))
+                .collect(Collectors.toList());
+        long totalElements = bookingDetailSteps.getTotalElements();
+        return new PageImpl<>(bookingDetailStepData,
+                totalElements == 0 ? Pageable.unpaged() : bookingDetailSteps.getPageable(),
+                totalElements);
+    }
 }

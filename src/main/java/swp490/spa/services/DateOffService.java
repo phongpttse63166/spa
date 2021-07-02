@@ -39,4 +39,8 @@ public class DateOffService {
                 .findBySpa_IdAndStatusDateOffAndDateOffBetweenOrderByDateOff(spaId, waiting,
                         fromDate, toDate, pageable);
     }
+
+    public void removeDateOff(Integer dateOffId) {
+        this.dateOffRepository.deleteById(dateOffId);
+    }
 }

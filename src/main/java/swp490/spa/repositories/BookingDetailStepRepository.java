@@ -31,5 +31,11 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                                                   IsConsultation isConsultation,
                                                                                                   Pageable pageable);
 
+    Page<BookingDetailStep> findByStaff_IdAndDateBookingOrderByStartTimeAsc(Integer staffId,
+                                                                            Date dateBooking,
+                                                                            Pageable pageable);
 
+    Page<BookingDetailStep> findByConsultant_IdAndAndDateBookingOrderByStartTimeAsc(Integer staffId,
+                                                                                    Date dateBooking,
+                                                                                    Pageable pageable);
 }
