@@ -2,10 +2,9 @@ package swp490.spa.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import swp490.spa.entities.Booking;
-import swp490.spa.entities.SpaPackage;
-import swp490.spa.entities.SpaTreatment;
-import swp490.spa.entities.Type;
+import swp490.spa.entities.*;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,10 +20,14 @@ public class BookingDetailResponse {
     private Type type;
     @JsonProperty("total_price")
     private Double totalPrice;
+    @JsonProperty("status_booking")
+    private StatusBooking statusBooking;
     @JsonProperty("booking")
     private Booking booking;
     @JsonProperty("treatment")
     private SpaTreatment spaTreatment;
     @JsonProperty("spa_package")
     private SpaPackage spaPackage;
+    @JsonProperty("booking_detail_steps")
+    private List<BookingDetailStepResponse> bookingDetailSteps;
 }

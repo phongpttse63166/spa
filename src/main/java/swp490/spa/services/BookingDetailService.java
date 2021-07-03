@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.BookingDetail;
+import swp490.spa.entities.Type;
 import swp490.spa.repositories.BookingDetailRepository;
 
 @Service
@@ -26,5 +27,12 @@ public class BookingDetailService {
 
     public void removeDB(Integer bookingDetailId) {
         this.bookingDetailRepository.deleteById(bookingDetailId);
+    }
+
+    public Page<BookingDetail> findByTypeMoreStepAndCustomerId(Type type,
+                                                               Integer customerId,
+                                                               Pageable pageable) {
+        return this.bookingDetailRepository.
+                findByTypeAndBooking_Customer_User_IdOrderByBookingAsc(type,customerId, pageable);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.BookingDetailStep;
 import swp490.spa.entities.IsConsultation;
+import swp490.spa.entities.StatusBooking;
 import swp490.spa.repositories.BookingDetailStepRepository;
 
 import java.net.ContentHandler;
@@ -63,5 +64,9 @@ public class BookingDetailStepService {
                                                                Pageable pageable) {
         return this.bookingDetailStepRepository
                 .findByConsultant_IdAndAndDateBookingOrderByStartTimeAsc(consultantId, dateBooking, pageable);
+    }
+
+    public List<BookingDetailStep> findByStatusAndSpaId(StatusBooking statusBooking, Integer spaId) {
+        return this.bookingDetailStepRepository.findByStatusAndSpa(statusBooking, spaId);
     }
 }

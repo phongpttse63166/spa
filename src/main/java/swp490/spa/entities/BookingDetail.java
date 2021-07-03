@@ -1,5 +1,6 @@
 package swp490.spa.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -24,6 +27,8 @@ public class BookingDetail implements Serializable {
     private Type type;
     @Column(name = "total_price")
     private Double totalPrice;
+    @Column(name = "status_booking")
+    private StatusBooking statusBooking;
     @ManyToOne
     @JoinColumn(name = "booking_id")
     private Booking booking;
@@ -33,4 +38,7 @@ public class BookingDetail implements Serializable {
     @ManyToOne
     @JoinColumn(name = "spa_package_id")
     private SpaPackage spaPackage;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
 }

@@ -12,6 +12,7 @@ public class Notification {
     public static final String SAVE_IMAGE_FAILED = "Lưu hình thất bại";
     public static final String CANNOT_BOOKING_AT_TIME = "Không thể booking tại thời gian đó vì không có nhân viên rảnh";
     public static final String NO_EMPLOYEE_FREE = "Không có nhân viên rảnh";
+    public static final String BOOKING_OVERTIME = "Booking thất bại vì thời gian không phù hợp";
 
     public static final String INSERT_SUCCESS = "Thêm %s thành công";
     public static final String INSERT_FAILED = "Thêm %s thất bại";
@@ -21,5 +22,6 @@ public class Notification {
     public static final String REMOVE_FAILED = "Xóa %s thất bại";
     public static final String GET_SUCCESS = "Lấy thông tin %s thành công";
     public static final String GET_FAILED = "Lấy thông tin %s thất bại";
+
 
 }

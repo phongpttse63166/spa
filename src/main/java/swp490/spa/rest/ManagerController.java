@@ -18,6 +18,7 @@ import swp490.spa.entities.SpaService;
 import swp490.spa.services.*;
 import swp490.spa.utils.support.Constant;
 import swp490.spa.utils.support.Notification;
+import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.UploadImage;
 
 import java.sql.Date;
@@ -52,15 +53,19 @@ public class ManagerController {
     @Autowired
     private TreatmentServiceService treatmentServiceService;
     @Autowired
+    private BookingDetailStepService bookingDetailStepService;
+    @Autowired
     private StaffService staffService;
     private Conversion conversion;
+    private SupportFunctions supportFunctions;
 
     public ManagerController(ManagerService managerService, SpaServiceService spaServiceService,
                              SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
                              swp490.spa.services.SpaService spaService, UserService userService,
                              DateOffService dateOffService, BookingService bookingService,
                              BookingDetailService bookingDetailService, StaffService staffService,
-                             TreatmentServiceService treatmentServiceService) {
+                             TreatmentServiceService treatmentServiceService,
+                             BookingDetailStepService bookingDetailStepService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
@@ -72,7 +77,9 @@ public class ManagerController {
         this.bookingDetailService = bookingDetailService;
         this.staffService = staffService;
         this.treatmentServiceService = treatmentServiceService;
+        this.bookingDetailStepService = bookingDetailStepService;
         this.conversion = new Conversion();
+        this.supportFunctions = new SupportFunctions();
     }
 
     @GetMapping("/search/{userId}")
@@ -295,7 +302,7 @@ public class ManagerController {
         return ResponseHelper.ok(conversion.convertToPageStaffResponse(staffs));
     }
 
-    @GetMapping("/spaservices/findbyId/{packageId}")
+    @GetMapping("/spaservices/findbyid/{packageId}")
     public Response findSpaServicesBySpaPackageId(@PathVariable Integer packageId){
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(packageId);
         if(Objects.nonNull(spaPackage)){
@@ -308,6 +315,44 @@ public class ManagerController {
         }
         LOGGER.info(String.format(Notification.GET_FAILED, Constant.SPA_PACKAGE));
         return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SERVICES));
+    }
+
+    @GetMapping("/bookings/findbystatusandspaid/{spaId}")
+    public Response findByStatusBookingAndSpaId(@PathVariable Integer spaId){
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findByStatusAndSpaId(StatusBooking.BOOKING, spaId);
+        if(Objects.nonNull(bookingDetailSteps)) {
+            List<BookingDetail> bookingDetails = new ArrayList<>();
+            for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                BookingDetail bookingDetailCheck = bookingDetailStep.getBookingDetail();
+                if (bookingDetails.size() == 0) {
+                    bookingDetails.add(bookingDetailStep.getBookingDetail());
+                } else {
+                    if (!supportFunctions
+                            .checkBookingDetailExistedInList(bookingDetailCheck, bookingDetails)) {
+                        bookingDetails.add(bookingDetailStep.getBookingDetail());
+                    }
+                }
+            }
+            List<Booking> bookings = new ArrayList<>();
+            for (int i = 0; i < bookingDetails.size(); i++) {
+                Booking booking = bookingDetails.get(i).getBooking();
+                if (i == 0) {
+                    bookings.add(booking);
+                } else {
+                    if (!supportFunctions.checkBookingExistedInList(booking, bookings)) {
+                        bookings.add(booking);
+                    }
+                }
+            }
+            Page<Booking> bookingPage =
+                    new PageImpl<>(bookings,
+                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
+                            bookings.size());
+            return ResponseHelper.ok(conversion.convertToPageBookingResponse(bookingPage));
+        }
+        LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING));
     }
 
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
@@ -643,8 +688,8 @@ public class ManagerController {
         return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.SPA_TREATMENT));
     }
 
-    @PutMapping("/category/delete")
-    public Response removeCategory(@RequestParam Integer categoryId) {
+    @PutMapping("/category/delete/{categoryId}")
+    public Response removeCategory(@PathVariable Integer categoryId) {
         Category categoryResult = categoryService.findById(categoryId);
         if (Objects.nonNull(categoryResult)) {
             categoryResult.setStatus(Status.DISABLE);
@@ -655,8 +700,8 @@ public class ManagerController {
         return ResponseHelper.ok(String.format(Notification.REMOVE_FAILED, Constant.CATEGORY));
     }
 
-    @PutMapping("/spapackage/delete")
-    public Response removeSpaPackage(@RequestParam Integer packageId) {
+    @PutMapping("/spapackage/delete/{packageId}")
+    public Response removeSpaPackage(@PathVariable Integer packageId) {
         SpaPackage spaPackageResult = spaPackageService.findBySpaPackageId(packageId);
         if (Objects.nonNull(spaPackageResult)) {
             spaPackageResult.setStatus(Status.DISABLE);
@@ -667,8 +712,8 @@ public class ManagerController {
         return ResponseHelper.ok(String.format(Notification.REMOVE_FAILED, Constant.SPA_PACKAGE));
     }
 
-    @PutMapping("/spaservice/delete")
-    public Response removeSpaService(@RequestParam Integer spaServiceId) {
+    @PutMapping("/spaservice/delete/{spaServiceId}")
+    public Response removeSpaService(@PathVariable Integer spaServiceId) {
         SpaService spaServiceResult = spaServiceService.findBySpaServiceId(spaServiceId);
         if (Objects.nonNull(spaServiceResult)) {
             spaServiceResult.setStatus(Status.DISABLE);

@@ -2,12 +2,10 @@ package swp490.spa.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import swp490.spa.entities.Consultant;
-import swp490.spa.entities.Customer;
-import swp490.spa.entities.Spa;
-import swp490.spa.entities.StatusBooking;
+import swp490.spa.entities.*;
 
 import java.sql.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -29,4 +27,6 @@ public class BookingResponse {
     private Customer customer;
     @JsonProperty("spa")
     private Spa spa;
+    @JsonProperty("booking_details")
+    private List<BookingDetailResponse> bookingDetails;
 }

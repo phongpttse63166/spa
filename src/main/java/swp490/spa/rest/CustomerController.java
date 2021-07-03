@@ -83,43 +83,9 @@ public class CustomerController {
     }
 
     @GetMapping("/search/{userId}")
-    public Response findCustomerById(@PathVariable Integer userId) {
+    public Response getCustomerById(@PathVariable Integer userId) {
         Customer customer = customerService.findByUserId(userId);
         return ResponseHelper.ok(customer);
-    }
-
-    @PostMapping("/userlocation/create")
-    public Response createNewUserLocation(@RequestBody UserLocation userLocation) {
-        UserLocation newUserLocation = userLocationService.insertNewUserLocation(userLocation);
-        return ResponseHelper.ok(userLocation);
-    }
-
-    @PutMapping("/userlocation/edit")
-    public Response editUserLocation(@RequestBody UserLocation userLocationUpdate) {
-        UserLocation userLocation = userLocationService.findUserLocationByUserId(userLocationUpdate.getId());
-        if (userLocation != null) {
-            UserLocation result = userLocationService.editUserLocation(userLocationUpdate);
-            if (Objects.nonNull(result)) {
-                return ResponseHelper.ok(userLocationUpdate);
-            }
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.USER_LOCATION
-            ));
-        }
-        return ResponseHelper.error(Notification.USER_EXISTED);
-    }
-
-    @PutMapping("/user/edit")
-    public Response editUserProfile(@RequestBody User user) {
-        User userResult = userService.findByPhone(user.getPhone());
-        if (Objects.nonNull(userResult)) {
-            userResult.setFullname(user.getFullname());
-            userResult.setAddress(user.getAddress());
-            userResult.setEmail(user.getEmail());
-            if (Objects.nonNull(userService.editUser(userResult))) {
-                return ResponseHelper.ok(userResult);
-            }
-        }
-        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.PROFILE));
     }
 
     @GetMapping("/getprofile")
@@ -129,6 +95,33 @@ public class CustomerController {
             return ResponseHelper.ok(customer);
         }
         return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.CUSTOMER));
+    }
+
+    @GetMapping("/bookingdetail/{customerId}")
+    public Response getBookingDetailMoreStepByCustomerId(@PathVariable Integer customerId,
+                                                         Pageable pageable) {
+        Page<BookingDetail> bookingDetailPage =
+                bookingDetailService.findByTypeMoreStepAndCustomerId(Type.MORESTEP,
+                        customerId, pageable);
+        if (Objects.nonNull(bookingDetailPage)) {
+            long totalElements = bookingDetailPage.getTotalElements();
+            List<BookingDetail> bookingDetails = bookingDetailPage.getContent();
+            for (BookingDetail bookingDetail : bookingDetails) {
+                List<BookingDetailStep> bookingDetailSteps =
+                        bookingDetailStepService.findByBookingDetail(bookingDetail.getId(),
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
+                                .getContent();
+                if (Objects.nonNull(bookingDetailSteps)) {
+                    bookingDetail.setBookingDetailSteps(bookingDetailSteps);
+                } else {
+                    return ResponseHelper.error(String.format(Notification.GET_FAILED,
+                            Constant.BOOKING_DETAIL_STEP));
+                }
+            }
+            bookingDetailPage = new PageImpl<>(bookingDetails, pageable, totalElements);
+            return ResponseHelper.ok(conversion.convertToPageBookingDetailResponse(bookingDetailPage));
+        }
+        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL));
     }
 
     @GetMapping("/getlisttimebook")
@@ -266,6 +259,12 @@ public class CustomerController {
         } else {
             return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SPA_PACKAGE));
         }
+    }
+
+    @PostMapping("/userlocation/create")
+    public Response createNewUserLocation(@RequestBody UserLocation userLocation) {
+        UserLocation newUserLocation = userLocationService.insertNewUserLocation(userLocation);
+        return ResponseHelper.ok(userLocation);
     }
 
     @PostMapping("/booking/create")
@@ -411,6 +410,7 @@ public class CustomerController {
                             bookingDetail.setBooking(bookingResult);
                             bookingDetail.setSpaPackage(spaTreatment.getSpaPackage());
                             bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
+                            bookingDetail.setStatusBooking(StatusBooking.BOOKING);
                             bookingDetail.setSpaTreatment(spaTreatment);
                             bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                             bookingDetail.setType(spaTreatment.getSpaPackage().getType());
@@ -463,6 +463,7 @@ public class CustomerController {
                                 bookingDetail.setBooking(bookingResult);
                                 bookingDetail.setSpaPackage(spaPackage);
                                 bookingDetail.setSpaTreatment(spaTreatment);
+                                bookingDetail.setStatusBooking(StatusBooking.BOOKING);
                                 bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
                                 bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                                 bookingDetail.setType(Type.ONESTEP);
@@ -503,6 +504,7 @@ public class CustomerController {
                                 bookingDetail.setBooking(bookingResult);
                                 bookingDetail.setType(Type.MORESTEP);
                                 bookingDetail.setSpaPackage(spaPackage);
+                                bookingDetail.setStatusBooking(StatusBooking.BOOKING);
                                 bookingDetailResultList.add(bookingDetail);
                                 BookingDetailStep bookingDetailStep = new BookingDetailStep();
                                 bookingDetailStep.setDateBooking(bookingData.getDateBooking());
@@ -575,13 +577,43 @@ public class CustomerController {
                             LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.BOOKING_DETAIL));
                         }
                     }
-                    return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS,Constant.BOOKING));
+                    return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS, Constant.BOOKING));
                 } else {
-                    LOGGER.info(String.format(Notification.INSERT_FAILED,Constant.BOOKING));
+                    LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.BOOKING));
                 }
+            } else {
+                return ResponseHelper.error(Notification.BOOKING_OVERTIME);
             }
-            return ResponseHelper.error(String.format(Notification.INSERT_FAILED,Constant.BOOKING));
+            return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.BOOKING));
         }
+    }
+
+    @PutMapping("/userlocation/edit")
+    public Response editUserLocation(@RequestBody UserLocation userLocationUpdate) {
+        UserLocation userLocation = userLocationService.findUserLocationByUserId(userLocationUpdate.getId());
+        if (userLocation != null) {
+            UserLocation result = userLocationService.editUserLocation(userLocationUpdate);
+            if (Objects.nonNull(result)) {
+                return ResponseHelper.ok(userLocationUpdate);
+            }
+            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.USER_LOCATION
+            ));
+        }
+        return ResponseHelper.error(Notification.USER_EXISTED);
+    }
+
+    @PutMapping("/user/edit")
+    public Response editUserProfile(@RequestBody User user) {
+        User userResult = userService.findByPhone(user.getPhone());
+        if (Objects.nonNull(userResult)) {
+            userResult.setFullname(user.getFullname());
+            userResult.setAddress(user.getAddress());
+            userResult.setEmail(user.getEmail());
+            if (Objects.nonNull(userService.editUser(userResult))) {
+                return ResponseHelper.ok(userResult);
+            }
+        }
+        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.PROFILE));
     }
 
     @PutMapping("/editpassword")

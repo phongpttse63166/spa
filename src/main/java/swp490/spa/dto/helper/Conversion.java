@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import swp490.spa.dto.responses.*;
 import swp490.spa.entities.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,7 +71,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<SpaServiceResponse> convertToPageSpaServiceResponse(Page<SpaService> spaServices){
+    public Page<SpaServiceResponse> convertToPageSpaServiceResponse(Page<SpaService> spaServices) {
         List<SpaServiceResponse> spaServiceData = spaServices.getContent().stream()
                 .map(spaService -> new SpaServiceResponse(spaService.getId(),
                         spaService.getName(),
@@ -89,7 +90,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<SpaTreatmentResponse> convertToPageSpaTreatmentResponse(Page<SpaTreatment> spaTreatments){
+    public Page<SpaTreatmentResponse> convertToPageSpaTreatmentResponse(Page<SpaTreatment> spaTreatments) {
         List<SpaTreatmentResponse> spaTreatmentData = spaTreatments.getContent().stream()
                 .map(spaTreatment -> new SpaTreatmentResponse(spaTreatment.getId(),
                         spaTreatment.getName(),
@@ -107,7 +108,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<SpaPackageResponse> convertToPageSpaPackageResponse(Page<SpaPackage> spaPackages){
+    public Page<SpaPackageResponse> convertToPageSpaPackageResponse(Page<SpaPackage> spaPackages) {
         List<SpaPackageResponse> spaPackageData = spaPackages.getContent().stream()
                 .map(spaPackage -> new SpaPackageResponse(spaPackage.getId(),
                         spaPackage.getName(),
@@ -126,7 +127,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public SpaPackageResponse convertToSpaPackageResponse(SpaPackage spaPackage){
+    public SpaPackageResponse convertToSpaPackageResponse(SpaPackage spaPackage) {
         SpaPackageResponse spaPackageResponse = new SpaPackageResponse(spaPackage.getId(),
                 spaPackage.getName(),
                 spaPackage.getDescription(),
@@ -151,7 +152,7 @@ public class Conversion {
                 totalElements);
     }
 
-    public Page<BookingResponse> convertToPageBookingResponse(Page<Booking> page){
+    public Page<BookingResponse> convertToPageBookingResponse(Page<Booking> page) {
         List<BookingResponse> bookingData = page.getContent().stream()
                 .map(booking -> new BookingResponse(booking.getId(),
                         booking.getTotalPrice(),
@@ -159,7 +160,30 @@ public class Conversion {
                         booking.getStatusBooking(),
                         booking.getCreateTime(),
                         booking.getCustomer(),
-                        booking.getSpa()))
+                        booking.getSpa(),
+                        booking.getBookingDetails().stream()
+                                .map(bookingDetail -> new BookingDetailResponse(bookingDetail.getId(),
+                                        bookingDetail.getTotalTime(),
+                                        bookingDetail.getType(),
+                                        bookingDetail.getTotalPrice(),
+                                        bookingDetail.getStatusBooking(),
+                                        bookingDetail.getBooking(),
+                                        bookingDetail.getSpaTreatment(),
+                                        bookingDetail.getSpaPackage(),
+                                        bookingDetail.getBookingDetailSteps().stream()
+                                                .map(bookingDetailStep -> new BookingDetailStepResponse(bookingDetailStep.getId(),
+                                                        bookingDetailStep.getDateBooking(),
+                                                        bookingDetailStep.getStartTime(),
+                                                        bookingDetailStep.getEndTime(),
+                                                        bookingDetailStep.getBookingPrice(),
+                                                        bookingDetailStep.getStatusBooking(),
+                                                        bookingDetailStep.getReasonCancel(),
+                                                        bookingDetailStep.getIsConsultation(),
+                                                        bookingDetailStep.getTreatmentService(),
+                                                        bookingDetailStep.getStaff(),
+                                                        bookingDetailStep.getConsultant(),
+                                                        bookingDetailStep.getBookingDetail())).collect(Collectors.toList())))
+                                .collect(Collectors.toList())))
                 .collect(Collectors.toList());
         long totalElements = page.getTotalElements();
         return new PageImpl<>(bookingData, totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
@@ -172,12 +196,26 @@ public class Conversion {
                         bookingDetail.getTotalTime(),
                         bookingDetail.getType(),
                         bookingDetail.getTotalPrice(),
+                        bookingDetail.getStatusBooking(),
                         bookingDetail.getBooking(),
                         bookingDetail.getSpaTreatment(),
-                        bookingDetail.getSpaPackage()))
+                        bookingDetail.getSpaPackage(),
+                        bookingDetail.getBookingDetailSteps().stream()
+                                .map(bookingDetailStep -> new BookingDetailStepResponse(bookingDetailStep.getId(),
+                                        bookingDetailStep.getDateBooking(),
+                                        bookingDetailStep.getStartTime(),
+                                        bookingDetailStep.getEndTime(),
+                                        bookingDetailStep.getBookingPrice(),
+                                        bookingDetailStep.getStatusBooking(),
+                                        bookingDetailStep.getReasonCancel(),
+                                        bookingDetailStep.getIsConsultation(),
+                                        bookingDetailStep.getTreatmentService(),
+                                        bookingDetailStep.getStaff(),
+                                        bookingDetailStep.getConsultant(),
+                                        bookingDetailStep.getBookingDetail())).collect(Collectors.toList())))
                 .collect(Collectors.toList());
         long totalElements = page.getTotalElements();
-        return new PageImpl<>(bookingDetailData,totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
+        return new PageImpl<>(bookingDetailData, totalElements == 0 ? Pageable.unpaged() : page.getPageable(),
                 totalElements);
     }
 
@@ -193,7 +231,7 @@ public class Conversion {
                         dateOff.getSpa()))
                 .collect(Collectors.toList());
         long totalElements = dateOffPage.getTotalElements();
-        return new PageImpl<>(dateOffData,totalElements == 0 ? Pageable.unpaged() : dateOffPage.getPageable(),
+        return new PageImpl<>(dateOffData, totalElements == 0 ? Pageable.unpaged() : dateOffPage.getPageable(),
                 totalElements);
     }
 
@@ -203,7 +241,7 @@ public class Conversion {
                         staff.getSpa()))
                 .collect(Collectors.toList());
         long totalElements = staffs.getTotalElements();
-        return new PageImpl<>(staffData,totalElements == 0 ? Pageable.unpaged() : staffs.getPageable(),
+        return new PageImpl<>(staffData, totalElements == 0 ? Pageable.unpaged() : staffs.getPageable(),
                 totalElements);
     }
 

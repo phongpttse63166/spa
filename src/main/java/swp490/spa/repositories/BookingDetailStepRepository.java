@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.BookingDetailStep;
 import swp490.spa.entities.IsConsultation;
+import swp490.spa.entities.StatusBooking;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -38,4 +39,8 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     Page<BookingDetailStep> findByConsultant_IdAndAndDateBookingOrderByStartTimeAsc(Integer staffId,
                                                                                     Date dateBooking,
                                                                                     Pageable pageable);
+
+    @Query("FROM BookingDetailStep s WHERE s.statusBooking = ?1 AND s.bookingDetail.booking.spa.id = ?2 " +
+            "ORDER BY s.dateBooking ASC, s.startTime ASC")
+    List<BookingDetailStep> findByStatusAndSpa(StatusBooking status, Integer spaId);
 }
