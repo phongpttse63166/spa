@@ -232,6 +232,12 @@ public class CustomerController {
                         }
                     } else {
                         bookingDetailStepCheckList.add(bookingDetailStep);
+                        if(bookingDetailStepDraftList.get(bookingDetailStepDraftList.size() - 1).equals(bookingDetailStep)) {
+                            count++;
+                            checkIgnore = -1;
+                            newBookingDetailId = 0;
+                            map.put(count, list);
+                        }
                     }
                 }
                 if (bookingDetailStepCheckList.size() == 0) {
