@@ -8,6 +8,8 @@ import swp490.spa.entities.BookingDetail;
 import swp490.spa.entities.Type;
 import swp490.spa.repositories.BookingDetailRepository;
 
+import java.util.List;
+
 @Service
 public class BookingDetailService {
     @Autowired
@@ -34,5 +36,9 @@ public class BookingDetailService {
                                                                Pageable pageable) {
         return this.bookingDetailRepository.
                 findByTypeAndBooking_Customer_User_IdOrderByBookingAsc(type,customerId, pageable);
+    }
+
+    public List<BookingDetail> findByCustomer(Integer customerId) {
+        return this.bookingDetailRepository.findByBooking_Customer_User_Id(customerId);
     }
 }

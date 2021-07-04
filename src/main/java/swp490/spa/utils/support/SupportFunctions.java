@@ -73,7 +73,7 @@ public class SupportFunctions {
                                     if (Math.abs(30 - min) % 15 == 0) {
                                         timeAdd = endTime;
                                     } else {
-                                        timePlus = Math.abs(30 - min) % 15;
+                                        timePlus = 15 - (Math.abs(30 - min) % 15);
                                         timeAdd = Time.valueOf(endTime.toLocalTime()
                                                 .plusMinutes(timePlus));
                                     }
@@ -112,7 +112,7 @@ public class SupportFunctions {
                                     if (Math.abs(30 - min) % 15 == 0) {
                                         timeAdd = endTime;
                                     } else {
-                                        timePlus = Math.abs(30 - min) % 15;
+                                        timePlus = 15 - (Math.abs(30 - min) % 15);
                                         timeAdd = Time.valueOf(endTime.toLocalTime()
                                                 .plusMinutes(timePlus));
                                     }
@@ -175,7 +175,7 @@ public class SupportFunctions {
                                             if (Math.abs(30 - min) % 15 == 0) {
                                                 timeAdd = bookingFirst.getEndTime();
                                             } else {
-                                                timePlus = Math.abs(30 - min) % 15;
+                                                timePlus = 15 - (Math.abs(30 - min) % 15);
                                                 timeAdd = Time.valueOf(bookingFirst.getEndTime().toLocalTime()
                                                         .plusMinutes(timePlus));
                                             }
@@ -197,7 +197,7 @@ public class SupportFunctions {
                                                 if (Math.abs(30 - min) % 15 == 0) {
                                                     timeAdd = bookingSecond.getEndTime();
                                                 } else {
-                                                    timePlus = Math.abs(30 - min) % 15;
+                                                    timePlus = 15 - (Math.abs(30 - min) % 15);
                                                     timeAdd = Time.valueOf(bookingSecond.getEndTime().toLocalTime()
                                                             .plusMinutes(timePlus));
                                                 }
@@ -252,7 +252,7 @@ public class SupportFunctions {
                                             if (Math.abs(30 - min) % 15 == 0) {
                                                 timeAdd = bookingFirst.getEndTime();
                                             } else {
-                                                timePlus = Math.abs(30 - min) % 15;
+                                                timePlus = 15 - (Math.abs(30 - min) % 15);
                                                 timeAdd = Time.valueOf(bookingFirst.getEndTime().toLocalTime()
                                                         .plusMinutes(timePlus));
                                             }
@@ -288,7 +288,7 @@ public class SupportFunctions {
                                                 if (Math.abs(30 - min) % 15 == 0) {
                                                     timeAdd = bookingSecond.getEndTime();
                                                 } else {
-                                                    timePlus = Math.abs(30 - min) % 15;
+                                                    timePlus = 15 - (Math.abs(30 - min) % 15);
                                                     timeAdd = Time.valueOf(bookingSecond.getEndTime().toLocalTime()
                                                             .plusMinutes(timePlus));
                                                 }
@@ -342,7 +342,7 @@ public class SupportFunctions {
                                             if (Math.abs(30 - min) % 15 == 0) {
                                                 timeAdd = bookingFirst.getEndTime();
                                             } else {
-                                                timePlus = Math.abs(30 - min) % 15;
+                                                timePlus = 15 - (Math.abs(30 - min) % 15);
                                                 timeAdd = Time.valueOf(bookingFirst.getEndTime().toLocalTime()
                                                         .plusMinutes(timePlus));
                                             }
@@ -364,7 +364,7 @@ public class SupportFunctions {
                                                 if (Math.abs(30 - min) % 15 == 0) {
                                                     timeAdd = bookingSecond.getEndTime();
                                                 } else {
-                                                    timePlus = Math.abs(30 - min) % 15;
+                                                    timePlus = 15 - (Math.abs(30 - min) % 15);
                                                     timeAdd = Time.valueOf(bookingSecond.getEndTime().toLocalTime()
                                                             .plusMinutes(timePlus));
                                                 }
@@ -463,6 +463,15 @@ public class SupportFunctions {
     public boolean checkBookingExistedInList(Booking booking, List<Booking> bookings) {
         for (Booking bookingCheck : bookings) {
             if(bookingCheck.equals(booking)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkTimeStringExisted(String timeString, List<String> timeList) {
+        for (String timeStringCheck : timeList) {
+            if(timeStringCheck.equals(timeString)){
                 return true;
             }
         }

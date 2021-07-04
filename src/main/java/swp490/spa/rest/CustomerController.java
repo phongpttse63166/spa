@@ -9,6 +9,7 @@ import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.BookingRequest;
+import swp490.spa.dto.responses.BookingDetailResponse;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
@@ -134,26 +135,7 @@ public class CustomerController {
         List<Staff> staffs = null;
         List<Consultant> consultants = null;
         List<BookingDetailStep> bookingDetailSteps = null;
-        // Get List Booking Detail Step of Customer in DateBooking
-        List<Booking> bookings = bookingService.findByCustomerId(customerId);
-        List<BookingDetailStep> bookingDetailStepOfCustomer = new ArrayList<>();
-        for (Booking booking : bookings) {
-            List<BookingDetail> bookingDetails =
-                    bookingDetailService.findByBooking(booking.getId(),
-                            PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
-                            .getContent();
-            for (BookingDetail bookingDetail : bookingDetails) {
-                List<BookingDetailStep> bookingDetailStepGet =
-                        bookingDetailStepService.findByBookingDetail(bookingDetail.getId(),
-                                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
-                                .getContent();
-                for (BookingDetailStep bookingDetailStep : bookingDetailStepGet) {
-                    if(bookingDetailStep.getDateBooking().equals(Date.valueOf(dateBooking))){
-                        bookingDetailStepOfCustomer.add(bookingDetailStep);
-                    }
-                }
-            }
-        }
+
         // Get List Staff or List Consultant and All Booking Detail Step List
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
         if (Objects.nonNull(spaPackage)) {
@@ -202,18 +184,6 @@ public class CustomerController {
                                 IsConsultation.TRUE,
                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
                         .getContent();
-            }
-            if(bookingDetailStepOfCustomer.size()!=0){
-                bookingDetailSteps.removeAll(bookingDetailStepOfCustomer);
-                int bookingDetailStepId =
-                        bookingDetailSteps.get(bookingDetailSteps.size()-1).getId();
-                for (int i = 0; i < countEmployee; i++) {
-                    for (BookingDetailStep bookingDetailStep : bookingDetailStepOfCustomer) {
-                        bookingDetailStepId++;
-                        bookingDetailStep.setId(bookingDetailStepId);
-                        bookingDetailSteps.add(bookingDetailStep);
-                    }
-                }
             }
             List<BookingDetailStep> bookingDetailStepCheckList = bookingDetailSteps;
             Map<Integer, List<BookingDetailStep>> map = new HashMap<>();
@@ -266,7 +236,7 @@ public class CustomerController {
                         }
                     } else {
                         bookingDetailStepCheckList.add(bookingDetailStep);
-                        if(bookingDetailStepDraftList.get(bookingDetailStepDraftList.size() - 1).equals(bookingDetailStep)) {
+                        if (bookingDetailStepDraftList.get(bookingDetailStepDraftList.size() - 1).equals(bookingDetailStep)) {
                             count++;
                             checkIgnore = -1;
                             newBookingDetailId = 0;
@@ -290,6 +260,54 @@ public class CustomerController {
                         supportFunctions.getBookTime(Constant.DURATION_OF_CONSULTATION, map, check);
             }
             if (timeBookingList.size() != 0) {
+                // Get BookingDetail Of Customer
+                List<BookingDetail> bookingDetails = bookingDetailService.findByCustomer(customerId);
+                List<BookingDetailStep> bookingDetailStepCustomerBooked = new ArrayList<>();
+                // Get BookingDetailStep by dateBooking and bookingDetail Id from list above
+                for (BookingDetail bookingDetail : bookingDetails) {
+                    List<BookingDetailStep> bookingDetailStepsCheck =
+                            bookingDetailStepService.findByBookingDetailIdAndDateBooking(bookingDetail.getId(),
+                                    Date.valueOf(dateBooking));
+                    bookingDetailStepCustomerBooked.addAll(bookingDetailStepsCheck);
+                }
+                List<String> timeShowList = new ArrayList<>();
+                List<String> timeRemoveList = new ArrayList<>();
+                for (BookingDetailStep bookingDetailStep : bookingDetailStepCustomerBooked) {
+                    Time startTime = bookingDetailStep.getStartTime();
+                    Time endTime = bookingDetailStep.getEndTime();
+                    Time nextTime = startTime;
+                    int min = nextTime.getMinutes();
+                    if(Math.abs(30-min)%15!=0){
+                        nextTime =
+                                Time.valueOf(nextTime.toLocalTime().plusMinutes(15 - (Math.abs(30-min)%15)));
+                    }
+                    boolean checkOver = false;
+                    if (timeRemoveList.size() == 0) {
+                        timeRemoveList.add(startTime.toString());
+                    } else {
+                        if(!supportFunctions.checkTimeStringExisted(nextTime.toString(),timeRemoveList)){
+                            timeRemoveList.add(nextTime.toString());
+                        }
+                    }
+                    while (checkOver == false) {
+                        nextTime = Time.valueOf(nextTime.toLocalTime()
+                                .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                        if(nextTime.compareTo(endTime)>0){
+                            checkOver = true;
+                        } else {
+                            if(!supportFunctions.checkTimeStringExisted(nextTime.toString(),timeRemoveList)){
+                                timeRemoveList.add(nextTime.toString());
+                            }
+                        }
+                    }
+                    checkOver = false;
+                }
+                for (String timeCheck : timeBookingList) {
+                    if(!supportFunctions.checkTimeStringExisted(timeCheck, timeRemoveList)){
+                        timeShowList.add(timeCheck);
+                    }
+                }
+                timeBookingList = timeShowList;
                 Page<String> page = new PageImpl<>(timeBookingList,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
                         timeBookingList.size());

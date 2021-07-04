@@ -337,9 +337,4 @@ public class PublicController {
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
-
-    @PostMapping("/image/upload")
-    public String testUpdateImage(@RequestParam("file") MultipartFile file) {
-        return UploadImage.uploadImage(file);
-    }
 }

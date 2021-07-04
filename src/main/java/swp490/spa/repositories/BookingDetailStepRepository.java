@@ -43,4 +43,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     @Query("FROM BookingDetailStep s WHERE s.statusBooking = ?1 AND s.bookingDetail.booking.spa.id = ?2 " +
             "ORDER BY s.dateBooking ASC, s.startTime ASC")
     List<BookingDetailStep> findByStatusAndSpa(StatusBooking status, Integer spaId);
+
+    List<BookingDetailStep> findByBookingDetail_IdAndAndDateBookingOrderByStartTimeAsc(Integer bookingDetailId,
+                                                                                           Date dateBooking);
 }

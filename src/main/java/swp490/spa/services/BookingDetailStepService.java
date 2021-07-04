@@ -69,4 +69,11 @@ public class BookingDetailStepService {
     public List<BookingDetailStep> findByStatusAndSpaId(StatusBooking statusBooking, Integer spaId) {
         return this.bookingDetailStepRepository.findByStatusAndSpa(statusBooking, spaId);
     }
+
+    public List<BookingDetailStep> findByBookingDetailIdAndDateBooking(Integer bookingDetailId,
+                                                                       Date dateBooking) {
+        return this.bookingDetailStepRepository
+                .findByBookingDetail_IdAndAndDateBookingOrderByStartTimeAsc(bookingDetailId,
+                        dateBooking);
+    }
 }
