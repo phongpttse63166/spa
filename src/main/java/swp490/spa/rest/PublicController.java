@@ -16,10 +16,10 @@ import swp490.spa.services.*;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
 import swp490.spa.services.SpaService;
-import swp490.spa.utils.support.Constant;
-import swp490.spa.utils.support.UploadImage;
-import swp490.spa.utils.support.GenerationOTP;
-import swp490.spa.utils.support.Notification;
+import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.Image.UploadImage;
+import swp490.spa.utils.support.OTP.GenerationOTP;
+import swp490.spa.utils.support.Templates.LoggingTemplate;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
@@ -135,7 +135,7 @@ public class PublicController {
     public Response registerAccount(@RequestBody AccountRegister accountRegister) {
         User userResult = userService.findByPhone(accountRegister.getPhone());
         if (Objects.nonNull(userResult)) {
-            return ResponseHelper.error(Notification.USER_EXISTED);
+            return ResponseHelper.error(LoggingTemplate.USER_EXISTED);
         }
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime expireTime = currentTime.plusMinutes(15);
@@ -149,7 +149,7 @@ public class PublicController {
             if (Objects.nonNull(accountRegisterService.updateAccountRegister(result))) {
                 return ResponseHelper.ok(result);
             }
-            return ResponseHelper.error(Notification.SEND_OTP_FAILED);
+            return ResponseHelper.error(LoggingTemplate.SEND_OTP_FAILED);
         } else {
             User user = userService.findByPhone(accountRegister.getPhone());
             if (Objects.isNull(user)) {
@@ -162,10 +162,10 @@ public class PublicController {
                     return ResponseHelper.ok(accountRegister);
                 }
             } else {
-                return ResponseHelper.error(Notification.USER_EXISTED);
+                return ResponseHelper.error(LoggingTemplate.USER_EXISTED);
             }
         }
-        return ResponseHelper.error(Notification.REGISTER_FAILED);
+        return ResponseHelper.error(LoggingTemplate.REGISTER_FAILED);
     }
 
     @PostMapping("/verifyregister")
@@ -174,10 +174,10 @@ public class PublicController {
         if (result != null) {
             Date currentTime = Date.valueOf(LocalDateTime.now().toLocalDate());
             if (currentTime.compareTo(result.getExpiredTime()) == 1) {
-                return ResponseHelper.error(Notification.EXPIRED_VERIFY);
+                return ResponseHelper.error(LoggingTemplate.EXPIRED_VERIFY);
             }
             if (!accountRegister.getOtpCode().equalsIgnoreCase(result.getOtpCode())) {
-                return ResponseHelper.error(Notification.OTP_NOT_MATCH);
+                return ResponseHelper.error(LoggingTemplate.OTP_NOT_MATCH);
             }
             User newUser = new User();
             newUser.setActive(true);
@@ -192,18 +192,18 @@ public class PublicController {
                     customer.setUser(resultUser);
                     customer.setCustomType("Normal");
                     if (Objects.nonNull(customerService.insertNewCustomer(customer))) {
-                        return ResponseHelper.error(Notification.REGISTER_SUCCESS);
+                        return ResponseHelper.error(LoggingTemplate.REGISTER_SUCCESS);
                     }
                 } else {
-                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.USER));
+                    return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.USER));
                 }
             } else {
-                return ResponseHelper.error(String.format(Notification.INSERT_SUCCESS, newUser.getFullname()));
+                return ResponseHelper.error(String.format(LoggingTemplate.INSERT_SUCCESS, newUser.getFullname()));
             }
 
 
         }
-        return ResponseHelper.error(Notification.VERIFY_FAILED);
+        return ResponseHelper.error(LoggingTemplate.VERIFY_FAILED);
     }
 
     @GetMapping("/spa/findall")

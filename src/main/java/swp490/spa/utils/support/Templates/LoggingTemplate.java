@@ -1,6 +1,6 @@
-package swp490.spa.utils.support;
+package swp490.spa.utils.support.Templates;
 
-public class Notification {
+public class LoggingTemplate {
     public static final String USER_EXISTED = "Đã có tài khoản";
     public static final String REGISTER_SUCCESS = "Đăng kí thành công";
     public static final String REGISTER_FAILED = "Đăng kí thất bại";

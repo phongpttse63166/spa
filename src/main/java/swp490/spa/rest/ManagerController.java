@@ -16,10 +16,10 @@ import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.entities.SpaService;
 import swp490.spa.services.*;
-import swp490.spa.utils.support.Constant;
-import swp490.spa.utils.support.Notification;
+import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.Templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
-import swp490.spa.utils.support.UploadImage;
+import swp490.spa.utils.support.Image.UploadImage;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
@@ -241,7 +241,7 @@ public class ManagerController {
                             totalItem);
             return ResponseHelper.ok(pageReturn);
         }
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.CATEGORY));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
     }
 
     @GetMapping("/booking/findbookingwithbookingdetails")
@@ -263,12 +263,12 @@ public class ManagerController {
                     bookingInsert.setBookingDetailList(bookingDetails);
                     bookingResponses.add(bookingInsert);
                 } else {
-                    LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL));
+                    LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
                 }
             }
         } else {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING));
-            return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
         }
         Page<BookingBookingDetailResponse> page =
                 new PageImpl<>(bookingResponses, pageable, totalElements);
@@ -284,10 +284,10 @@ public class ManagerController {
         Page<DateOff> dateOffs = dateOffService.findBySpaAndStatusInRangeDate(spaId,
                 statusDateOff, Date.valueOf(fromDate), Date.valueOf(toDate), pageable);
         if (Objects.nonNull(dateOffs)) {
-            LOGGER.info(String.format(Notification.GET_SUCCESS, Constant.DATE_OFF));
+            LOGGER.info(String.format(LoggingTemplate.GET_SUCCESS, Constant.DATE_OFF));
             return ResponseHelper.ok(conversion.convertToPageDateOffResponse(dateOffs));
         }
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.DATE_OFF));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
     }
 
     @GetMapping("/staff/findbyspa")
@@ -313,8 +313,8 @@ public class ManagerController {
                             spaServices.size());
             return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServicePage));
         }
-        LOGGER.info(String.format(Notification.GET_FAILED, Constant.SPA_PACKAGE));
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SERVICES));
+        LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SERVICES));
     }
 
     @GetMapping("/bookings/findbystatusandspaid/{spaId}")
@@ -351,8 +351,8 @@ public class ManagerController {
                             bookings.size());
             return ResponseHelper.ok(conversion.convertToPageBookingResponse(bookingPage));
         }
-        LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING));
+        LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
     }
 
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
@@ -363,8 +363,8 @@ public class ManagerController {
             if (imageLink != "") {
                 Manager manager = managerService.findManagerById(spaServiceRequest.getCreateBy());
                 if (Objects.isNull(manager)) {
-                    LOGGER.info(String.format(Notification.GET_FAILED, Constant.MANAGER));
-                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.MANAGER));
+                    LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
+                    return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
                 }
                 Spa spa = manager.getSpa();
                 SpaService spaService = new SpaService();
@@ -383,12 +383,12 @@ public class ManagerController {
                     return ResponseHelper.ok(serviceResult);
                 }
             } else {
-                LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+                LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
             }
         } else {
-            LOGGER.info(Notification.FILE_NOT_EXISTED);
+            LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
         }
-        return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.SERVICE));
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.SERVICE));
     }
 
     @PostMapping(value = "/spapackageservices/insert",
@@ -401,11 +401,11 @@ public class ManagerController {
                 List<SpaService> spaServices = new ArrayList<>();
                 Category category = categoryService.findById(spaPackage.getCategoryId());
                 if (Objects.isNull(category)) {
-                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.CATEGORY));
+                    return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
                 }
                 Spa spa = spaService.findById(spaPackage.getSpaId());
                 if (Objects.isNull(spa)) {
-                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SPA));
+                    return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
                 }
                 SpaPackage spaPackageInsert = new SpaPackage();
                 spaPackageInsert.setName(spaPackage.getName());
@@ -419,26 +419,26 @@ public class ManagerController {
                 spaPackageInsert.setStatus(spaPackage.getStatus());
                 SpaPackage spaPackageResult = spaPackageService.insertNewSpaPackage(spaPackageInsert);
                 if (Objects.isNull(spaPackageResult)) {
-                    return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.SPA_PACKAGE_SERVICE));
+                    return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.SPA_PACKAGE_SERVICE));
                 }
                 for (Integer serviceId : spaPackage.getListSpaServiceId()) {
                     swp490.spa.entities.SpaService spaService = spaServiceService.findBySpaId(serviceId);
                     if (Objects.isNull(spaService)) {
-                        ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SERVICE));
+                        ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SERVICE));
                     }
                     spaServices.add(spaService);
                 }
                 spaPackageResult.addListService(spaServices);
                 if (Objects.nonNull(spaPackageService.insertNewSpaPackage(spaPackageResult))) {
-                    return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS, Constant.SPA_PACKAGE_SERVICE));
+                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.SPA_PACKAGE_SERVICE));
                 }
             } else {
-                LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+                LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
             }
         } else {
-            LOGGER.info(Notification.FILE_NOT_EXISTED);
+            LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
         }
-        return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.SPA_PACKAGE_SERVICE));
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.SPA_PACKAGE_SERVICE));
     }
 
     @PostMapping("/spatreatmentservices/insert")
@@ -446,11 +446,11 @@ public class ManagerController {
         List<TreatmentService> treatmentServices = new ArrayList<>();
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaTreatmentRequest.getPackageId());
         if (Objects.isNull(spaPackage)) {
-            return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SPA_PACKAGE));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
         }
         Spa spa = spaService.findById(spaTreatmentRequest.getSpaId());
         if (Objects.isNull(spa)) {
-            return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SPA));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
         }
         int ordinal = 1;
         int totalTime = 0;
@@ -459,7 +459,7 @@ public class ManagerController {
             swp490.spa.entities.SpaService spaService =
                     spaServiceService.findBySpaId(spaTreatmentRequest.getListSpaServiceId().get(i));
             if (Objects.isNull(spaService)) {
-                ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SERVICE));
+                ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SERVICE));
             }
             TreatmentService treatmentService = new TreatmentService(spaService, ordinal);
             ordinal++;
@@ -478,15 +478,15 @@ public class ManagerController {
                 TreatmentService treatmentServiceResult =
                         treatmentServiceService.insertNewTreatmentService(treatmentService);
                 if (Objects.isNull(treatmentServiceResult)) {
-                    LOGGER.info(String.format(Notification.INSERT_FAILED,Constant.TREATMENT_SERVICE));
-                    return ResponseHelper.error(String.format(Notification.INSERT_FAILED,Constant.TREATMENT_SERVICE));
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED,Constant.TREATMENT_SERVICE));
+                    return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED,Constant.TREATMENT_SERVICE));
                 } else {
-                    LOGGER.info(String.format(Notification.INSERT_SUCCESS,Constant.TREATMENT_SERVICE));
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS,Constant.TREATMENT_SERVICE));
                 }
             }
-            return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS,Constant.TREATMENT_SERVICE));
+            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,Constant.TREATMENT_SERVICE));
         }
-        return ResponseHelper.error(String.format(Notification.INSERT_FAILED,Constant.TREATMENT_SERVICE));
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED,Constant.TREATMENT_SERVICE));
     }
 
     @PostMapping(value = "/category/insert",
@@ -508,20 +508,20 @@ public class ManagerController {
                     categoryNew.setSpa(spa);
                     Category categoryResult = categoryService.insertNewCategory(categoryNew);
                     if (Objects.nonNull(categoryResult)) {
-                        LOGGER.info(String.format(Notification.INSERT_SUCCESS, Constant.CATEGORY));
+                        LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CATEGORY));
                         return ResponseHelper.ok(categoryResult);
                     }
-                    LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.CATEGORY));
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.CATEGORY));
                 } else {
-                    LOGGER.info(String.format(Notification.GET_FAILED, Constant.SPA));
+                    LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
                 }
             } else {
-                LOGGER.info(Notification.SAVE_IMAGE_FAILED);
+                LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
             }
         } else {
-            LOGGER.info(Notification.FILE_NOT_EXISTED);
+            LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
         }
-        return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.CATEGORY));
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.CATEGORY));
     }
 
     @PutMapping("/editpassword")
@@ -534,7 +534,7 @@ public class ManagerController {
             return ResponseHelper.ok(updateUser);
         } else {
             userService.editUser(oldUser);
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.PASSWORD));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PASSWORD));
         }
     }
 
@@ -544,7 +544,7 @@ public class ManagerController {
         for (DateOff dateOff : dateOffList) {
             DateOff dateOffResult = dateOffService.findDateOffById(dateOff.getId());
             if (Objects.isNull(dateOffResult)) {
-                LOGGER.info(String.format(Notification.GET_FAILED, Constant.DATE_OFF));
+                LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
                 isError = true;
             } else {
                 dateOffResult.setStatusDateOff(dateOff.getStatusDateOff());
@@ -553,14 +553,14 @@ public class ManagerController {
                 }
             }
             if (Objects.isNull(dateOffService.editDateOff(dateOffResult))) {
-                LOGGER.info(String.format(Notification.EDIT_FAILED, Constant.DATE_OFF));
+                LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.DATE_OFF));
                 isError = true;
             }
         }
         if (isError) {
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.DATE_OFF));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.DATE_OFF));
         }
-        return ResponseHelper.ok(String.format(Notification.EDIT_SUCCESS, Constant.DATE_OFF));
+        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.DATE_OFF));
     }
 
     @PutMapping(value = "/category/edit/{categoryId}",
@@ -575,8 +575,8 @@ public class ManagerController {
                 if (iconLink != "") {
                     categoryEdit.setIcon(iconLink);
                 } else {
-                    LOGGER.info(Notification.SAVE_IMAGE_FAILED);
-                    return ResponseHelper.error(Notification.SAVE_IMAGE_FAILED);
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
                 }
             }
             if (Objects.nonNull(category.getName())) {
@@ -587,13 +587,13 @@ public class ManagerController {
             }
             Category categoryResult = categoryService.editByCategoryId(categoryEdit);
             if (Objects.nonNull(categoryResult)) {
-                LOGGER.info(String.format(Notification.EDIT_SUCCESS, Constant.CATEGORY));
+                LOGGER.info(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.CATEGORY));
                 return ResponseHelper.ok(categoryResult);
             }
         } else {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.CATEGORY));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
         }
-        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.CATEGORY));
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CATEGORY));
     }
 
     @PutMapping(value = "/spapackage/edit/{packageId}",
@@ -608,8 +608,8 @@ public class ManagerController {
                 if (imageLink != "") {
                     spaPackageEdit.setImage(imageLink);
                 } else {
-                    LOGGER.info(Notification.SAVE_IMAGE_FAILED);
-                    return ResponseHelper.error(Notification.SAVE_IMAGE_FAILED);
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
                 }
             }
             if (Objects.nonNull(spaPackage.getName())) {
@@ -620,13 +620,13 @@ public class ManagerController {
             }
             SpaPackage spaPackageResult = spaPackageService.editBySpaPackageId(spaPackageEdit);
             if (Objects.nonNull(spaPackageResult)) {
-                LOGGER.info(String.format(Notification.EDIT_SUCCESS, Constant.SPA_PACKAGE));
+                LOGGER.info(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.SPA_PACKAGE));
                 return ResponseHelper.ok(spaPackageResult);
             }
         } else {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.SPA_PACKAGE));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
         }
-        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.SPA_PACKAGE));
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.SPA_PACKAGE));
     }
 
     @PutMapping(value = "/spaservice/edit/{spaServiceId}",
@@ -640,8 +640,8 @@ public class ManagerController {
                 if (imageLink != "") {
                     spaServiceEdit.setImage(imageLink);
                 } else {
-                    LOGGER.info(Notification.SAVE_IMAGE_FAILED);
-                    return ResponseHelper.error(Notification.SAVE_IMAGE_FAILED);
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
                 }
             }
             if (Objects.nonNull(spaService.getName())) {
@@ -658,13 +658,13 @@ public class ManagerController {
             }
             SpaService spaServiceResult = spaServiceService.editBySpaService(spaServiceEdit);
             if (Objects.nonNull(spaServiceResult)) {
-                LOGGER.info(String.format(Notification.EDIT_SUCCESS, Constant.SERVICE));
+                LOGGER.info(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.SERVICE));
                 return ResponseHelper.ok(spaServiceResult);
             }
         } else {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.SERVICE));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.SERVICE));
         }
-        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.SERVICE));
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.SERVICE));
     }
 
     @PutMapping("/spatreatment/edit/{spaTreatmentId}")
@@ -680,12 +680,12 @@ public class ManagerController {
             }
             SpaTreatment spaTreatmentResult = spaTreatmentService.editBySpaTreatment(spaTreatmentEdit);
             if (Objects.nonNull(spaTreatmentResult)) {
-                LOGGER.info(String.format(Notification.EDIT_SUCCESS, Constant.SPA_TREATMENT));
+                LOGGER.info(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.SPA_TREATMENT));
                 return ResponseHelper.ok(spaTreatmentResult);
             }
         }
-        LOGGER.info(String.format(Notification.EDIT_FAILED, Constant.SPA_TREATMENT));
-        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.SPA_TREATMENT));
+        LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.SPA_TREATMENT));
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.SPA_TREATMENT));
     }
 
     @PutMapping("/category/delete/{categoryId}")
@@ -694,10 +694,10 @@ public class ManagerController {
         if (Objects.nonNull(categoryResult)) {
             categoryResult.setStatus(Status.DISABLE);
             if (categoryService.removeCategory(categoryResult)) {
-                return ResponseHelper.ok(String.format(Notification.REMOVE_SUCCESS,Constant.CATEGORY));
+                return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_SUCCESS,Constant.CATEGORY));
             }
         }
-        return ResponseHelper.ok(String.format(Notification.REMOVE_FAILED, Constant.CATEGORY));
+        return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_FAILED, Constant.CATEGORY));
     }
 
     @PutMapping("/spapackage/delete/{packageId}")
@@ -706,10 +706,10 @@ public class ManagerController {
         if (Objects.nonNull(spaPackageResult)) {
             spaPackageResult.setStatus(Status.DISABLE);
             if (spaPackageService.removeCategory(spaPackageResult)) {
-                return ResponseHelper.ok(String.format(Notification.REMOVE_SUCCESS, Constant.SPA_PACKAGE));
+                return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_SUCCESS, Constant.SPA_PACKAGE));
             }
         }
-        return ResponseHelper.ok(String.format(Notification.REMOVE_FAILED, Constant.SPA_PACKAGE));
+        return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_FAILED, Constant.SPA_PACKAGE));
     }
 
     @PutMapping("/spaservice/delete/{spaServiceId}")
@@ -718,9 +718,9 @@ public class ManagerController {
         if (Objects.nonNull(spaServiceResult)) {
             spaServiceResult.setStatus(Status.DISABLE);
             if (spaServiceService.removeService(spaServiceResult)) {
-                return ResponseHelper.ok(String.format(Notification.REMOVE_SUCCESS, Constant.SERVICE));
+                return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_SUCCESS, Constant.SERVICE));
             }
         }
-        return ResponseHelper.ok(String.format(Notification.REMOVE_FAILED, Constant.SERVICE));
+        return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_FAILED, Constant.SERVICE));
     }
 }

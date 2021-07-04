@@ -4,10 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import swp490.spa.entities.Booking;
 import swp490.spa.entities.BookingDetail;
 import swp490.spa.entities.BookingDetailStep;
-import swp490.spa.entities.User;
 import swp490.spa.services.BookingDetailStepService;
+import swp490.spa.utils.support.Templates.Constant;
 
-import java.sql.Date;
 import java.sql.Time;
 import java.util.*;
 

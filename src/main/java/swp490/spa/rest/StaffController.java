@@ -13,8 +13,8 @@ import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
-import swp490.spa.utils.support.Constant;
-import swp490.spa.utils.support.Notification;
+import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.Templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
 
 import java.sql.Date;
@@ -68,9 +68,9 @@ public class StaffController {
             if(Objects.nonNull(userService.editUser(user))){
                 return ResponseHelper.ok(userResult);
             }
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.PROFILE));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));
         }
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.STAFF));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
     }
 
     @PutMapping("/editpassword")
@@ -97,12 +97,12 @@ public class StaffController {
                 for (DateOff dateOffRemove : dateOffs) {
                     dateOffService.removeDateOff(dateOffRemove.getId());
                 }
-                return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.DATE_OFF));
+                return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.DATE_OFF));
             } else {
                 dateOffs.add(dateOff);
             }
         }
-        return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS, Constant.DATE_OFF));
+        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
     }
 
     @GetMapping("/workingofstaff/findbydatechosen/{staffId}")
@@ -116,12 +116,12 @@ public class StaffController {
             if(Objects.nonNull(bookingDetailSteps)){
                 return ResponseHelper.ok(conversion.convertToPageBookingDetailStepResponse(bookingDetailSteps));
             } else {
-                LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
-                return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
             }
         } else {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.STAFF));
-            return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.STAFF));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
         }
     }
 

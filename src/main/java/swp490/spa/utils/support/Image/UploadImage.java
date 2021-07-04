@@ -1,16 +1,12 @@
-package swp490.spa.utils.support;
+package swp490.spa.utils.support.Image;
 
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Bucket;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import swp490.spa.utils.support.Templates.Constant;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 public class UploadImage {

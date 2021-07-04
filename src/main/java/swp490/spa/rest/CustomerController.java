@@ -13,8 +13,8 @@ import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
 import swp490.spa.services.SpaService;
-import swp490.spa.utils.support.Constant;
-import swp490.spa.utils.support.Notification;
+import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.Templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
 
 import java.sql.Date;
@@ -94,7 +94,7 @@ public class CustomerController {
         if (Objects.nonNull(customer)) {
             return ResponseHelper.ok(customer);
         }
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.CUSTOMER));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CUSTOMER));
     }
 
     @GetMapping("/bookingdetail/{customerId}")
@@ -114,14 +114,14 @@ public class CustomerController {
                 if (Objects.nonNull(bookingDetailSteps)) {
                     bookingDetail.setBookingDetailSteps(bookingDetailSteps);
                 } else {
-                    return ResponseHelper.error(String.format(Notification.GET_FAILED,
+                    return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED,
                             Constant.BOOKING_DETAIL_STEP));
                 }
             }
             bookingDetailPage = new PageImpl<>(bookingDetails, pageable, totalElements);
             return ResponseHelper.ok(conversion.convertToPageBookingDetailResponse(bookingDetailPage));
         }
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
     }
 
     @GetMapping("/getlisttimebook")
@@ -295,9 +295,9 @@ public class CustomerController {
                         timeBookingList.size());
                 return ResponseHelper.ok(page);
             }
-            return ResponseHelper.ok(Notification.NO_EMPLOYEE_FREE);
+            return ResponseHelper.ok(LoggingTemplate.NO_EMPLOYEE_FREE);
         } else {
-            return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SPA_PACKAGE));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
         }
     }
 
@@ -357,8 +357,8 @@ public class CustomerController {
                         bookingDetailStepService.findByStartTimeAndEndTimeAndDateBooking(startTime,
                                 endTime, bookingData.getDateBooking());
                 if (Objects.isNull(bookingDetailSteps)) {
-                    LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
-                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                    LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                    return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
                 } else {
                     if (bookingDetailSteps.size() != 0) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
@@ -380,8 +380,8 @@ public class CustomerController {
                         bookingDetailStepService.findByStartTimeAndEndTimeAndDateBooking(startTime,
                                 endTime, bookingData.getDateBooking());
                 if (Objects.isNull(bookingDetailSteps)) {
-                    LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
-                    return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                    LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                    return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
                 } else {
                     if (bookingDetailSteps.size() != 0) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
@@ -399,7 +399,7 @@ public class CustomerController {
             }
         }
         if (checkNoEmployForBooking) {
-            return ResponseHelper.error(Notification.CANNOT_BOOKING_AT_TIME);
+            return ResponseHelper.error(LoggingTemplate.CANNOT_BOOKING_AT_TIME);
         } else {
             List<BookingData> bookingDataList = bookingRequest.getBookingDataList();
             List<SpaPackage> spaPackageList = new ArrayList<>();
@@ -415,7 +415,7 @@ public class CustomerController {
             Spa spa = null;
             Customer customer = customerService.findByUserId(bookingRequest.getCustomerId());
             if (Objects.isNull(customer)) {
-                ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.CUSTOMER));
+                ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CUSTOMER));
             }
             for (BookingData bookingData : bookingDataList) {
                 spaPackageSearchResult = spaPackageService.findBySpaPackageId(bookingData.getPackageId());
@@ -586,7 +586,7 @@ public class CustomerController {
                                             bookingDetailStepService
                                                     .insertBookingDetailStep(bookingDetailStep);
                                     if (Objects.isNull(bookingDetailStepInsert)) {
-                                        LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.BOOKING_DETAIL_STEP));
+                                        LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING_DETAIL_STEP));
                                         // delete booking + bookingDetail + bookingDetailStep inserted
                                         List<BookingDetail> bookingDetailDeleteList =
                                                 bookingDetailService
@@ -609,22 +609,22 @@ public class CustomerController {
                                             bookingDetailService.removeDB(bdd.getId());
                                         }
                                         bookingService.removeDB(bookingInsert.getId());
-                                        return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.BOOKING));
+                                        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING));
                                     }
                                 }
                             }
                         } else {
-                            LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.BOOKING_DETAIL));
+                            LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING_DETAIL));
                         }
                     }
-                    return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS, Constant.BOOKING));
+                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
                 } else {
-                    LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.BOOKING));
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING));
                 }
             } else {
-                return ResponseHelper.error(Notification.BOOKING_OVERTIME);
+                return ResponseHelper.error(LoggingTemplate.BOOKING_OVERTIME);
             }
-            return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.BOOKING));
+            return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING));
         }
     }
 
@@ -636,10 +636,10 @@ public class CustomerController {
             if (Objects.nonNull(result)) {
                 return ResponseHelper.ok(userLocationUpdate);
             }
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.USER_LOCATION
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.USER_LOCATION
             ));
         }
-        return ResponseHelper.error(Notification.USER_EXISTED);
+        return ResponseHelper.error(LoggingTemplate.USER_EXISTED);
     }
 
     @PutMapping("/user/edit")
@@ -653,7 +653,7 @@ public class CustomerController {
                 return ResponseHelper.ok(userResult);
             }
         }
-        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.PROFILE));
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));
     }
 
     @PutMapping("/editpassword")

@@ -15,8 +15,8 @@ import swp490.spa.dto.requests.BookingDetailEditRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
-import swp490.spa.utils.support.Constant;
-import swp490.spa.utils.support.Notification;
+import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.Templates.LoggingTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -87,12 +87,12 @@ public class ConsultantController {
                 for (DateOff dateOffRemove : dateOffs) {
                     dateOffService.removeDateOff(dateOffRemove.getId());
                 }
-                return ResponseHelper.error(String.format(Notification.INSERT_FAILED, Constant.DATE_OFF));
+                return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.DATE_OFF));
             } else {
                 dateOffs.add(dateOff);
             }
         }
-        return ResponseHelper.ok(String.format(Notification.INSERT_SUCCESS, Constant.DATE_OFF));
+        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
     }
 
     @GetMapping("/booking/findbybookingstatus")
@@ -104,7 +104,7 @@ public class ConsultantController {
         if (Objects.nonNull(bookings)) {
             return ResponseHelper.ok(conversion.convertToPageBookingResponse(bookings));
         }
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
     }
 
     @GetMapping("/bookingdetail/findbybookingid")
@@ -115,7 +115,7 @@ public class ConsultantController {
         if (Objects.nonNull(bookingDetails)) {
             return ResponseHelper.ok(conversion.convertToPageBookingDetailResponse(bookingDetails));
         }
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
     }
 
     @GetMapping("/spatreatment/findbyspapackage")
@@ -127,7 +127,7 @@ public class ConsultantController {
         if(Objects.nonNull(spaTreatments)){
             return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
         }
-        return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.SPA_TREATMENT));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_TREATMENT));
     }
 
     @GetMapping("/workingofconsultant/findbydatechosen/{consultantId}")
@@ -141,12 +141,12 @@ public class ConsultantController {
             if(Objects.nonNull(bookingDetailSteps)){
                 return ResponseHelper.ok(conversion.convertToPageBookingDetailStepResponse(bookingDetailSteps));
             } else {
-                LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
-                return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
             }
         } else {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.STAFF));
-            return ResponseHelper.error(String.format(Notification.GET_FAILED, Constant.STAFF));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
         }
     }
 
@@ -163,13 +163,13 @@ public class ConsultantController {
                         .getBooking()
                         .getId());
         if (Objects.isNull(bookingResult)) {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING));
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.BOOKING_DETAIL));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
         }
         Consultant consultant = consultantService.findByConsultantId(bookingDetailRequest.getConsultantId());
         if (Objects.isNull(consultant)) {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.CONSULTANT));
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.BOOKING_DETAIL));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
         }
         List<BookingDetail> bookingDetailList = bookingDetailService
                 .findByBooking(bookingResult.getId(),
@@ -177,8 +177,8 @@ public class ConsultantController {
                                 Constant.SIZE_DEFAULT,
                                 Sort.unsorted())).getContent();
         if (Objects.isNull(bookingDetailList)) {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.BOOKING_DETAIL));
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.BOOKING_DETAIL));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
         }
         for (BookingDetail bookingDetail : bookingDetailList) {
             if(Objects.nonNull(bookingDetail.getSpaTreatment())){
@@ -189,13 +189,13 @@ public class ConsultantController {
         bookingResult.setTotalPrice(totalPriceBooking);
         bookingResult.setTotalTime(totalTimeBooking);
         if(Objects.isNull(bookingService.editBooking(bookingResult))){
-            LOGGER.info(String.format(Notification.EDIT_FAILED, Constant.BOOKING));
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.BOOKING_DETAIL));
+            LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
         }
         if(Objects.isNull(bookingDetailService
                 .editBookingDetail(bookingDetailRequest.getBookingDetail()))){
-            LOGGER.info(String.format(Notification.EDIT_FAILED, Constant.BOOKING_DETAIL));
-            return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.BOOKING_DETAIL));
+            LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
         } else {
             List<TreatmentService> treatmentServices =
                     new ArrayList<>(bookingDetailRequest
@@ -225,21 +225,21 @@ public class ConsultantController {
                 BookingDetailStep bookingDetailStepNew = (bookingDetailStepService
                         .insertBookingDetailStep(bookingDetailStep));
                 if(Objects.isNull(bookingDetailStepNew)){
-                    LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.BOOKING_DETAIL_STEP));
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING_DETAIL_STEP));
                 } else {
                     ConsultationContent consultationContent = new ConsultationContent();
                     consultationContent.setBookingDetailStep(bookingDetailStepNew);
                     ConsultationContent consultationContentResult =
                             consultationContentService.insertNewConsultationContent(consultationContent);
                     if(Objects.nonNull(consultationContentResult)){
-                        LOGGER.info(String.format(Notification.INSERT_SUCCESS, Constant.CONSULTATION_CONTENT));
+                        LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTATION_CONTENT));
                     } else {
-                        LOGGER.info(String.format(Notification.INSERT_FAILED, Constant.CONSULTATION_CONTENT));
+                        LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.CONSULTATION_CONTENT));
                     }
                 }
             }
         }
-        return ResponseHelper.ok(String.format(Notification.EDIT_SUCCESS, Constant.BOOKING_DETAIL));
+        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.BOOKING_DETAIL));
     }
 
     @PutMapping("/consultationcontent/edit")
@@ -262,13 +262,13 @@ public class ConsultantController {
             ConsultationContent consultationContentResult =
                     consultationContentService.editByConsultationContent(consultationContentEdit);
             if(Objects.isNull(consultationContentResult)){
-                LOGGER.info(String.format(Notification.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
+                LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
             }
-            LOGGER.info(String.format(Notification.EDIT_SUCCESS, Constant.CONSULTATION_CONTENT));
-            return ResponseHelper.ok(String.format(Notification.EDIT_SUCCESS, Constant.BOOKING_DETAIL));
+            LOGGER.info(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.CONSULTATION_CONTENT));
+            return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.BOOKING_DETAIL));
         } else {
-            LOGGER.info(String.format(Notification.GET_FAILED, Constant.CONSULTATION_CONTENT));
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTATION_CONTENT));
         }
-        return ResponseHelper.error(String.format(Notification.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
     }
 }
