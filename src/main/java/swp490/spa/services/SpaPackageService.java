@@ -7,7 +7,7 @@ import swp490.spa.entities.SpaPackage;
 import swp490.spa.entities.SpaService;
 import swp490.spa.entities.Status;
 import swp490.spa.repositories.SpaPackageRepository;
-import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.templates.Constant;
 
 import java.util.ArrayList;
 import java.util.List;

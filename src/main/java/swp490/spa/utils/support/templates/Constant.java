@@ -1,4 +1,4 @@
-package swp490.spa.utils.support.Templates;
+package swp490.spa.utils.support.templates;
 
 public class Constant {
     // Page's setting

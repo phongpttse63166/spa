@@ -8,7 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
-import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.templates.Constant;
 
 import java.io.FileInputStream;
 

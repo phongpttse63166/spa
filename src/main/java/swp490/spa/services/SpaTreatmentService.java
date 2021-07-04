@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import swp490.spa.entities.SpaTreatment;
 import swp490.spa.entities.TreatmentService;
 import swp490.spa.repositories.SpaTreatmentRepository;
-import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.templates.Constant;
 
 import java.util.ArrayList;
 import java.util.List;

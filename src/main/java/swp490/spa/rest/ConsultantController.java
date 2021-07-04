@@ -15,8 +15,8 @@ import swp490.spa.dto.requests.BookingDetailEditRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
-import swp490.spa.utils.support.Templates.Constant;
-import swp490.spa.utils.support.Templates.LoggingTemplate;
+import swp490.spa.utils.support.templates.Constant;
+import swp490.spa.utils.support.templates.LoggingTemplate;
 
 import java.sql.Date;
 import java.sql.Time;

@@ -1,4 +1,4 @@
-package swp490.spa.utils.support.Templates;
+package swp490.spa.utils.support.templates;
 
 public class LoggingTemplate {
     public static final String USER_EXISTED = "Đã có tài khoản";

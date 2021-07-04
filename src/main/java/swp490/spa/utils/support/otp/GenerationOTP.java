@@ -1,4 +1,4 @@
-package swp490.spa.utils.support.OTP;
+package swp490.spa.utils.support.otp;
 
 import java.util.Random;
 

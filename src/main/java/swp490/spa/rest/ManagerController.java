@@ -16,10 +16,10 @@ import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.entities.SpaService;
 import swp490.spa.services.*;
-import swp490.spa.utils.support.Templates.Constant;
-import swp490.spa.utils.support.Templates.LoggingTemplate;
+import swp490.spa.utils.support.templates.Constant;
+import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
-import swp490.spa.utils.support.Image.UploadImage;
+import swp490.spa.utils.support.image.UploadImage;
 
 import java.sql.Date;
 import java.time.LocalDateTime;

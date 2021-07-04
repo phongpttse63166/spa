@@ -1,10 +1,10 @@
-package swp490.spa.utils.support.Image;
+package swp490.spa.utils.support.image;
 
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import swp490.spa.utils.support.Templates.Constant;
+import swp490.spa.utils.support.templates.Constant;
 
 import java.io.IOException;
 import java.util.UUID;
