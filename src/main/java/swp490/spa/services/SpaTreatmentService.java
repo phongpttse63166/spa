@@ -62,4 +62,8 @@ public class SpaTreatmentService {
     public SpaTreatment findByTreatmentId(Integer spaTreatmentId) {
         return this.spaTreatmentRepository.findById(spaTreatmentId).get();
     }
+
+    public SpaTreatment findByPackageIdAndTypeOneStep(Integer spaPackageId) {
+        return this.spaTreatmentRepository.findBySpaPackage_Id(spaPackageId);
+    }
 }

@@ -44,4 +44,5 @@ public class Constant {
     public static final String SERVICES = "Danh sách Service";
     public static final String WORKING_STAFF = "lịch làm việc của Staff";
     public static final String WORKING_CONSULTANT = "lịch làm việc của Consultant";
+    public static final Integer TOTAL_TIME_DEFAULT = 0;
 }

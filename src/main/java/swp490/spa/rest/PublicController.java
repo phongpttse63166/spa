@@ -3,14 +3,13 @@ package swp490.spa.rest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.dto.requests.AuthRequest;
 import swp490.spa.dto.responses.LoginResponse;
 import swp490.spa.dto.helper.Conversion;
+import swp490.spa.dto.responses.SpaPackageGetAllResponse;
 import swp490.spa.entities.*;
 import swp490.spa.jwt.JWTUtils;
 import swp490.spa.services.*;
@@ -24,7 +23,9 @@ import swp490.spa.utils.support.Notification;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/public")
@@ -295,7 +296,32 @@ public class PublicController {
                     .findAllStatusAvailable(PageRequest.of(spaPackages.getTotalPages() - 1,
                             spaPackages.getSize(), spaPackages.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
+        long totalElement = spaPackages.getTotalElements();
+        List<SpaPackageGetAllResponse> sprList = spaPackages.getContent().stream()
+                .map(spaPackage -> new SpaPackageGetAllResponse(spaPackage.getId(),
+                        spaPackage.getName(),
+                        spaPackage.getDescription(),
+                        spaPackage.getImage(),
+                        spaPackage.getType(),
+                        spaPackage.getStatus(),
+                        spaPackage.getCreateTime(),
+                        spaPackage.getCreate_by(),
+                        spaPackage.getCategory(),
+                        spaPackage.getSpa(),
+                        Constant.TOTAL_TIME_DEFAULT,
+                        spaPackage.getSpaServices()))
+                .collect(Collectors.toList());
+        for (SpaPackageGetAllResponse spaPackage : sprList) {
+            if(spaPackage.getType().equals(Type.ONESTEP)) {
+                SpaTreatment spaTreatment =
+                        spaTreatmentService.findByPackageIdAndTypeOneStep(spaPackage.getId());
+                spaPackage.setTotalTime(spaTreatment.getTotalTime());
+            } else {
+                spaPackage.setTotalTime(Constant.DURATION_OF_CONSULTATION);
+            }
+        }
+        Page<SpaPackageGetAllResponse> page = new PageImpl<>(sprList, pageable, totalElement);
+        return ResponseHelper.ok(page);
     }
 
     @GetMapping("/spapackage/findbycategoryId")

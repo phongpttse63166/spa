@@ -16,4 +16,5 @@ public interface SpaTreatmentRepository extends JpaRepository<SpaTreatment, Inte
     Page<SpaTreatment> findByPackageId(Integer packageId, String search, Pageable pageable);
 
     SpaTreatment findBySpaPackage_Id(Integer packageId);
+
 }

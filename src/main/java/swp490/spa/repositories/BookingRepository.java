@@ -7,7 +7,11 @@ import org.springframework.stereotype.Repository;
 import swp490.spa.entities.Booking;
 import swp490.spa.entities.StatusBooking;
 
+import java.util.List;
+
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     Page<Booking> findByStatusBookingAndSpa_IdOrderByCreateTimeAsc(StatusBooking status, Integer spaId, Pageable pageable);
+
+    List<Booking> findByCustomer_User_Id(Integer customerId);
 }

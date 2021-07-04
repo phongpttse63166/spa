@@ -126,13 +126,35 @@ public class CustomerController {
 
     @GetMapping("/getlisttimebook")
     public Response getListTimeBookingTest(@RequestParam Integer spaPackageId,
-                                           @RequestParam String dateBooking) {
+                                           @RequestParam String dateBooking,
+                                           @RequestParam Integer customerId) {
         supportFunctions.setBookingDetailStepService(bookingDetailStepService);
         int countEmployee = 0;
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;
         List<Consultant> consultants = null;
         List<BookingDetailStep> bookingDetailSteps = null;
+        // Get List Booking Detail Step of Customer in DateBooking
+        List<Booking> bookings = bookingService.findByCustomerId(customerId);
+        List<BookingDetailStep> bookingDetailStepOfCustomer = new ArrayList<>();
+        for (Booking booking : bookings) {
+            List<BookingDetail> bookingDetails =
+                    bookingDetailService.findByBooking(booking.getId(),
+                            PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                            .getContent();
+            for (BookingDetail bookingDetail : bookingDetails) {
+                List<BookingDetailStep> bookingDetailStepGet =
+                        bookingDetailStepService.findByBookingDetail(bookingDetail.getId(),
+                                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                                .getContent();
+                for (BookingDetailStep bookingDetailStep : bookingDetailStepGet) {
+                    if(bookingDetailStep.getDateBooking().equals(Date.valueOf(dateBooking))){
+                        bookingDetailStepOfCustomer.add(bookingDetailStep);
+                    }
+                }
+            }
+        }
+        // Get List Staff or List Consultant and All Booking Detail Step List
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
         if (Objects.nonNull(spaPackage)) {
             dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
@@ -180,6 +202,18 @@ public class CustomerController {
                                 IsConsultation.TRUE,
                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
                         .getContent();
+            }
+            if(bookingDetailStepOfCustomer.size()!=0){
+                bookingDetailSteps.removeAll(bookingDetailStepOfCustomer);
+                int bookingDetailStepId =
+                        bookingDetailSteps.get(bookingDetailSteps.size()-1).getId();
+                for (int i = 0; i < countEmployee; i++) {
+                    for (BookingDetailStep bookingDetailStep : bookingDetailStepOfCustomer) {
+                        bookingDetailStepId++;
+                        bookingDetailStep.setId(bookingDetailStepId);
+                        bookingDetailSteps.add(bookingDetailStep);
+                    }
+                }
             }
             List<BookingDetailStep> bookingDetailStepCheckList = bookingDetailSteps;
             Map<Integer, List<BookingDetailStep>> map = new HashMap<>();

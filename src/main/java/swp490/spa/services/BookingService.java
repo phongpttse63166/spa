@@ -8,6 +8,8 @@ import swp490.spa.entities.Booking;
 import swp490.spa.entities.StatusBooking;
 import swp490.spa.repositories.BookingRepository;
 
+import java.util.List;
+
 @Service
 public class BookingService {
     @Autowired
@@ -34,5 +36,9 @@ public class BookingService {
 
     public void removeDB(Integer bookingId) {
         this.bookingRepository.deleteById(bookingId);
+    }
+
+    public List<Booking> findByCustomerId(Integer customerId) {
+        return this.bookingRepository.findByCustomer_User_Id(customerId);
     }
 }

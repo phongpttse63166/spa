@@ -17,4 +17,5 @@ public class BookingData implements Serializable {
     private Integer packageId;
     private Date dateBooking;
     private Time timeBooking;
+    private Time endTimeBooking;
 }
