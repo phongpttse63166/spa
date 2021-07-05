@@ -379,7 +379,7 @@ public class ManagerController {
                         staffListResult.add(staff);
                     }
                 }
-                ResponseHelper.ok(staffListResult);
+                return ResponseHelper.ok(staffListResult);
             } else {
                 LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
             }
