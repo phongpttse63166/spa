@@ -22,6 +22,7 @@ import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.image.UploadImage;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -353,6 +354,39 @@ public class ManagerController {
         }
         LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
+    }
+
+    @GetMapping("/getstafflistfree/{bookingDetailId}")
+    public Response getListStaffsFreeInOneDate(@PathVariable Integer bookingDetailId){
+        List<Staff> staffListResult = new ArrayList<>();
+        BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
+        if(Objects.nonNull(bookingDetail)){
+            List<Staff> allStaffList =
+                    staffService.findBySpaId(bookingDetail.getSpaPackage().getSpa().getId());
+            if(Objects.nonNull(allStaffList)){
+                List<BookingDetailStep> bookingDetailSteps =
+                        bookingDetailStepService.findByBookingDetail(bookingDetailId,
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                        .getContent();
+                Date dateBooking = bookingDetailSteps.get(0).getDateBooking();
+                Time startTime = bookingDetailSteps.get(0).getStartTime();
+                Time endTime = bookingDetailSteps.get(bookingDetailSteps.size()-1).getEndTime();
+                for (Staff staff : allStaffList) {
+                    List<BookingDetailStep> bookingDetailStepsCheck =
+                            bookingDetailStepService.findByDateBookingAndStartEndTimeAndStaffId(dateBooking,
+                                    startTime,endTime,staff.getUser().getId());
+                    if(bookingDetailStepsCheck.size() == 0){
+                        staffListResult.add(staff);
+                    }
+                }
+                ResponseHelper.ok(staffListResult);
+            } else {
+                LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.LIST_STAFF_FREE));
     }
 
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},

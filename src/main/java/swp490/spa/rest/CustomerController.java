@@ -285,7 +285,7 @@ public class CustomerController {
                     if (timeRemoveList.size() == 0) {
                         timeRemoveList.add(startTime.toString());
                     } else {
-                        if(!supportFunctions.checkTimeStringExisted(nextTime.toString(),timeRemoveList)){
+                        if(!supportFunctions.checkTimeExisted(nextTime.toString(),timeRemoveList)){
                             timeRemoveList.add(nextTime.toString());
                         }
                     }
@@ -295,7 +295,7 @@ public class CustomerController {
                         if(nextTime.compareTo(endTime)>0){
                             checkOver = true;
                         } else {
-                            if(!supportFunctions.checkTimeStringExisted(nextTime.toString(),timeRemoveList)){
+                            if(!supportFunctions.checkTimeExisted(nextTime.toString(),timeRemoveList)){
                                 timeRemoveList.add(nextTime.toString());
                             }
                         }
@@ -303,7 +303,7 @@ public class CustomerController {
                     checkOver = false;
                 }
                 for (String timeCheck : timeBookingList) {
-                    if(!supportFunctions.checkTimeStringExisted(timeCheck, timeRemoveList)){
+                    if(!supportFunctions.checkTimeExisted(timeCheck, timeRemoveList)){
                         timeShowList.add(timeCheck);
                     }
                 }

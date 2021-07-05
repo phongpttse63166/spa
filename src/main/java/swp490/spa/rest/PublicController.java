@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.dto.requests.AuthRequest;
 import swp490.spa.dto.responses.LoginResponse;
 import swp490.spa.dto.helper.Conversion;
@@ -17,7 +16,6 @@ import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
 import swp490.spa.services.SpaService;
 import swp490.spa.utils.support.templates.Constant;
-import swp490.spa.utils.support.image.UploadImage;
 import swp490.spa.utils.support.otp.GenerationOTP;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 

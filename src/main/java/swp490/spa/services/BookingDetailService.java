@@ -41,4 +41,8 @@ public class BookingDetailService {
     public List<BookingDetail> findByCustomer(Integer customerId) {
         return this.bookingDetailRepository.findByBooking_Customer_User_Id(customerId);
     }
+
+    public BookingDetail findByBookingDetailId(Integer bookingDetailId) {
+        return this.bookingDetailRepository.findById(bookingDetailId).get();
+    }
 }

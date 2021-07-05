@@ -46,4 +46,11 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
 
     List<BookingDetailStep> findByBookingDetail_IdAndAndDateBookingOrderByStartTimeAsc(Integer bookingDetailId,
                                                                                            Date dateBooking);
+    @Query("FROM BookingDetailStep b WHERE b.dateBooking = ?1 AND " +
+            "((b.startTime < ?2 AND b.endTime > ?2) " +
+            "OR (b.startTime < ?3 AND b.endTime > ?3) " +
+            "OR (b.startTime > ?2 AND b.endTime < ?3)) AND b.staff.user.id = ?4 " +
+            "ORDER BY b.staff.user.id ASC")
+    List<BookingDetailStep> findByDateBookingAndStartEndTimeAndStaffId(Date dateBooking, Time startTime,
+                                                                       Time endTime, Integer staffId);
 }

@@ -76,4 +76,12 @@ public class BookingDetailStepService {
                 .findByBookingDetail_IdAndAndDateBookingOrderByStartTimeAsc(bookingDetailId,
                         dateBooking);
     }
+
+    public List<BookingDetailStep> findByDateBookingAndStartEndTimeAndStaffId(Date dateBooking,
+                                                                              Time startTime,
+                                                                              Time endTime,
+                                                                              Integer staffId){
+        return this.bookingDetailStepRepository
+                .findByDateBookingAndStartEndTimeAndStaffId(dateBooking,startTime,endTime,staffId);
+    }
 }

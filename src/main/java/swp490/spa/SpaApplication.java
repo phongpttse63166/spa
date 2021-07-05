@@ -13,7 +13,7 @@ import swp490.spa.utils.support.templates.Constant;
 import java.io.FileInputStream;
 
 @SpringBootApplication
-@EnableAsync
+//@EnableAsync
 public class SpaApplication implements ApplicationRunner {
 
     public static void main(String[] args) {

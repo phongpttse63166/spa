@@ -432,7 +432,7 @@ public class SupportFunctions {
         return timeResult;
     }
 
-    private boolean checkTimeExisted(String time, List<String> timeResult) {
+    public boolean checkTimeExisted(String time, List<String> timeResult) {
         for (int i = 0; i < timeResult.size(); i++) {
             if (timeResult.get(i).equalsIgnoreCase(time)) {
                 return true;
@@ -463,15 +463,6 @@ public class SupportFunctions {
     public boolean checkBookingExistedInList(Booking booking, List<Booking> bookings) {
         for (Booking bookingCheck : bookings) {
             if(bookingCheck.equals(booking)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean checkTimeStringExisted(String timeString, List<String> timeList) {
-        for (String timeStringCheck : timeList) {
-            if(timeStringCheck.equals(timeString)){
                 return true;
             }
         }
