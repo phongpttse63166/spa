@@ -20,7 +20,8 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     @Query("FROM BookingDetailStep b WHERE b.dateBooking = ?3 AND " +
             "((b.startTime < ?1 AND b.endTime > ?1) " +
             "OR (b.startTime < ?2 AND b.endTime > ?2) " +
-            "OR (b.startTime > ?1 AND b.endTime < ?2))" +
+            "OR (b.startTime > ?1 AND b.endTime < ?2) " +
+            "OR (b.startTime < ?1 AND b.endTime > ?2))" +
             "ORDER BY b.staff.user.id ASC, b.consultant.user.id ASC ")
     List<BookingDetailStep> findByStartTimeAndEndTimeAndDateBooking(Time startTime,
                                                                     Time endTime,
@@ -49,6 +50,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     @Query("FROM BookingDetailStep b WHERE b.dateBooking = ?1 AND " +
             "((b.startTime < ?2 AND b.endTime > ?2) " +
             "OR (b.startTime < ?3 AND b.endTime > ?3) " +
+            "OR (b.startTime < ?2 AND b.endTime > ?3) " +
             "OR (b.startTime > ?2 AND b.endTime < ?3)) AND b.staff.user.id = ?4 " +
             "ORDER BY b.staff.user.id ASC")
     List<BookingDetailStep> findByDateBookingAndStartEndTimeAndStaffId(Date dateBooking, Time startTime,
