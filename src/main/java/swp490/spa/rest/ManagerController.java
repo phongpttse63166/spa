@@ -757,4 +757,38 @@ public class ManagerController {
         }
         return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_FAILED, Constant.SERVICE));
     }
+
+    @PutMapping("/bookingdetailstep/editstafftypeonestep/{bookingDetailId}/{staffId}")
+    public Response addStaffIntoBookingDetailTypeOneStep(@PathVariable Integer bookingDetailId,
+                                                         @PathVariable Integer staffId){
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findByBookingDetail(bookingDetailId,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                .getContent();
+        List<BookingDetailStep> bookingDetailStepEdited = new ArrayList<>();
+        if(bookingDetailSteps.size()!= 0 || Objects.nonNull(bookingDetailSteps)){
+            Staff staff = staffService.findByStaffId(staffId);
+            if(Objects.nonNull(staff)){
+                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                    bookingDetailStep.setStaff(staff);
+                    bookingDetailStep.setStatusBooking(StatusBooking.START);
+                }
+                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                    BookingDetailStep bookingDetailStepResult =
+                            bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
+                    if(Objects.isNull(bookingDetailStepResult)){
+                       LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL_STEP));
+                    } else {
+                        bookingDetailStepEdited.add(bookingDetailStepResult);
+                    }
+                }
+                if(bookingDetailSteps.size() == bookingDetailStepEdited.size()){
+                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_FAILED, Constant.STAFF));
+                }
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.STAFF));
+    }
 }

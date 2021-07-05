@@ -28,6 +28,7 @@ public class SpaApplication implements ApplicationRunner {
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setStorageBucket(Constant.STORAGE_BUCKET)
+                .setDatabaseUrl(Constant.DATABASE_URL)
                 .build();
 
         FirebaseApp.initializeApp(options);

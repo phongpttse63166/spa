@@ -220,7 +220,7 @@ public class ConsultantController {
                     bookingDetailStep.setEndTime(endTime);
                     bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
                 } else {
-                    bookingDetailStep.setStatusBooking(StatusBooking.WAITING);
+                    bookingDetailStep.setStatusBooking(StatusBooking.START);
                 }
                 BookingDetailStep bookingDetailStepNew = (bookingDetailStepService
                         .insertBookingDetailStep(bookingDetailStep));

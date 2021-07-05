@@ -19,6 +19,7 @@ public class Constant {
     public static final String STORAGE_URL = "https://storage.googleapis.com/testuploadimgae.appspot.com/%s";
     public static final String FILE_JSON = "testuploadimgae-firebase-adminsdk-tpl07-8b469b8252.json";
     public static final String STORAGE_BUCKET = "testuploadimgae.appspot.com";
+    public static final String DATABASE_URL = "https://testuploadimgae-default-rtdb.asia-southeast1.firebasedatabase.app/";
     // Properties
     public static final String PROFILE = "Profile";
     public static final String SERVICE = "Service";
