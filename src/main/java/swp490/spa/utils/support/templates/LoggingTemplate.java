@@ -24,4 +24,5 @@ public class LoggingTemplate {
     public static final String GET_FAILED = "Lấy thông tin %s thất bại";
 
 
+    public static final String EMPLOYEE_EXISTED = "Đã xếp nhân viên cho dich vụ";
 }

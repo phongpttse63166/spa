@@ -761,33 +761,91 @@ public class ManagerController {
     @PutMapping("/bookingdetailstep/editstafftypeonestep/{bookingDetailId}/{staffId}")
     public Response addStaffIntoBookingDetailTypeOneStep(@PathVariable Integer bookingDetailId,
                                                          @PathVariable Integer staffId){
-        List<BookingDetailStep> bookingDetailSteps =
-                bookingDetailStepService.findByBookingDetail(bookingDetailId,
-                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-                .getContent();
         List<BookingDetailStep> bookingDetailStepEdited = new ArrayList<>();
-        if(bookingDetailSteps.size()!= 0 || Objects.nonNull(bookingDetailSteps)){
-            Staff staff = staffService.findByStaffId(staffId);
-            if(Objects.nonNull(staff)){
-                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                    bookingDetailStep.setStaff(staff);
-                    bookingDetailStep.setStatusBooking(StatusBooking.START);
+        int count = 0;
+        boolean check = true;
+        Booking bookingEdited = null;
+        BookingDetail bookingDetailEdited = null;
+        BookingDetail bookingDetailGet =
+                bookingDetailService.findByBookingDetailId(bookingDetailId);
+        if(Objects.nonNull(bookingDetailGet)){
+            List<BookingDetailStep> bookingDetailSteps =
+                    bookingDetailStepService.findByBookingDetail(bookingDetailId,
+                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                            .getContent();
+            for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                if(bookingDetailStep.getStaff() != null){
+                    count++;
                 }
-                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                    BookingDetailStep bookingDetailStepResult =
-                            bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
-                    if(Objects.isNull(bookingDetailStepResult)){
-                       LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL_STEP));
-                    } else {
-                        bookingDetailStepEdited.add(bookingDetailStepResult);
+            }
+            if(count == bookingDetailSteps.size()){
+                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
+            } else {
+                if(bookingDetailSteps.size()!= 0 || Objects.nonNull(bookingDetailSteps)){
+                    Staff staff = staffService.findByStaffId(staffId);
+                    if(Objects.nonNull(staff)){
+                        for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                            bookingDetailStep.setStaff(staff);
+                            bookingDetailStep.setStatusBooking(StatusBooking.START);
+                        }
+                        for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                            BookingDetailStep bookingDetailStepResult =
+                                    bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
+                            if(Objects.isNull(bookingDetailStepResult)){
+                                check = false;
+                                LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL_STEP));
+                            } else {
+                                bookingDetailStepEdited.add(bookingDetailStepResult);
+                            }
+                        }
+                        if(bookingDetailSteps.size() == bookingDetailStepEdited.size()){
+                            bookingDetailGet.setStatusBooking(StatusBooking.START);
+                            bookingDetailEdited =
+                                    bookingDetailService.editBookingDetail(bookingDetailGet);
+                            if(Objects.nonNull(bookingDetailEdited)){
+                                Integer countBookingDetail =
+                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
+                                                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                                                .getContent().size();
+                                if(Objects.nonNull(countBookingDetail)){
+                                    if(countBookingDetail == 1) {
+                                        Booking booking = bookingDetailEdited.getBooking();
+                                        booking.setStatusBooking(StatusBooking.START);
+                                        bookingEdited = bookingService.editBooking(booking);
+                                        if(Objects.nonNull(bookingEdited)) {
+                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
+                                        } else {
+                                            check = false;
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                check = false;
+                                LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+                            }
+                        }
                     }
-                }
-                if(bookingDetailSteps.size() == bookingDetailStepEdited.size()){
-                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
+                } else {
+                    LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
                 }
             }
         } else {
-            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+        if(!check){
+            if(bookingEdited!=null){
+                bookingEdited.setStatusBooking(StatusBooking.BOOKING);
+                bookingService.editBooking(bookingEdited);
+            }
+            if(bookingDetailEdited!=null){
+                bookingDetailEdited.setStatusBooking(StatusBooking.BOOKING);
+                bookingDetailService.editBookingDetail(bookingDetailEdited);
+            }
+            for (BookingDetailStep bookingDetailStep : bookingDetailStepEdited) {
+                bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
+            }
         }
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.STAFF));
     }
