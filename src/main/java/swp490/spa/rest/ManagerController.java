@@ -783,7 +783,7 @@ public class ManagerController {
                     }
                 }
                 if(bookingDetailSteps.size() == bookingDetailStepEdited.size()){
-                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_FAILED, Constant.STAFF));
+                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
                 }
             }
         } else {
