@@ -24,6 +24,7 @@ import swp490.spa.utils.support.image.UploadImage;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @RequestMapping("/api/manager")
@@ -57,6 +58,10 @@ public class ManagerController {
     private BookingDetailStepService bookingDetailStepService;
     @Autowired
     private StaffService staffService;
+    @Autowired
+    private ConsultantService consultantService;
+    @Autowired
+    private ConsultationContentService consultationContentService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -65,8 +70,9 @@ public class ManagerController {
                              swp490.spa.services.SpaService spaService, UserService userService,
                              DateOffService dateOffService, BookingService bookingService,
                              BookingDetailService bookingDetailService, StaffService staffService,
-                             TreatmentServiceService treatmentServiceService,
-                             BookingDetailStepService bookingDetailStepService) {
+                             TreatmentServiceService treatmentServiceService, ConsultantService consultantService,
+                             BookingDetailStepService bookingDetailStepService,
+                             ConsultationContentService consultationContentService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
@@ -78,7 +84,9 @@ public class ManagerController {
         this.bookingDetailService = bookingDetailService;
         this.staffService = staffService;
         this.treatmentServiceService = treatmentServiceService;
+        this.consultantService = consultantService;
         this.bookingDetailStepService = bookingDetailStepService;
+        this.consultationContentService = consultationContentService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions();
     }
@@ -558,6 +566,97 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.CATEGORY));
     }
 
+    @PostMapping("/bookingdetail/editandinsertmorestep")
+    public Response editBookingDetail(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
+        Double totalPriceBooking = bookingDetailRequest.getBookingDetail().
+                getSpaTreatment().getTotalPrice();
+        Integer totalTimeBooking = bookingDetailRequest.getBookingDetail().
+                getSpaTreatment().getTotalTime();
+        Booking bookingResult =
+                bookingService.findByBookingId(bookingDetailRequest
+                        .getBookingDetail()
+                        .getBooking()
+                        .getId());
+        if (Objects.isNull(bookingResult)) {
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+        }
+        Consultant consultant = consultantService.findByConsultantId(bookingDetailRequest.getConsultantId());
+        if (Objects.isNull(consultant)) {
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+        }
+        List<BookingDetail> bookingDetailList = bookingDetailService
+                .findByBooking(bookingResult.getId(),
+                        PageRequest.of(Constant.PAGE_DEFAULT,
+                                Constant.SIZE_DEFAULT,
+                                Sort.unsorted())).getContent();
+        if (Objects.isNull(bookingDetailList)) {
+            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+        }
+        for (BookingDetail bookingDetail : bookingDetailList) {
+            if(Objects.nonNull(bookingDetail.getSpaTreatment())){
+                totalPriceBooking += bookingDetail.getSpaTreatment().getTotalPrice();
+                totalTimeBooking += bookingDetail.getSpaTreatment().getTotalTime();
+            }
+        }
+        bookingResult.setTotalPrice(totalPriceBooking);
+        bookingResult.setTotalTime(totalTimeBooking);
+        if(Objects.isNull(bookingService.editBooking(bookingResult))){
+            LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+        }
+        if(Objects.isNull(bookingDetailService
+                .editBookingDetail(bookingDetailRequest.getBookingDetail()))){
+            LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+        } else {
+            List<TreatmentService> treatmentServices =
+                    new ArrayList<>(bookingDetailRequest
+                            .getBookingDetail()
+                            .getSpaTreatment()
+                            .getTreatmentServices());
+            Collections.sort(treatmentServices);
+            for (int i = 0; i < treatmentServices.size(); i++) {
+                BookingDetailStep bookingDetailStep = new BookingDetailStep();
+                bookingDetailStep.setConsultant(consultant);
+                bookingDetailStep.setBookingDetail(bookingDetailRequest.getBookingDetail());
+                bookingDetailStep.setTreatmentService(treatmentServices.get(i));
+                if (i == 0) {
+                    bookingDetailStep
+                            .setDateBooking(Date.valueOf(bookingDetailRequest.getDateBooking()));
+                    bookingDetailStep
+                            .setStartTime(Time.valueOf(bookingDetailRequest.getTimeBooking()));
+                    Time endTime = Time.valueOf(LocalTime.parse(bookingDetailRequest.getTimeBooking())
+                            .plusMinutes(treatmentServices.get(i)
+                                    .getSpaService()
+                                    .getDurationMin()));
+                    bookingDetailStep.setEndTime(endTime);
+                    bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                } else {
+                    bookingDetailStep.setStatusBooking(StatusBooking.START);
+                }
+                BookingDetailStep bookingDetailStepNew = (bookingDetailStepService
+                        .insertBookingDetailStep(bookingDetailStep));
+                if(Objects.isNull(bookingDetailStepNew)){
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING_DETAIL_STEP));
+                } else {
+                    ConsultationContent consultationContent = new ConsultationContent();
+                    consultationContent.setBookingDetailStep(bookingDetailStepNew);
+                    ConsultationContent consultationContentResult =
+                            consultationContentService.insertNewConsultationContent(consultationContent);
+                    if(Objects.nonNull(consultationContentResult)){
+                        LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTATION_CONTENT));
+                    } else {
+                        LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.CONSULTATION_CONTENT));
+                    }
+                }
+            }
+        }
+        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.BOOKING_DETAIL));
+    }
+
     @PutMapping("/editpassword")
     public Response editPassword(@RequestBody AccountPasswordRequest account) {
         Manager manager = managerService.findManagerById(account.getId());
@@ -817,9 +916,10 @@ public class ManagerController {
                                         } else {
                                             check = false;
                                         }
+                                    } else {
+                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
                                     }
                                 }
-
                             } else {
                                 check = false;
                                 LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
