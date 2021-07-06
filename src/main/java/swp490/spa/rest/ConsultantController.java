@@ -245,7 +245,7 @@ public class ConsultantController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
     }
 
-//    @PostMapping("/bookingdetailstep/add")
+//    @PostMapping("/bookingdetailstep/addtreatment")
 //    public Response editBookingDetail(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
 //        Double totalPriceBooking = bookingDetailRequest.getBookingDetail().
 //                getSpaTreatment().getTotalPrice();
@@ -335,5 +335,4 @@ public class ConsultantController {
 //        }
 //        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.BOOKING_DETAIL));
 //    }
-
 }

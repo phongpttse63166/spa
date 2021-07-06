@@ -891,7 +891,7 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.STAFF));
     }
 
-    @PutMapping("/bookingdetailstep/addconsultant/{bookingDetailId}")
+    @PutMapping("/bookingdetailstep/addconsultant/{bookingDetailId}/{consultantId}")
     public Response addConsultantIntoBookingDetail(@PathVariable Integer bookingDetailId,
                                                    @PathVariable Integer consultantId){
         List<BookingDetailStep> bookingDetailStepEdited = new ArrayList<>();
