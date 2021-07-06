@@ -88,4 +88,12 @@ public class BookingDetailStepService {
     public BookingDetailStep editBookingDetailStep(BookingDetailStep bookingDetailStep) {
         return this.bookingDetailStepRepository.save(bookingDetailStep);
     }
+
+    public List<BookingDetailStep> findByDateBookingAndStartEndTimeAndConsultantId(Date dateBooking,
+                                                                                   Time startTime,
+                                                                                   Time endTime,
+                                                                                   Integer consultantId) {
+        return this.bookingDetailStepRepository
+                .findByDateBookingAndStartEndTimeAndConsultantId(dateBooking,startTime,endTime,consultantId);
+    }
 }

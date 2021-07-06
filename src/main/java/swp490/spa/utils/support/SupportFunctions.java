@@ -4,21 +4,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import swp490.spa.entities.Booking;
 import swp490.spa.entities.BookingDetail;
 import swp490.spa.entities.BookingDetailStep;
+import swp490.spa.services.BookingDetailService;
 import swp490.spa.services.BookingDetailStepService;
 import swp490.spa.utils.support.templates.Constant;
 
+import java.sql.Date;
 import java.sql.Time;
 import java.util.*;
 
 public class SupportFunctions {
     @Autowired
     public BookingDetailStepService bookingDetailStepService;
+    @Autowired
+    public BookingDetailService bookingDetailService;
 
     public SupportFunctions() {
     }
 
-    public SupportFunctions(BookingDetailStepService bookingDetailStepService) {
+    public SupportFunctions(BookingDetailStepService bookingDetailStepService,
+                            BookingDetailService bookingDetailService) {
         this.bookingDetailStepService = bookingDetailStepService;
+        this.bookingDetailService = bookingDetailService;
     }
 
     public void setBookingDetailStepService(BookingDetailStepService bookingDetailStepService) {
@@ -467,5 +473,126 @@ public class SupportFunctions {
             }
         }
         return false;
+    }
+
+    public Map<Integer, List<BookingDetailStep>> separateBookingDetailStepListAndPutIntoMap(List<BookingDetailStep> bookingDetailSteps) {
+        Map<Integer, List<BookingDetailStep>> result = new HashMap<>();
+        int count = 0;
+        int oldBookingDetailId = 0;
+        int newBookingDetailId = 0;
+        int checkIgnore = -1;
+        boolean checkFinish = false;
+        BookingDetailStep oldBookingDetailStep = null;
+        List<BookingDetailStep> bookingDetailStepCheckList = bookingDetailSteps;
+        while (!checkFinish) {
+            List<BookingDetailStep> bookingDetailStepDraftList = bookingDetailStepCheckList;
+            bookingDetailStepCheckList = new ArrayList<>();
+            List<BookingDetailStep> list = new ArrayList<>();
+            for (BookingDetailStep bookingDetailStep : bookingDetailStepDraftList) {
+                oldBookingDetailId = newBookingDetailId;
+                newBookingDetailId = bookingDetailStep.getBookingDetail().getId();
+                if (checkIgnore != newBookingDetailId) {
+                    if (oldBookingDetailId == 0) {
+                        list.add(bookingDetailStep);
+                        oldBookingDetailStep = bookingDetailStep;
+                    } else if (!bookingDetailStepDraftList.get(bookingDetailStepDraftList.size() - 1).equals(bookingDetailStep)) {
+                        if (oldBookingDetailId == newBookingDetailId) {
+                            list.add(bookingDetailStep);
+                            oldBookingDetailStep = bookingDetailStep;
+                        } else {
+                            if (oldBookingDetailStep.getStartTime()
+                                    .compareTo(bookingDetailStep.getStartTime()) > 0) {
+                                checkIgnore = newBookingDetailId;
+                                bookingDetailStepCheckList.add(bookingDetailStep);
+                            } else {
+                                list.add(bookingDetailStep);
+                                oldBookingDetailStep = bookingDetailStep;
+                            }
+                        }
+                    } else {
+                        if (oldBookingDetailId == newBookingDetailId) {
+                            list.add(bookingDetailStep);
+                        } else {
+                            if (oldBookingDetailStep.getStartTime().toLocalTime()
+                                    .isBefore(bookingDetailStep.getEndTime().toLocalTime())) {
+                                bookingDetailStepCheckList.add(bookingDetailStep);
+                            } else {
+                                list.add(bookingDetailStep);
+                            }
+                        }
+                        count++;
+                        checkIgnore = -1;
+                        newBookingDetailId = 0;
+                        result.put(count, list);
+                    }
+                } else {
+                    bookingDetailStepCheckList.add(bookingDetailStep);
+                    if (bookingDetailStepDraftList.get(bookingDetailStepDraftList.size() - 1).equals(bookingDetailStep)) {
+                        count++;
+                        checkIgnore = -1;
+                        newBookingDetailId = 0;
+                        result.put(count, list);
+                    }
+                }
+            }
+            if (bookingDetailStepCheckList.size() == 0) {
+                checkFinish = true;
+            }
+        }
+        return result;
+    }
+
+    public List<String> checkAndGetListTimeBooking(Integer customerId, List<String> timeBookingList,
+                                                   String dateBooking) {
+        List<String> result = new ArrayList<>();
+        List<String> timeShowList = new ArrayList<>();
+        List<String> timeRemoveList = new ArrayList<>();
+        boolean checkOver = false;
+        // Get BookingDetail Of Customer
+        List<BookingDetail> bookingDetails = bookingDetailService.findByCustomer(customerId);
+        List<BookingDetailStep> bookingDetailStepCustomerBooked = new ArrayList<>();
+        // Get BookingDetailStep by dateBooking and bookingDetail Id from list above
+        for (BookingDetail bookingDetail : bookingDetails) {
+            List<BookingDetailStep> bookingDetailStepsCheck =
+                    bookingDetailStepService.findByBookingDetailIdAndDateBooking(bookingDetail.getId(),
+                            Date.valueOf(dateBooking));
+            bookingDetailStepCustomerBooked.addAll(bookingDetailStepsCheck);
+        }
+        for (BookingDetailStep bookingDetailStep : bookingDetailStepCustomerBooked) {
+            Time startTime = bookingDetailStep.getStartTime();
+            Time endTime = bookingDetailStep.getEndTime();
+            Time nextTime = startTime;
+            int min = nextTime.getMinutes();
+            if (Math.abs(30 - min) % 15 != 0) {
+                nextTime =
+                        Time.valueOf(nextTime.toLocalTime().plusMinutes(15 - (Math.abs(30 - min) % 15)));
+            }
+            if (timeRemoveList.size() == 0) {
+                timeRemoveList.add(startTime.toString());
+            } else {
+                if (!checkTimeExisted(nextTime.toString(), timeRemoveList)) {
+                    timeRemoveList.add(nextTime.toString());
+                }
+            }
+            while (checkOver == false) {
+                nextTime = Time.valueOf(nextTime.toLocalTime()
+                        .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                if (nextTime.compareTo(endTime) > 0) {
+                    checkOver = true;
+                } else {
+                    if (!checkTimeExisted(nextTime.toString(), timeRemoveList)) {
+                        timeRemoveList.add(nextTime.toString());
+                    }
+                }
+            }
+            checkOver = false;
+        }
+        for (String timeCheck : timeBookingList) {
+            if (!checkTimeExisted(timeCheck, timeRemoveList)) {
+                timeShowList.add(timeCheck);
+            }
+        }
+        result = timeShowList;
+        return result;
     }
 }

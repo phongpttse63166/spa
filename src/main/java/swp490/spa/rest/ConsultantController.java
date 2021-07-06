@@ -3,21 +3,22 @@ package swp490.spa.rest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;
+import swp490.spa.dto.requests.BookingDetailEditRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
+import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 
 import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.*;
 
 @RestController
@@ -41,11 +42,14 @@ public class ConsultantController {
     private DateOffService dateOffService;
     @Autowired
     private ConsultationContentService consultationContentService;
+    @Autowired
+    private StaffService staffService;
     private Conversion conversion;
+    private SupportFunctions supportFunctions;
 
     public ConsultantController(ConsultantService consultantService, UserService userService,
                                 DateOffService dateOffService, BookingService bookingService,
-                                BookingDetailService bookingDetailService,
+                                BookingDetailService bookingDetailService, StaffService staffService,
                                 BookingDetailStepService bookingDetailStepService,
                                 SpaTreatmentService spaTreatmentService,
                                 ConsultationContentService consultationContentService) {
@@ -53,11 +57,13 @@ public class ConsultantController {
         this.userService = userService;
         this.dateOffService = dateOffService;
         this.bookingService = bookingService;
+        this.staffService = staffService;
         this.bookingDetailService = bookingDetailService;
         this.bookingDetailStepService = bookingDetailStepService;
         this.spaTreatmentService = spaTreatmentService;
         this.consultationContentService = consultationContentService;
         this.conversion = new Conversion();
+        this.supportFunctions = new SupportFunctions();
     }
 
     @PutMapping("/editpassword")
@@ -176,4 +182,158 @@ public class ConsultantController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
     }
+
+    @GetMapping("/getlisttimebookingtreatment")
+    public Response getListTimeBookingTreatment(@RequestParam Integer treatmentId,
+                                                @RequestParam String dateBooking,
+                                                @RequestParam Integer customerId){
+        int countEmployee = 0;
+        List<DateOff> dateOffs = null;
+        List<Staff> staffs = null;
+        List<BookingDetailStep> bookingDetailSteps = null;
+        SpaTreatment spaTreatment = spaTreatmentService.findByTreatmentId(treatmentId);
+        if(Objects.nonNull(spaTreatment)){
+            dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
+                    spaTreatment.getSpa().getId());
+            staffs = staffService.findBySpaId(spaTreatment.getSpa().getId());
+            List<Staff> staffDateOff = new ArrayList<>();
+            for (Staff staff : staffs) {
+                if (staff.getUser().isActive() == true) {
+                    for (DateOff dateOff : dateOffs) {
+                        if (staff.getUser().equals(dateOff.getEmployee())) {
+                            staffDateOff.add(staff);
+                        }
+                    }
+                } else {
+                    staffDateOff.add(staff);
+                }
+            }
+            staffs.removeAll(staffDateOff);
+            countEmployee = staffs.size();
+            bookingDetailSteps = bookingDetailStepService
+                    .findByDateBookingAndIsConsultation(Date.valueOf(dateBooking),
+                            IsConsultation.FALSE,
+                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
+                    .getContent();
+            Map<Integer, List<BookingDetailStep>> map =
+                    supportFunctions.separateBookingDetailStepListAndPutIntoMap(bookingDetailSteps);
+            int check = countEmployee - map.size();
+            List<String> timeBookingList = null;
+            int totalTime = 0;
+            List<TreatmentService> treatmentServices =
+                    new ArrayList<>(spaTreatment.getTreatmentServices());
+            for (TreatmentService treatmentService : treatmentServices) {
+                if(treatmentService.getOrdinal().equals(1)){
+                    totalTime = treatmentService.getSpaService().getDurationMin();
+                }
+            }
+            timeBookingList =
+                    supportFunctions.getBookTime(totalTime, map, check);
+            if (timeBookingList.size() != 0) {
+                timeBookingList =
+                        supportFunctions.checkAndGetListTimeBooking(customerId,timeBookingList,
+                                dateBooking);
+                Page<String> page = new PageImpl<>(timeBookingList,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
+                        timeBookingList.size());
+                return ResponseHelper.ok(page);
+            }
+            return ResponseHelper.ok(LoggingTemplate.NO_EMPLOYEE_FREE);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_TREATMENT));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
+    }
+
+//    @PostMapping("/bookingdetailstep/add")
+//    public Response editBookingDetail(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
+//        Double totalPriceBooking = bookingDetailRequest.getBookingDetail().
+//                getSpaTreatment().getTotalPrice();
+//        Integer totalTimeBooking = bookingDetailRequest.getBookingDetail().
+//                getSpaTreatment().getTotalTime();
+//        Booking bookingResult =
+//                bookingService.findByBookingId(bookingDetailRequest
+//                        .getBookingDetail()
+//                        .getBooking()
+//                        .getId());
+//        if (Objects.isNull(bookingResult)) {
+//            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
+//            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+//        }
+//        Consultant consultant = consultantService.findByConsultantId(bookingDetailRequest.getConsultantId());
+//        if (Objects.isNull(consultant)) {
+//            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+//            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+//        }
+//        List<BookingDetail> bookingDetailList = bookingDetailService
+//                .findByBooking(bookingResult.getId(),
+//                        PageRequest.of(Constant.PAGE_DEFAULT,
+//                                Constant.SIZE_DEFAULT,
+//                                Sort.unsorted())).getContent();
+//        if (Objects.isNull(bookingDetailList)) {
+//            LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+//            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+//        }
+//        for (BookingDetail bookingDetail : bookingDetailList) {
+//            if(Objects.nonNull(bookingDetail.getSpaTreatment())){
+//                totalPriceBooking += bookingDetail.getSpaTreatment().getTotalPrice();
+//                totalTimeBooking += bookingDetail.getSpaTreatment().getTotalTime();
+//            }
+//        }
+//        bookingResult.setTotalPrice(totalPriceBooking);
+//        bookingResult.setTotalTime(totalTimeBooking);
+//        if(Objects.isNull(bookingService.editBooking(bookingResult))){
+//            LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING));
+//            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+//        }
+//        if(Objects.isNull(bookingDetailService
+//                .editBookingDetail(bookingDetailRequest.getBookingDetail()))){
+//            LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+//            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+//        } else {
+//            List<TreatmentService> treatmentServices =
+//                    new ArrayList<>(bookingDetailRequest
+//                            .getBookingDetail()
+//                            .getSpaTreatment()
+//                            .getTreatmentServices());
+//            Collections.sort(treatmentServices);
+//            for (int i = 0; i < treatmentServices.size(); i++) {
+//                BookingDetailStep bookingDetailStep = new BookingDetailStep();
+//                bookingDetailStep.setConsultant(consultant);
+//                bookingDetailStep.setBookingDetail(bookingDetailRequest.getBookingDetail());
+//                bookingDetailStep.setTreatmentService(treatmentServices.get(i));
+//                if (i == 0) {
+//                    bookingDetailStep
+//                            .setDateBooking(Date.valueOf(bookingDetailRequest.getDateBooking()));
+//                    bookingDetailStep
+//                            .setStartTime(Time.valueOf(bookingDetailRequest.getTimeBooking()));
+//                    Time endTime = Time.valueOf(LocalTime.parse(bookingDetailRequest.getTimeBooking())
+//                            .plusMinutes(treatmentServices.get(i)
+//                                    .getSpaService()
+//                                    .getDurationMin()));
+//                    bookingDetailStep.setEndTime(endTime);
+//                    bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
+//                } else {
+//                    bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+//                }
+//                BookingDetailStep bookingDetailStepNew = (bookingDetailStepService
+//                        .insertBookingDetailStep(bookingDetailStep));
+//                if(Objects.isNull(bookingDetailStepNew)){
+//                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING_DETAIL_STEP));
+//                } else {
+//                    ConsultationContent consultationContent = new ConsultationContent();
+//                    consultationContent.setBookingDetailStep(bookingDetailStepNew);
+//                    ConsultationContent consultationContentResult =
+//                            consultationContentService.insertNewConsultationContent(consultationContent);
+//                    if(Objects.nonNull(consultationContentResult)){
+//                        LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTATION_CONTENT));
+//                    } else {
+//                        LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.CONSULTATION_CONTENT));
+//                    }
+//                }
+//            }
+//        }
+//        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.BOOKING_DETAIL));
+//    }
+
 }

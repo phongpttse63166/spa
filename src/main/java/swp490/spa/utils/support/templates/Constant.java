@@ -21,6 +21,7 @@ public class Constant {
     public static final String STORAGE_BUCKET = "testuploadimgae.appspot.com";
     public static final String DATABASE_URL = "https://testuploadimgae-default-rtdb.asia-southeast1.firebasedatabase.app/";
     // Properties
+    public static final Integer TOTAL_TIME_DEFAULT = 0;
     public static final String PROFILE = "Profile";
     public static final String SERVICE = "Service";
     public static final String CATEGORY = "Category";
@@ -45,6 +46,8 @@ public class Constant {
     public static final String SERVICES = "Danh sách Service";
     public static final String WORKING_STAFF = "lịch làm việc của Staff";
     public static final String WORKING_CONSULTANT = "lịch làm việc của Consultant";
-    public static final Integer TOTAL_TIME_DEFAULT = 0;
     public static final String LIST_STAFF_FREE = "Danh sách Staff rảnh";
+    public static final String LIST_CONSULTANT_FREE = "Danh sách Consultant rảnh";
+    public static final String TIME_LIST = "Danh sách thời gian";
+
 }

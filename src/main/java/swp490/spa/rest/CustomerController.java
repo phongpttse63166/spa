@@ -9,7 +9,6 @@ import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.BookingRequest;
-import swp490.spa.dto.responses.BookingDetailResponse;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
@@ -129,13 +128,11 @@ public class CustomerController {
     public Response getListTimeBookingTest(@RequestParam Integer spaPackageId,
                                            @RequestParam String dateBooking,
                                            @RequestParam Integer customerId) {
-        supportFunctions.setBookingDetailStepService(bookingDetailStepService);
         int countEmployee = 0;
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;
         List<Consultant> consultants = null;
         List<BookingDetailStep> bookingDetailSteps = null;
-
         // Get List Staff or List Consultant and All Booking Detail Step List
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
         if (Objects.nonNull(spaPackage)) {
@@ -185,70 +182,13 @@ public class CustomerController {
                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
                         .getContent();
             }
-            List<BookingDetailStep> bookingDetailStepCheckList = bookingDetailSteps;
-            Map<Integer, List<BookingDetailStep>> map = new HashMap<>();
-            int count = 0;
-            int oldBookingDetailId = 0;
-            int newBookingDetailId = 0;
-            int checkIgnore = -1;
-            boolean checkFinish = false;
-            BookingDetailStep oldBookingDetailStep = null;
-            while (!checkFinish) {
-                List<BookingDetailStep> bookingDetailStepDraftList = bookingDetailStepCheckList;
-                bookingDetailStepCheckList = new ArrayList<>();
-                List<BookingDetailStep> list = new ArrayList<>();
-                for (BookingDetailStep bookingDetailStep : bookingDetailStepDraftList) {
-                    oldBookingDetailId = newBookingDetailId;
-                    newBookingDetailId = bookingDetailStep.getBookingDetail().getId();
-                    if (checkIgnore != newBookingDetailId) {
-                        if (oldBookingDetailId == 0) {
-                            list.add(bookingDetailStep);
-                            oldBookingDetailStep = bookingDetailStep;
-                        } else if (!bookingDetailStepDraftList.get(bookingDetailStepDraftList.size() - 1).equals(bookingDetailStep)) {
-                            if (oldBookingDetailId == newBookingDetailId) {
-                                list.add(bookingDetailStep);
-                                oldBookingDetailStep = bookingDetailStep;
-                            } else {
-                                if (oldBookingDetailStep.getStartTime()
-                                        .compareTo(bookingDetailStep.getStartTime()) > 0) {
-                                    checkIgnore = newBookingDetailId;
-                                    bookingDetailStepCheckList.add(bookingDetailStep);
-                                } else {
-                                    list.add(bookingDetailStep);
-                                    oldBookingDetailStep = bookingDetailStep;
-                                }
-                            }
-                        } else {
-                            if (oldBookingDetailId == newBookingDetailId) {
-                                list.add(bookingDetailStep);
-                            } else {
-                                if (oldBookingDetailStep.getStartTime().toLocalTime()
-                                        .isBefore(bookingDetailStep.getEndTime().toLocalTime())) {
-                                    bookingDetailStepCheckList.add(bookingDetailStep);
-                                } else {
-                                    list.add(bookingDetailStep);
-                                }
-                            }
-                            count++;
-                            checkIgnore = -1;
-                            newBookingDetailId = 0;
-                            map.put(count, list);
-                        }
-                    } else {
-                        bookingDetailStepCheckList.add(bookingDetailStep);
-                        if (bookingDetailStepDraftList.get(bookingDetailStepDraftList.size() - 1).equals(bookingDetailStep)) {
-                            count++;
-                            checkIgnore = -1;
-                            newBookingDetailId = 0;
-                            map.put(count, list);
-                        }
-                    }
-                }
-                if (bookingDetailStepCheckList.size() == 0) {
-                    checkFinish = true;
-                }
-            }
-            int check = countEmployee - count;
+            /*
+                Separate bookingDetailSteps into lists with incrementation time
+                and put into map
+            */
+            Map<Integer, List<BookingDetailStep>> map =
+                    supportFunctions.separateBookingDetailStepListAndPutIntoMap(bookingDetailSteps);
+            int check = countEmployee - map.size();
             List<String> timeBookingList = null;
             if (spaPackage.getType().equals(Type.ONESTEP)) {
                 SpaTreatment spaTreatment =
@@ -260,54 +200,9 @@ public class CustomerController {
                         supportFunctions.getBookTime(Constant.DURATION_OF_CONSULTATION, map, check);
             }
             if (timeBookingList.size() != 0) {
-                // Get BookingDetail Of Customer
-                List<BookingDetail> bookingDetails = bookingDetailService.findByCustomer(customerId);
-                List<BookingDetailStep> bookingDetailStepCustomerBooked = new ArrayList<>();
-                // Get BookingDetailStep by dateBooking and bookingDetail Id from list above
-                for (BookingDetail bookingDetail : bookingDetails) {
-                    List<BookingDetailStep> bookingDetailStepsCheck =
-                            bookingDetailStepService.findByBookingDetailIdAndDateBooking(bookingDetail.getId(),
-                                    Date.valueOf(dateBooking));
-                    bookingDetailStepCustomerBooked.addAll(bookingDetailStepsCheck);
-                }
-                List<String> timeShowList = new ArrayList<>();
-                List<String> timeRemoveList = new ArrayList<>();
-                for (BookingDetailStep bookingDetailStep : bookingDetailStepCustomerBooked) {
-                    Time startTime = bookingDetailStep.getStartTime();
-                    Time endTime = bookingDetailStep.getEndTime();
-                    Time nextTime = startTime;
-                    int min = nextTime.getMinutes();
-                    if(Math.abs(30-min)%15!=0){
-                        nextTime =
-                                Time.valueOf(nextTime.toLocalTime().plusMinutes(15 - (Math.abs(30-min)%15)));
-                    }
-                    boolean checkOver = false;
-                    if (timeRemoveList.size() == 0) {
-                        timeRemoveList.add(startTime.toString());
-                    } else {
-                        if(!supportFunctions.checkTimeExisted(nextTime.toString(),timeRemoveList)){
-                            timeRemoveList.add(nextTime.toString());
-                        }
-                    }
-                    while (checkOver == false) {
-                        nextTime = Time.valueOf(nextTime.toLocalTime()
-                                .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
-                        if(nextTime.compareTo(endTime)>0){
-                            checkOver = true;
-                        } else {
-                            if(!supportFunctions.checkTimeExisted(nextTime.toString(),timeRemoveList)){
-                                timeRemoveList.add(nextTime.toString());
-                            }
-                        }
-                    }
-                    checkOver = false;
-                }
-                for (String timeCheck : timeBookingList) {
-                    if(!supportFunctions.checkTimeExisted(timeCheck, timeRemoveList)){
-                        timeShowList.add(timeCheck);
-                    }
-                }
-                timeBookingList = timeShowList;
+                timeBookingList =
+                        supportFunctions.checkAndGetListTimeBooking(customerId,timeBookingList,
+                                dateBooking);
                 Page<String> page = new PageImpl<>(timeBookingList,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
                         timeBookingList.size());
@@ -315,8 +210,9 @@ public class CustomerController {
             }
             return ResponseHelper.ok(LoggingTemplate.NO_EMPLOYEE_FREE);
         } else {
-            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
         }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
     }
 
     @PostMapping("/userlocation/create")
@@ -446,7 +342,7 @@ public class CustomerController {
                 }
             }
             Booking booking = new Booking();
-            booking.setStatusBooking(StatusBooking.BOOKING);
+            booking.setStatusBooking(StatusBooking.PENDING);
             booking.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
             booking.setCustomer(customer);
             booking.setSpa(spa);
@@ -468,7 +364,7 @@ public class CustomerController {
                             bookingDetail.setBooking(bookingResult);
                             bookingDetail.setSpaPackage(spaTreatment.getSpaPackage());
                             bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
-                            bookingDetail.setStatusBooking(StatusBooking.BOOKING);
+                            bookingDetail.setStatusBooking(StatusBooking.PENDING);
                             bookingDetail.setSpaTreatment(spaTreatment);
                             bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                             bookingDetail.setType(spaTreatment.getSpaPackage().getType());
@@ -481,7 +377,7 @@ public class CustomerController {
                             for (int i = 0; i < treatmentServices.size(); i++) {
                                 BookingDetailStep bookingDetailStep = new BookingDetailStep();
                                 bookingDetailStep.setDateBooking(bookingData.getDateBooking());
-                                bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                                bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
                                 bookingDetailStep.setBookingPrice(treatmentServices.get(i)
                                         .getSpaService().getPrice());
                                 bookingDetailStep.setTreatmentService(treatmentServices.get(i));
@@ -521,7 +417,7 @@ public class CustomerController {
                                 bookingDetail.setBooking(bookingResult);
                                 bookingDetail.setSpaPackage(spaPackage);
                                 bookingDetail.setSpaTreatment(spaTreatment);
-                                bookingDetail.setStatusBooking(StatusBooking.BOOKING);
+                                bookingDetail.setStatusBooking(StatusBooking.PENDING);
                                 bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
                                 bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                                 bookingDetail.setType(Type.ONESTEP);
@@ -534,7 +430,7 @@ public class CustomerController {
                                 for (int i = 0; i < treatmentServices.size(); i++) {
                                     BookingDetailStep bookingDetailStep = new BookingDetailStep();
                                     bookingDetailStep.setDateBooking(bookingData.getDateBooking());
-                                    bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                                    bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
                                     bookingDetailStep.setTreatmentService(treatmentServices.get(i));
                                     bookingDetailStep.setBookingPrice(treatmentServices.get(i)
                                             .getSpaService().getPrice());
@@ -562,11 +458,11 @@ public class CustomerController {
                                 bookingDetail.setBooking(bookingResult);
                                 bookingDetail.setType(Type.MORESTEP);
                                 bookingDetail.setSpaPackage(spaPackage);
-                                bookingDetail.setStatusBooking(StatusBooking.BOOKING);
+                                bookingDetail.setStatusBooking(StatusBooking.PENDING);
                                 bookingDetailResultList.add(bookingDetail);
                                 BookingDetailStep bookingDetailStep = new BookingDetailStep();
                                 bookingDetailStep.setDateBooking(bookingData.getDateBooking());
-                                bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                                bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
                                 bookingDetailStep.setIsConsultation(IsConsultation.TRUE);
                                 bookingDetailStep.setBookingDetail(bookingDetail);
                                 bookingDetailStep.setStartTime(bookingData.getTimeBooking());
