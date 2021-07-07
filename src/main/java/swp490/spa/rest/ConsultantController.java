@@ -257,6 +257,18 @@ public class ConsultantController {
             bookingBeforeEdit = bookingDetailBeforeEdit.getBooking();
             Booking bookingEdit = bookingBeforeEdit;
             bookingEdit.setStatusBooking(StatusBooking.PENDING);
+            if(bookingEdit.getTotalTime()!=null) {
+                bookingEdit.setTotalTime(bookingEdit.getTotalTime() +
+                        bookingDetailRequest.getSpaTreatment().getTotalTime());
+            } else {
+                bookingEdit.setTotalTime(bookingDetailRequest.getSpaTreatment().getTotalTime());
+            }
+            if(bookingEdit.getTotalPrice()!=null) {
+                bookingEdit.setTotalPrice(bookingEdit.getTotalPrice() +
+                        bookingDetailRequest.getSpaTreatment().getTotalPrice());
+            } else {
+                bookingEdit.setTotalPrice(bookingDetailRequest.getSpaTreatment().getTotalPrice());
+            }
             BookingDetail bookingDetailEdit = bookingDetailBeforeEdit;
             bookingDetailEdit.setStatusBooking(StatusBooking.PENDING);
             Consultant consultant =
@@ -286,24 +298,24 @@ public class ConsultantController {
                     bookingDetailStepEditList.add(bookingDetailStep);
                 }
                 Booking bookingResult = bookingService.editBooking(bookingEdit);
-                if(Objects.nonNull(bookingResult)){
+                if (Objects.nonNull(bookingResult)) {
                     BookingDetail bookingDetailResult =
                             bookingDetailService.editBookingDetail(bookingDetailEdit);
-                    if(Objects.nonNull(bookingDetailResult)){
+                    if (Objects.nonNull(bookingDetailResult)) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailStepEditList) {
                             BookingDetailStep bookingDetailStepResult =
                                     bookingDetailStepService.insertBookingDetailStep(bookingDetailStep);
-                            if(Objects.isNull(bookingDetailStepResult)){
-                                if(bookingDetailStepResultList.size() == 0){
+                            if (Objects.isNull(bookingDetailStepResult)) {
+                                if (bookingDetailStepResultList.size() == 0) {
                                     bookingDetailService.editBookingDetail(bookingDetailBeforeEdit);
                                     bookingService.editBooking(bookingBeforeEdit);
                                 } else {
-                                    if(consultationContentList.size()!=0) {
+                                    if (consultationContentList.size() != 0) {
                                         for (ConsultationContent consultationContent : consultationContentList) {
                                             consultationContentService.removeDB(consultationContent.getId());
                                         }
                                     }
-                                    for (BookingDetailStep bookingDetailStepRemove: bookingDetailStepResultList) {
+                                    for (BookingDetailStep bookingDetailStepRemove : bookingDetailStepResultList) {
                                         bookingDetailStepService.removeDB(bookingDetailStepRemove.getId());
                                     }
                                 }
