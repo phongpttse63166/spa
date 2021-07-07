@@ -59,7 +59,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
             "((b.startTime < ?2 AND b.endTime > ?2) " +
             "OR (b.startTime < ?3 AND b.endTime > ?3) " +
             "OR (b.startTime < ?2 AND b.endTime > ?3) " +
-            "OR (b.startTime > ?2 AND b.endTime < ?3)) AND b.staff.user.id = ?4 " +
+            "OR (b.startTime > ?2 AND b.endTime < ?3)) AND b.consultant.user.id = ?4 " +
             "ORDER BY b.consultant.user.id ASC")
     List<BookingDetailStep> findByDateBookingAndStartEndTimeAndConsultantId(Date dateBooking,
                                                                             Time startTime,
