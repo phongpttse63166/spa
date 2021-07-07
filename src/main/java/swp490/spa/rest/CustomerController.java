@@ -336,10 +336,12 @@ public class CustomerController {
             for (BookingData bookingData : bookingDataList) {
                 spaPackageSearchResult = spaPackageService.findBySpaPackageId(bookingData.getPackageId());
                 if (Objects.nonNull(spaPackageSearchResult)) {
-                    spaPackageList.add(spaPackageSearchResult);
-                    spa = spaPackageSearchResult.getSpa();
-                    if (spaPackageSearchResult.getType().equals(Type.MORESTEP)) {
-                        isOnlyOneStep = false;
+                    if(!supportFunctions.checkSpaPackageExisted(spaPackageSearchResult, spaPackageList)) {
+                        spaPackageList.add(spaPackageSearchResult);
+                        spa = spaPackageSearchResult.getSpa();
+                        if (spaPackageSearchResult.getType().equals(Type.MORESTEP)) {
+                            isOnlyOneStep = false;
+                        }
                     }
                 }
             }
@@ -370,7 +372,6 @@ public class CustomerController {
                             bookingDetail.setSpaTreatment(spaTreatment);
                             bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                             bookingDetail.setType(spaTreatment.getSpaPackage().getType());
-                            bookingDetailResultList.add(bookingDetail);
                             List<TreatmentService> treatmentServices =
                                     new ArrayList<>(spaTreatment.getTreatmentServices());
                             Collections.sort(treatmentServices);
@@ -403,11 +404,15 @@ public class CustomerController {
                                 bookingDetailStep.setEndTime(endTime);
                                 bookingDetailStepResultList.add(bookingDetailStep);
                             }
+                            bookingDetail.addAllBookingDetailStep(bookingDetailStepResultList);
+                            bookingDetailStepResultList.clear();
+                            bookingDetailResultList.add(bookingDetail);
                         }
                     }
                 }
+                booking.addAllBookingDetail(bookingDetailResultList);
+                bookingDetailResultList.clear();
             } else {
-                bookingResult = booking;
                 for (BookingData bookingData : bookingDataList) {
                     for (SpaPackage spaPackage : spaPackageList) {
                         if (spaPackage.getId().equals(bookingData.getPackageId())) {
@@ -416,14 +421,13 @@ public class CustomerController {
                                         spaTreatmentService
                                                 .findTreatmentBySpaPackageIdWithTypeOneStep(spaPackage.getId());
                                 BookingDetail bookingDetail = new BookingDetail();
-                                bookingDetail.setBooking(bookingResult);
+                                bookingDetail.setBooking(booking);
                                 bookingDetail.setSpaPackage(spaPackage);
                                 bookingDetail.setSpaTreatment(spaTreatment);
                                 bookingDetail.setStatusBooking(StatusBooking.PENDING);
                                 bookingDetail.setTotalPrice(spaTreatment.getTotalPrice());
                                 bookingDetail.setTotalTime(spaTreatment.getTotalTime());
                                 bookingDetail.setType(Type.ONESTEP);
-                                bookingDetailResultList.add(bookingDetail);
                                 List<TreatmentService> treatmentServices =
                                         new ArrayList<>(spaTreatment.getTreatmentServices());
                                 Collections.sort(treatmentServices);
@@ -455,13 +459,15 @@ public class CustomerController {
                                     bookingDetailStep.setEndTime(endTime);
                                     bookingDetailStepResultList.add(bookingDetailStep);
                                 }
+                                bookingDetail.addAllBookingDetailStep(bookingDetailStepResultList);
+                                bookingDetailStepResultList.clear();
+                                bookingDetailResultList.add(bookingDetail);
                             } else {
                                 BookingDetail bookingDetail = new BookingDetail();
-                                bookingDetail.setBooking(bookingResult);
+                                bookingDetail.setBooking(booking);
                                 bookingDetail.setType(Type.MORESTEP);
                                 bookingDetail.setSpaPackage(spaPackage);
                                 bookingDetail.setStatusBooking(StatusBooking.PENDING);
-                                bookingDetailResultList.add(bookingDetail);
                                 BookingDetailStep bookingDetailStep = new BookingDetailStep();
                                 bookingDetailStep.setDateBooking(bookingData.getDateBooking());
                                 bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
@@ -473,69 +479,30 @@ public class CustomerController {
                                         .toLocalTime()
                                         .plusMinutes(Constant.DURATION_OF_CONSULTATION)));
                                 bookingDetailStepResultList.add(bookingDetailStep);
+                                bookingDetail.addAllBookingDetailStep(bookingDetailStepResultList);
+                                bookingDetailStepResultList.clear();
+                                bookingDetailResultList.add(bookingDetail);
                             }
                         }
                     }
                 }
+                booking.addAllBookingDetail(bookingDetailResultList);
+                bookingDetailResultList.clear();
             }
-            for (BookingDetailStep bookingDetailStep : bookingDetailStepResultList) {
-                Time endTime = bookingDetailStep.getEndTime();
-                if ((endTime.toLocalTime().isAfter(LocalTime.parse(Constant.TIME_START_RELAX))
-                        && endTime.toLocalTime().isBefore(LocalTime.parse(Constant.TIME_END_RELAX)))
-                        || endTime.toLocalTime().isAfter(LocalTime.parse(Constant.TIME_END_DATE))) {
-                    checkCanInsert = false;
+            for (BookingDetail bookingDetail : booking.getBookingDetails()) {
+                for (BookingDetailStep bookingDetailStep : bookingDetail.getBookingDetailSteps()) {
+                    Time endTime = bookingDetailStep.getEndTime();
+                    if ((endTime.toLocalTime().isAfter(LocalTime.parse(Constant.TIME_START_RELAX))
+                            && endTime.toLocalTime().isBefore(LocalTime.parse(Constant.TIME_END_RELAX)))
+                            || endTime.toLocalTime().isAfter(LocalTime.parse(Constant.TIME_END_DATE))) {
+                        checkCanInsert = false;
+                    }
                 }
             }
             if (checkCanInsert) {
-                Booking bookingInsert = bookingService.insertNewBooking(bookingResult);
-                if (Objects.nonNull(bookingInsert)) {
-                    for (BookingDetail bookingDetail : bookingDetailResultList) {
-                        BookingDetail bookingDetailCheck = bookingDetail;
-                        bookingDetail.setBooking(bookingInsert);
-                        BookingDetail bookingDetailInsert =
-                                bookingDetailService.insertBookingDetail(bookingDetail);
-                        if (Objects.nonNull(bookingDetailInsert)) {
-                            for (BookingDetailStep bookingDetailStep : bookingDetailStepResultList) {
-                                if (bookingDetailStep.getBookingDetail().equals(bookingDetailCheck)) {
-                                    bookingDetailStep.setBookingDetail(bookingDetailInsert);
-                                    BookingDetailStep bookingDetailStepInsert =
-                                            bookingDetailStepService
-                                                    .insertBookingDetailStep(bookingDetailStep);
-                                    if (Objects.isNull(bookingDetailStepInsert)) {
-                                        LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING_DETAIL_STEP));
-                                        // delete booking + bookingDetail + bookingDetailStep inserted
-                                        List<BookingDetail> bookingDetailDeleteList =
-                                                bookingDetailService
-                                                        .findByBooking(bookingDetailInsert.getId(),
-                                                                PageRequest.of(Constant.PAGE_DEFAULT,
-                                                                        Constant.SIZE_DEFAULT,
-                                                                        Sort.unsorted()))
-                                                        .toList();
-                                        for (BookingDetail bdd : bookingDetailDeleteList) {
-                                            List<BookingDetailStep> bookingDetailStepDeleteList =
-                                                    bookingDetailStepService
-                                                            .findByBookingDetail(bdd.getId(),
-                                                                    PageRequest.of(Constant.PAGE_DEFAULT,
-                                                                            Constant.SIZE_DEFAULT,
-                                                                            Sort.unsorted()))
-                                                            .toList();
-                                            for (BookingDetailStep bdsd : bookingDetailStepDeleteList) {
-                                                bookingDetailStepService.removeDB(bdsd.getId());
-                                            }
-                                            bookingDetailService.removeDB(bdd.getId());
-                                        }
-                                        bookingService.removeDB(bookingInsert.getId());
-                                        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING));
-                                    }
-                                }
-                            }
-                        } else {
-                            LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING_DETAIL));
-                        }
-                    }
+                Booking bookingInsert = bookingService.insertNewBooking(booking);
+                if(Objects.nonNull(bookingInsert)){
                     return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
-                } else {
-                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.BOOKING));
                 }
             } else {
                 return ResponseHelper.error(LoggingTemplate.BOOKING_OVERTIME);

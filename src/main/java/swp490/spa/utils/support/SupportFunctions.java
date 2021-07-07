@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import swp490.spa.entities.Booking;
 import swp490.spa.entities.BookingDetail;
 import swp490.spa.entities.BookingDetailStep;
+import swp490.spa.entities.SpaPackage;
 import swp490.spa.services.BookingDetailService;
 import swp490.spa.services.BookingDetailStepService;
 import swp490.spa.utils.support.templates.Constant;
@@ -436,15 +437,6 @@ public class SupportFunctions {
         return timeResult;
     }
 
-    public boolean checkTimeExisted(String time, List<String> timeResult) {
-        for (int i = 0; i < timeResult.size(); i++) {
-            if (timeResult.get(i).equalsIgnoreCase(time)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private int calculateTimeDuration(Time timeHigher, Time timeLower, int totalMin) {
         int mins = (int) (timeHigher.getTime() - timeLower.getTime()) / 60000;
         if (mins - totalMin >= 0) {
@@ -452,25 +444,6 @@ public class SupportFunctions {
             return result;
         }
         return -1;
-    }
-
-    public boolean checkBookingDetailExistedInList(BookingDetail bookingDetailCheck,
-                                                     List<BookingDetail> bookingDetails) {
-        for (BookingDetail bookingDetail : bookingDetails) {
-            if(bookingDetail.equals(bookingDetailCheck)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean checkBookingExistedInList(Booking booking, List<Booking> bookings) {
-        for (Booking bookingCheck : bookings) {
-            if(bookingCheck.equals(booking)){
-                return true;
-            }
-        }
-        return false;
     }
 
     public Map<Integer, List<BookingDetailStep>> separateBookingDetailStepListAndPutIntoMap(List<BookingDetailStep> bookingDetailSteps) {
@@ -593,5 +566,42 @@ public class SupportFunctions {
         }
         result = timeShowList;
         return result;
+    }
+
+    public boolean checkTimeExisted(String time, List<String> timeResult) {
+        for (int i = 0; i < timeResult.size(); i++) {
+            if (timeResult.get(i).equalsIgnoreCase(time)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkBookingDetailExistedInList(BookingDetail bookingDetailCheck,
+                                                   List<BookingDetail> bookingDetails) {
+        for (BookingDetail bookingDetail : bookingDetails) {
+            if(bookingDetail.equals(bookingDetailCheck)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkBookingExistedInList(Booking booking, List<Booking> bookings) {
+        for (Booking bookingCheck : bookings) {
+            if(bookingCheck.equals(booking)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkSpaPackageExisted(SpaPackage spaPackage, List<SpaPackage> spaPackageList) {
+        for (SpaPackage spaPackageCheck : spaPackageList) {
+            if(spaPackageCheck.equals(spaPackage)){
+                return true;
+            }
+        }
+        return false;
     }
 }

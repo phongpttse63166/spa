@@ -41,4 +41,8 @@ public class BookingDetail implements Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @JsonBackReference
     private List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
+
+    public void addAllBookingDetailStep(List<BookingDetailStep> bookingDetailStepList){
+        this.bookingDetailSteps.addAll(bookingDetailStepList);
+    }
 }

@@ -16,7 +16,7 @@ public class BookingService {
     BookingRepository bookingRepository;
 
     public Booking insertNewBooking(Booking booking) {
-        return bookingRepository.save(booking);
+        return bookingRepository.saveAndFlush(booking);
     }
 
     public Page<Booking> findByBookingStatusAndSpa(StatusBooking statusBooking,

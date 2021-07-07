@@ -10,9 +10,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -42,4 +40,8 @@ public class Booking implements Serializable {
     @OneToMany(cascade = CascadeType.ALL)
     @JsonBackReference
     private List<BookingDetail> bookingDetails = new ArrayList<>();
+
+    public void addAllBookingDetail(List<BookingDetail> bookingDetailList){
+        this.bookingDetails.addAll(bookingDetailList);
+    }
 }
