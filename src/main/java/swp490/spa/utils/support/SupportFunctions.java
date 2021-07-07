@@ -1,5 +1,7 @@
 package swp490.spa.utils.support;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import swp490.spa.entities.Booking;
 import swp490.spa.entities.BookingDetail;
@@ -12,23 +14,23 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.*;
 
+@Setter
+@Getter
 public class SupportFunctions {
     @Autowired
-    public BookingDetailStepService bookingDetailStepService;
+    private BookingDetailStepService bookingDetailStepService;
     @Autowired
-    public BookingDetailService bookingDetailService;
+    private BookingDetailService bookingDetailService;
 
     public SupportFunctions() {
     }
 
-    public SupportFunctions(BookingDetailStepService bookingDetailStepService,
-                            BookingDetailService bookingDetailService) {
-        this.bookingDetailStepService = bookingDetailStepService;
-        this.bookingDetailService = bookingDetailService;
-    }
-
     public void setBookingDetailStepService(BookingDetailStepService bookingDetailStepService) {
         this.bookingDetailStepService = bookingDetailStepService;
+    }
+
+    public void setBookingDetailService(BookingDetailService bookingDetailService) {
+        this.bookingDetailService = bookingDetailService;
     }
 
     public List<String> getBookTime(Integer totalTime, Map<Integer, List<BookingDetailStep>> map,
@@ -549,7 +551,8 @@ public class SupportFunctions {
         List<String> timeRemoveList = new ArrayList<>();
         boolean checkOver = false;
         // Get BookingDetail Of Customer
-        List<BookingDetail> bookingDetails = bookingDetailService.findByCustomer(customerId);
+        List<BookingDetail> bookingDetails =
+                bookingDetailService.findByCustomer(customerId);
         List<BookingDetailStep> bookingDetailStepCustomerBooked = new ArrayList<>();
         // Get BookingDetailStep by dateBooking and bookingDetail Id from list above
         for (BookingDetail bookingDetail : bookingDetails) {

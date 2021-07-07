@@ -128,6 +128,8 @@ public class CustomerController {
     public Response getListTimeBookingTest(@RequestParam Integer spaPackageId,
                                            @RequestParam String dateBooking,
                                            @RequestParam Integer customerId) {
+        supportFunctions.setBookingDetailService(bookingDetailService);
+        supportFunctions.setBookingDetailStepService(bookingDetailStepService);
         int countEmployee = 0;
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;
