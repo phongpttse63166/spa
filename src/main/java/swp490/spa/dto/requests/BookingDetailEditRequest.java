@@ -2,6 +2,7 @@ package swp490.spa.dto.requests;
 
 import lombok.*;
 import swp490.spa.entities.BookingDetail;
+import swp490.spa.entities.SpaTreatment;
 
 @Data
 @AllArgsConstructor
@@ -9,7 +10,8 @@ import swp490.spa.entities.BookingDetail;
 @Getter
 @Setter
 public class BookingDetailEditRequest {
-    private BookingDetail bookingDetail;
+    private Integer bookingDetailId;
+    private SpaTreatment spaTreatment;
     private String timeBooking;
     private String dateBooking;
     private Integer consultantId;

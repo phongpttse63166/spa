@@ -21,4 +21,8 @@ public class ConsultationContentService {
     public ConsultationContent findByConsultationContentId(Integer consultationContentId) {
         return this.consultationContentRepository.findById(consultationContentId).get();
     }
+
+    public void removeDB(Integer consultationContentId) {
+        this.consultationContentRepository.deleteById(consultationContentId);
+    }
 }

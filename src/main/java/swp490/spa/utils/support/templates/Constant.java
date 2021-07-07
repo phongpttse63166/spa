@@ -7,7 +7,7 @@ public class Constant {
     public static final int SIZE_MAX = 50;
     public static final String SEARCH_NO_CONTENT = "";
     // Spa's working
-    public static final String TIME_START_DATE = "08:00:00";
+    public static final String TIME_START_DATE = "08:30:00";
     public static final String TIME_END_DATE = "21:00:00";
     public static final String TIME_START_RELAX = "12:00:00";
     public static final String TIME_END_RELAX = "13:00:00";
