@@ -79,7 +79,7 @@ public class CustomerController {
         this.bookingDetailService = bookingDetailService;
         this.dateOffService = dateOffService;
         this.conversion = new Conversion();
-        this.supportFunctions = new SupportFunctions();
+        this.supportFunctions = new SupportFunctions(bookingDetailStepService, bookingDetailService);
     }
 
     @GetMapping("/search/{userId}")
@@ -128,8 +128,8 @@ public class CustomerController {
     public Response getListTimeBookingTest(@RequestParam Integer spaPackageId,
                                            @RequestParam String dateBooking,
                                            @RequestParam Integer customerId) {
-        supportFunctions.setBookingDetailService(bookingDetailService);
-        supportFunctions.setBookingDetailStepService(bookingDetailStepService);
+//        supportFunctions.setBookingDetailService(bookingDetailService);
+//        supportFunctions.setBookingDetailStepService(bookingDetailStepService);
         int countEmployee = 0;
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;

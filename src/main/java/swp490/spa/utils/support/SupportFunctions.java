@@ -14,8 +14,6 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.*;
 
-@Setter
-@Getter
 public class SupportFunctions {
     @Autowired
     private BookingDetailStepService bookingDetailStepService;
@@ -25,11 +23,9 @@ public class SupportFunctions {
     public SupportFunctions() {
     }
 
-    public void setBookingDetailStepService(BookingDetailStepService bookingDetailStepService) {
+    public SupportFunctions(BookingDetailStepService bookingDetailStepService,
+                            BookingDetailService bookingDetailService) {
         this.bookingDetailStepService = bookingDetailStepService;
-    }
-
-    public void setBookingDetailService(BookingDetailService bookingDetailService) {
         this.bookingDetailService = bookingDetailService;
     }
 
