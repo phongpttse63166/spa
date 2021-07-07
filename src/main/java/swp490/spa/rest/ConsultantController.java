@@ -251,24 +251,26 @@ public class ConsultantController {
         List<BookingDetailStep> bookingDetailStepEditList = new ArrayList<>();
         List<BookingDetailStep> bookingDetailStepResultList = new ArrayList<>();
         List<ConsultationContent> consultationContentList = new ArrayList<>();
+        Integer totalTime = 0;
+        Double totalPrice = 0.0;
         BookingDetail bookingDetailBeforeEdit =
                 bookingDetailService.findByBookingDetailId(bookingDetailRequest.getBookingDetailId());
         if (Objects.nonNull(bookingDetailBeforeEdit)) {
             bookingBeforeEdit = bookingDetailBeforeEdit.getBooking();
             Booking bookingEdit = bookingBeforeEdit;
             bookingEdit.setStatusBooking(StatusBooking.PENDING);
-            if(bookingEdit.getTotalTime()!=null) {
-                bookingEdit.setTotalTime(bookingEdit.getTotalTime() +
-                        bookingDetailRequest.getSpaTreatment().getTotalTime());
-            } else {
-                bookingEdit.setTotalTime(bookingDetailRequest.getSpaTreatment().getTotalTime());
+            List<BookingDetail> bookingDetails =
+                    bookingDetailService.findByBooking(bookingBeforeEdit.getId(),
+                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                            .getContent();
+            for (BookingDetail bookingDetail : bookingDetails) {
+                if (bookingDetail.getTotalPrice() != null && bookingDetail.getTotalTime() != null) {
+                    totalPrice += bookingDetail.getTotalPrice();
+                    totalTime += bookingDetail.getTotalTime();
+                }
             }
-            if(bookingEdit.getTotalPrice()!=null) {
-                bookingEdit.setTotalPrice(bookingEdit.getTotalPrice() +
-                        bookingDetailRequest.getSpaTreatment().getTotalPrice());
-            } else {
-                bookingEdit.setTotalPrice(bookingDetailRequest.getSpaTreatment().getTotalPrice());
-            }
+            bookingEdit.setTotalPrice(totalPrice+ bookingDetailRequest.getSpaTreatment().getTotalPrice());
+            bookingEdit.setTotalTime(totalTime+ bookingDetailRequest.getSpaTreatment().getTotalTime());
             BookingDetail bookingDetailEdit = bookingDetailBeforeEdit;
             bookingDetailEdit.setStatusBooking(StatusBooking.PENDING);
             Consultant consultant =
