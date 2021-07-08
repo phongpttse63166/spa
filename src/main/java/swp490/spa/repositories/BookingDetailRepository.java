@@ -17,4 +17,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
                                                                                Pageable pageable);
 
     List<BookingDetail> findByBooking_Customer_User_Id(Integer customerId);
+
+    List<BookingDetail> findByBooking_Customer_User_IdAndBooking_Spa_IdOrderById(Integer customerId,
+                                                                        Integer spaId);
 }

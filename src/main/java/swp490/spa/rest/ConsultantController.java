@@ -364,4 +364,87 @@ public class ConsultantController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
     }
+
+    @GetMapping("/getListCustomerOfConsultant/{consultantId}")
+    public Response getListCustomerOfConsultant(@PathVariable Integer consultantId){
+        List<User> userList = new ArrayList<>();
+        List<Booking> bookings = new ArrayList<>();
+        List<BookingDetail> bookingDetails = new ArrayList<>();
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findByConsultantIdAndStatusBookingPendingBooking(consultantId);
+        if(Objects.nonNull(bookingDetailSteps)) {
+            for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+                if (bookingDetails.size() == 0) {
+                    bookingDetails.add(bookingDetail);
+                } else {
+                    if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)) {
+                        bookingDetails.add(bookingDetail);
+                    }
+                }
+            }
+            for (BookingDetail bookingDetail : bookingDetails) {
+                Booking booking = bookingDetail.getBooking();
+                if (bookings.size() == 0) {
+                    bookings.add(booking);
+                } else {
+                    if (!supportFunctions.checkBookingExistedInList(booking, bookings)) {
+                        bookings.add(booking);
+                    }
+                }
+            }
+            for (Booking booking : bookings) {
+                User customer = booking.getCustomer().getUser();
+                if (userList.size() == 0) {
+                    userList.add(customer);
+                } else {
+                    if (!supportFunctions.checkUserExistedInList(customer, userList)) {
+                        userList.add(customer);
+                    }
+                }
+            }
+            Page result = new PageImpl(userList,
+                    PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
+                    userList.size());
+            return ResponseHelper.ok(result);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CUSTOMER));
+    }
+
+    @GetMapping("/bookingDetail/findByCustomerAndConsultant/{customerId}/{consultantId}")
+    public Response findBookingDetailByCustomerAndConsultant(@PathVariable Integer customerId,
+                                                             @PathVariable Integer consultantId){
+        List<BookingDetail> bookingDetailResult = new ArrayList<>();
+        Consultant consultant = consultantService.findByConsultantId(consultantId);
+        if(Objects.nonNull(consultant)) {
+            List<BookingDetail> bookingDetails = bookingDetailService
+                    .findByCustomerAndSpa(customerId, consultant.getSpa().getId());
+            for (BookingDetail bookingDetail : bookingDetails) {
+                List<BookingDetailStep> bookingDetailStepCheck =
+                        bookingDetail.getBookingDetailSteps();
+                for (BookingDetailStep bookingDetailStep : bookingDetailStepCheck) {
+                    if(bookingDetailStep.getConsultant()!=null) {
+                        if (bookingDetailStep.getConsultant().equals(consultant)) {
+                            if (bookingDetailResult.size() == 0) {
+                                bookingDetailResult.add(bookingDetail);
+                            } else {
+                                if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetailResult)) {
+                                    bookingDetailResult.add(bookingDetail);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Page<BookingDetail> page = new PageImpl<>(bookingDetailResult,
+                    PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
+                    bookingDetailResult.size());
+            return ResponseHelper.ok(page);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+    }
 }

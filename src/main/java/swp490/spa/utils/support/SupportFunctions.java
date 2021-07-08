@@ -3,10 +3,7 @@ package swp490.spa.utils.support;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import swp490.spa.entities.Booking;
-import swp490.spa.entities.BookingDetail;
-import swp490.spa.entities.BookingDetailStep;
-import swp490.spa.entities.SpaPackage;
+import swp490.spa.entities.*;
 import swp490.spa.services.BookingDetailService;
 import swp490.spa.services.BookingDetailStepService;
 import swp490.spa.utils.support.templates.Constant;
@@ -599,6 +596,15 @@ public class SupportFunctions {
     public boolean checkSpaPackageExisted(SpaPackage spaPackage, List<SpaPackage> spaPackageList) {
         for (SpaPackage spaPackageCheck : spaPackageList) {
             if(spaPackageCheck.equals(spaPackage)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkUserExistedInList(User customer, List<User> userList) {
+        for (User userCheck : userList) {
+            if(userCheck.equals(customer)){
                 return true;
             }
         }

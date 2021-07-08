@@ -96,4 +96,9 @@ public class BookingDetailStepService {
         return this.bookingDetailStepRepository
                 .findByDateBookingAndStartEndTimeAndConsultantId(dateBooking,startTime,endTime,consultantId);
     }
+
+    public List<BookingDetailStep> findByConsultantIdAndStatusBookingPendingBooking(Integer consultantId) {
+        return this.bookingDetailStepRepository.findByConsultantAndStatusBooking(consultantId,
+                StatusBooking.PENDING,StatusBooking.BOOKING);
+    }
 }
