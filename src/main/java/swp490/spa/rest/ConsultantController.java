@@ -1,6 +1,5 @@
 package swp490.spa.rest;
 
-import javassist.bytecode.Bytecode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import swp490.spa.utils.support.templates.LoggingTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalTime;
 import java.util.*;
 
 @RestController
