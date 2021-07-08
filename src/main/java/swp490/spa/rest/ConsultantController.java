@@ -246,7 +246,7 @@ public class ConsultantController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
     }
 
-    @PostMapping("/bookingdetailstep/addtreatment")
+    @PutMapping("/bookingdetailstep/addtreatment")
     public Response editBookingDetail(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
         Booking bookingBeforeEdit;
         BookingDetail bookingDetailEdit = null;
