@@ -11,7 +11,7 @@ import swp490.spa.entities.SpaTreatment;
 @Setter
 public class BookingDetailEditRequest {
     private Integer bookingDetailId;
-    private SpaTreatment spaTreatment;
+    private Integer spaTreatmentId;
     private String timeBooking;
     private String dateBooking;
     private Integer consultantId;

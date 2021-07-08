@@ -1,5 +1,6 @@
 package swp490.spa.rest;
 
+import javassist.bytecode.Bytecode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -248,35 +249,45 @@ public class ConsultantController {
     @PostMapping("/bookingdetailstep/addtreatment")
     public Response editBookingDetail(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
         Booking bookingBeforeEdit;
+        BookingDetail bookingDetailEdit = null;
         List<BookingDetailStep> bookingDetailStepEditList = new ArrayList<>();
-        List<BookingDetailStep> bookingDetailStepResultList = new ArrayList<>();
         List<ConsultationContent> consultationContentList = new ArrayList<>();
+        List<ConsultationContent> consultationContentResultList = new ArrayList<>();
+        boolean checkFinish = true;
         Integer totalTime = 0;
         Double totalPrice = 0.0;
+        //Get Booking to edit
         BookingDetail bookingDetailBeforeEdit =
                 bookingDetailService.findByBookingDetailId(bookingDetailRequest.getBookingDetailId());
         if (Objects.nonNull(bookingDetailBeforeEdit)) {
             bookingBeforeEdit = bookingDetailBeforeEdit.getBooking();
-            Booking bookingEdit = bookingBeforeEdit;
-            bookingEdit.setStatusBooking(StatusBooking.PENDING);
-            List<BookingDetail> bookingDetails =
-                    bookingDetailService.findByBooking(bookingBeforeEdit.getId(),
-                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-                            .getContent();
-            for (BookingDetail bookingDetail : bookingDetails) {
+            // Get totalPrice and totalTime from another booking detail
+            for (BookingDetail bookingDetail : bookingBeforeEdit.getBookingDetails()) {
                 if (bookingDetail.getTotalPrice() != null && bookingDetail.getTotalTime() != null) {
                     totalPrice += bookingDetail.getTotalPrice();
                     totalTime += bookingDetail.getTotalTime();
                 }
+                if (bookingDetail.getBookingDetailSteps().size() == 1) {
+                    bookingDetailEdit = bookingDetail;
+                }
             }
-            bookingEdit.setTotalPrice(totalPrice+ bookingDetailRequest.getSpaTreatment().getTotalPrice());
-            bookingEdit.setTotalTime(totalTime+ bookingDetailRequest.getSpaTreatment().getTotalTime());
-            BookingDetail bookingDetailEdit = bookingDetailBeforeEdit;
+            // Get SpaTreatment to get price And time from Treatment chosen
+            // and setting bookingDetailEdit
+            SpaTreatment spaTreatment =
+                    spaTreatmentService.findByTreatmentId(bookingDetailRequest.getSpaTreatmentId());
+            totalPrice += spaTreatment.getTotalPrice();
+            totalTime += spaTreatment.getTotalTime();
+            bookingBeforeEdit.setTotalPrice(totalPrice);
+            bookingBeforeEdit.setTotalTime(totalTime);
             bookingDetailEdit.setStatusBooking(StatusBooking.PENDING);
+            bookingDetailEdit.setTotalPrice(spaTreatment.getTotalPrice());
+            bookingDetailEdit.setTotalTime(spaTreatment.getTotalTime());
+            bookingDetailEdit.setSpaTreatment(spaTreatment);
+            // Get consultant to set into bookingDetailStep
             Consultant consultant =
                     consultantService.findByConsultantId(bookingDetailRequest.getConsultantId());
             if (Objects.nonNull(consultant)) {
-                SpaTreatment spaTreatment = bookingDetailRequest.getSpaTreatment();
+                // for TreatmentService - get Service to prepare list booking detail step
                 List<TreatmentService> treatmentServiceList =
                         new ArrayList<>(spaTreatment.getTreatmentServices());
                 Collections.sort(treatmentServiceList);
@@ -299,46 +310,56 @@ public class ConsultantController {
                     bookingDetailStep.setBookingDetail(bookingDetailEdit);
                     bookingDetailStepEditList.add(bookingDetailStep);
                 }
-                Booking bookingResult = bookingService.editBooking(bookingEdit);
-                if (Objects.nonNull(bookingResult)) {
-                    BookingDetail bookingDetailResult =
-                            bookingDetailService.editBookingDetail(bookingDetailEdit);
-                    if (Objects.nonNull(bookingDetailResult)) {
-                        for (BookingDetailStep bookingDetailStep : bookingDetailStepEditList) {
-                            BookingDetailStep bookingDetailStepResult =
-                                    bookingDetailStepService.insertBookingDetailStep(bookingDetailStep);
-                            if (Objects.isNull(bookingDetailStepResult)) {
-                                if (bookingDetailStepResultList.size() == 0) {
-                                    bookingDetailService.editBookingDetail(bookingDetailBeforeEdit);
-                                    bookingService.editBooking(bookingBeforeEdit);
-                                } else {
-                                    if (consultationContentList.size() != 0) {
-                                        for (ConsultationContent consultationContent : consultationContentList) {
-                                            consultationContentService.removeDB(consultationContent.getId());
-                                        }
-                                    }
-                                    for (BookingDetailStep bookingDetailStepRemove : bookingDetailStepResultList) {
-                                        bookingDetailStepService.removeDB(bookingDetailStepRemove.getId());
-                                    }
-                                }
-                            } else {
-                                bookingDetailStepResultList.add(bookingDetailStepResult);
+                bookingDetailEdit.getBookingDetailSteps().addAll(bookingDetailStepEditList);
+            }
+            // set bookingDetail into booking before insert
+            for (BookingDetail bookingDetail : bookingBeforeEdit.getBookingDetails()) {
+                if (bookingDetail.getBookingDetailSteps().size() == 1) {
+                    bookingDetail = bookingDetailEdit;
+                }
+            }
+            Booking bookingResult = bookingService.editBookingByAddTreatment(bookingBeforeEdit);
+            if (Objects.nonNull(bookingResult)) {
+                // Create consultation content base on bookingDetailStep created
+                for (BookingDetail bookingDetail : bookingResult.getBookingDetails()) {
+                    if (bookingDetail.getType().equals(Type.MORESTEP)) {
+                        for (BookingDetailStep bookingDetailStep : bookingDetail.getBookingDetailSteps()) {
+                            if(bookingDetailStep.getIsConsultation().equals(IsConsultation.FALSE)) {
                                 ConsultationContent consultationContent = new ConsultationContent();
-                                consultationContent.setBookingDetailStep(bookingDetailStepResult);
-                                consultationContent =
-                                        consultationContentService.insertNewConsultationContent(consultationContent);
+                                consultationContent.setBookingDetailStep(bookingDetailStep);
                                 consultationContentList.add(consultationContent);
+                                ConsultationContent result =
+                                        consultationContentService.insertNewConsultationContent(consultationContent);
+                                if (result == null) {
+                                    LOGGER.error(String.format(LoggingTemplate.INSERT_FAILED,
+                                            Constant.CONSULTATION_CONTENT));
+                                    checkFinish = false;
+                                } else {
+                                    consultationContentResultList.add(result);
+                                }
                             }
                         }
-                    } else {
-                        LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
                     }
-                } else {
-                    LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING));
                 }
-                return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.BOOKING_DETAIL));
+            }
+            if (!checkFinish) {
+                for (ConsultationContent consultationContent : consultationContentResultList) {
+                    consultationContentService.removeDB(consultationContent.getId());
+                }
+                for (ConsultationContent consultationContent : consultationContentList) {
+                    consultationContentService.insertNewConsultationContent(consultationContent);
+                }
             } else {
-                LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+                for (ConsultationContent consultationContent : consultationContentResultList) {
+                    BookingDetailStep bookingDetailStep = consultationContent.getBookingDetailStep();
+                    bookingDetailStep.setConsultationContent(consultationContent);
+                    if(Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep))){
+                        LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED,
+                                Constant.BOOKING_DETAIL_STEP));
+                    }
+                }
+                return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
+                        Constant.BOOKING_DETAIL_TREATMENT));
             }
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));

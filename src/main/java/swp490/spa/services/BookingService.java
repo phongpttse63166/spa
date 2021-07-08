@@ -41,4 +41,8 @@ public class BookingService {
     public List<Booking> findByCustomerId(Integer customerId) {
         return this.bookingRepository.findByCustomer_User_Id(customerId);
     }
+
+    public Booking editBookingByAddTreatment(Booking bookingBeforeEdit) {
+        return this.bookingRepository.saveAndFlush(bookingBeforeEdit);
+    }
 }
