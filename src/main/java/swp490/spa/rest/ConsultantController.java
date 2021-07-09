@@ -265,7 +265,8 @@ public class ConsultantController {
                     totalPrice += bookingDetail.getTotalPrice();
                     totalTime += bookingDetail.getTotalTime();
                 }
-                if (bookingDetail.getBookingDetailSteps().size() == 1) {
+                if (bookingDetail.getBookingDetailSteps().size() == 1
+                        && bookingDetailBeforeEdit.getId().equals(bookingDetail.getId())) {
                     bookingDetailEdit = bookingDetail;
                 }
             }
@@ -322,7 +323,7 @@ public class ConsultantController {
                 for (BookingDetail bookingDetail : bookingResult.getBookingDetails()) {
                     if (bookingDetail.getType().equals(Type.MORESTEP)) {
                         for (BookingDetailStep bookingDetailStep : bookingDetail.getBookingDetailSteps()) {
-                            if(bookingDetailStep.getIsConsultation().equals(IsConsultation.FALSE)) {
+                            if (bookingDetailStep.getIsConsultation().equals(IsConsultation.FALSE)) {
                                 ConsultationContent consultationContent = new ConsultationContent();
                                 consultationContent.setBookingDetailStep(bookingDetailStep);
                                 consultationContentList.add(consultationContent);
@@ -351,7 +352,7 @@ public class ConsultantController {
                 for (ConsultationContent consultationContent : consultationContentResultList) {
                     BookingDetailStep bookingDetailStep = consultationContent.getBookingDetailStep();
                     bookingDetailStep.setConsultationContent(consultationContent);
-                    if(Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep))){
+                    if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep))) {
                         LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED,
                                 Constant.BOOKING_DETAIL_STEP));
                     }
@@ -366,13 +367,13 @@ public class ConsultantController {
     }
 
     @GetMapping("/getListCustomerOfConsultant/{consultantId}")
-    public Response getListCustomerOfConsultant(@PathVariable Integer consultantId){
+    public Response getListCustomerOfConsultant(@PathVariable Integer consultantId) {
         List<User> userList = new ArrayList<>();
         List<Booking> bookings = new ArrayList<>();
         List<BookingDetail> bookingDetails = new ArrayList<>();
         List<BookingDetailStep> bookingDetailSteps =
                 bookingDetailStepService.findByConsultantIdAndStatusBookingPendingBooking(consultantId);
-        if(Objects.nonNull(bookingDetailSteps)) {
+        if (Objects.nonNull(bookingDetailSteps)) {
             for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                 BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
                 if (bookingDetails.size() == 0) {
@@ -415,17 +416,17 @@ public class ConsultantController {
 
     @GetMapping("/bookingDetail/findByCustomerAndConsultant/{customerId}/{consultantId}")
     public Response findBookingDetailByCustomerAndConsultant(@PathVariable Integer customerId,
-                                                             @PathVariable Integer consultantId){
+                                                             @PathVariable Integer consultantId) {
         List<BookingDetail> bookingDetailResult = new ArrayList<>();
         Consultant consultant = consultantService.findByConsultantId(consultantId);
-        if(Objects.nonNull(consultant)) {
+        if (Objects.nonNull(consultant)) {
             List<BookingDetail> bookingDetails = bookingDetailService
                     .findByCustomerAndSpa(customerId, consultant.getSpa().getId());
             for (BookingDetail bookingDetail : bookingDetails) {
                 List<BookingDetailStep> bookingDetailStepCheck =
                         bookingDetail.getBookingDetailSteps();
                 for (BookingDetailStep bookingDetailStep : bookingDetailStepCheck) {
-                    if(bookingDetailStep.getConsultant()!=null) {
+                    if (bookingDetailStep.getConsultant() != null) {
                         if (bookingDetailStep.getConsultant().equals(consultant)) {
                             if (bookingDetailResult.size() == 0) {
                                 bookingDetailResult.add(bookingDetail);
