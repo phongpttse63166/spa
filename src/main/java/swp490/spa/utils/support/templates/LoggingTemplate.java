@@ -1,5 +1,7 @@
 package swp490.spa.utils.support.templates;
 
+import org.springframework.data.domain.Page;
+
 public class LoggingTemplate {
     public static final String USER_EXISTED = "Đã có tài khoản";
     public static final String REGISTER_SUCCESS = "Đăng kí thành công";
@@ -25,4 +27,6 @@ public class LoggingTemplate {
 
 
     public static final String EMPLOYEE_EXISTED = "Đã xếp nhân viên cho dich vụ";
+    public static final String BOOKING_SERVICE_EXISTED = "Có lịch booking";
+    public static final String CONSULTANT_DATE_OFF = "Consultant xin nghỉ ngày %s";
 }

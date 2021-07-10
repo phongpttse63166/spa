@@ -44,12 +44,11 @@ public class BookingDetailStepService {
         this.bookingDetailStepRepository.deleteById(bookingDetailStepId);
     }
 
-    public Page<BookingDetailStep> findByDateBookingAndIsConsultation(Date dateBooking,
-                                                                      IsConsultation isConsultation,
-                                                                      Pageable pageable) {
+    public List<BookingDetailStep> findByDateBookingAndIsConsultationAndSpa(Date dateBooking,
+                                                                            IsConsultation isConsultation,
+                                                                            Integer spaId) {
         return this.bookingDetailStepRepository
-                .findByDateBookingAndIsConsultationOrderByBookingDetailAscStartTimeAsc(dateBooking,
-                        isConsultation, pageable);
+                .findByDateBookingAndIsConsultationAndSpa(dateBooking, isConsultation, spaId);
     }
 
     public Page<BookingDetailStep> findByStaffIdAndDateBooking(Integer staffId,
@@ -100,5 +99,23 @@ public class BookingDetailStepService {
     public List<BookingDetailStep> findByConsultantIdAndStatusBookingPendingBooking(Integer consultantId) {
         return this.bookingDetailStepRepository.findByConsultantAndStatusBooking(consultantId,
                 StatusBooking.PENDING,StatusBooking.BOOKING);
+    }
+
+    public List<BookingDetailStep> findByDateBookingAndConsultant(Date dateBooking, Integer consultantId) {
+        return this.bookingDetailStepRepository
+                .findByDateBookingAndConsultant_User_Id(dateBooking, consultantId);
+    }
+
+    public List<BookingDetailStep> findByDateBookingAndStaff(Date dateBooking, Integer staffId) {
+        return this.bookingDetailStepRepository
+                .findByDateBookingAndStaff_User_Id(dateBooking, staffId);
+    }
+
+    public List<BookingDetailStep> findByDateBookingAndStartEndTimeAndSpa(Date dateBooking,
+                                                                          Time startTime,
+                                                                          Time endTime,
+                                                                          Integer spaId) {
+        return this.bookingDetailStepRepository.findByDateBookingAndStartEndTimeAndSpa
+        (dateBooking,startTime,endTime,spaId,IsConsultation.FALSE);
     }
 }

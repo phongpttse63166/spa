@@ -29,9 +29,12 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
 
     Page<BookingDetailStep> findByBookingDetail_IdOrderById(Integer bookingDetailId, Pageable pageable);
 
-    Page<BookingDetailStep> findByDateBookingAndIsConsultationOrderByBookingDetailAscStartTimeAsc(Date dateBooking,
-                                                                                                  IsConsultation isConsultation,
-                                                                                                  Pageable pageable);
+    @Query("FROM BookingDetailStep b WHERE b.dateBooking = ?1 AND b.isConsultation = ?2 " +
+            "AND b.bookingDetail.booking.spa.id = ?3 " +
+            "ORDER BY b.bookingDetail.id ASC, b.startTime ASC")
+    List<BookingDetailStep> findByDateBookingAndIsConsultationAndSpa(Date dateBooking,
+                                                                     IsConsultation isConsultation,
+                                                                     Integer spaId);
 
     Page<BookingDetailStep> findByStaff_IdAndDateBookingOrderByStartTimeAsc(Integer staffId,
                                                                             Date dateBooking,
@@ -70,4 +73,18 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     List<BookingDetailStep> findByConsultantAndStatusBooking(Integer consultantId,
                                                              StatusBooking status1,
                                                              StatusBooking status2);
+
+    List<BookingDetailStep> findByDateBookingAndConsultant_User_Id(Date dateBooking,
+                                                                   Integer consultantId);
+
+    List<BookingDetailStep> findByDateBookingAndStaff_User_Id(Date dateBooking, Integer staffId);
+
+    @Query("FROM BookingDetailStep b WHERE b.dateBooking = ?1 AND " +
+            "((b.startTime <= ?2 AND b.endTime >= ?2) " +
+            "OR (b.startTime >= ?2 AND b.endTime <= ?3) " +
+            "OR (b.startTime <= ?2 AND b.endTime >= ?3)) AND " +
+            "b.bookingDetail.booking.spa.id = ?4 AND b.isConsultation = ?5 ORDER BY b.id")
+    List<BookingDetailStep> findByDateBookingAndStartEndTimeAndSpa(Date dateBooking, Time startTime,
+                                                                   Time endTime, Integer spaId,
+                                                                   IsConsultation value);
 }

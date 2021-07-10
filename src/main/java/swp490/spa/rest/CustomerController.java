@@ -125,17 +125,15 @@ public class CustomerController {
     }
 
     @GetMapping("/getlisttimebook")
-    public Response getListTimeBookingTest(@RequestParam Integer spaPackageId,
-                                           @RequestParam String dateBooking,
-                                           @RequestParam Integer customerId) {
-//        supportFunctions.setBookingDetailService(bookingDetailService);
-//        supportFunctions.setBookingDetailStepService(bookingDetailStepService);
+    public Response getListTimeBookingForCustomer(@RequestParam Integer spaPackageId,
+                                                  @RequestParam String dateBooking,
+                                                  @RequestParam Integer customerId) {
         int countEmployee = 0;
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;
         List<Consultant> consultants = null;
         List<BookingDetailStep> bookingDetailSteps = null;
-        // Get List Staff or List Consultant and All Booking Detail Step List
+        // Check list dateOff and get List Staff or List Consultant and All Booking Detail Step List
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
         if (Objects.nonNull(spaPackage)) {
             dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
@@ -157,10 +155,8 @@ public class CustomerController {
                 staffs.removeAll(staffDateOff);
                 countEmployee = staffs.size();
                 bookingDetailSteps = bookingDetailStepService
-                        .findByDateBookingAndIsConsultation(Date.valueOf(dateBooking),
-                                IsConsultation.FALSE,
-                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
-                        .getContent();
+                        .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
+                                IsConsultation.FALSE, spaPackage.getSpa().getId());
             } else {
                 consultants =
                         consultantService.findBySpaId(spaPackage.getSpa().getId());
@@ -179,10 +175,8 @@ public class CustomerController {
                 consultants.removeAll(consultantDateOff);
                 countEmployee = consultants.size();
                 bookingDetailSteps = bookingDetailStepService
-                        .findByDateBookingAndIsConsultation(Date.valueOf(dateBooking),
-                                IsConsultation.TRUE,
-                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
-                        .getContent();
+                        .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
+                                IsConsultation.TRUE, spaPackage.getSpa().getId());
             }
             /*
                 Separate bookingDetailSteps into lists with incrementation time

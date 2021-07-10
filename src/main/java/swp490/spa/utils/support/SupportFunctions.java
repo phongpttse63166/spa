@@ -610,4 +610,14 @@ public class SupportFunctions {
         }
         return false;
     }
+
+    public boolean checkBookingDetailStepExisted(BookingDetailStep bookingDetailStep,
+                                                 List<BookingDetailStep> bookingDetailSteps) {
+        for (BookingDetailStep bookingDetailStepCheck : bookingDetailSteps) {
+            if(bookingDetailStepCheck.equals(bookingDetailStep)){
+                return true;
+            }
+        }
+        return false;
+    }
 }

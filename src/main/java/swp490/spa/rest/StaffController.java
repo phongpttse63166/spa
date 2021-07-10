@@ -87,22 +87,21 @@ public class StaffController {
         }
     }
 
-    @PostMapping("/dateoff/create")
-    public Response insertNewDateOff(@RequestBody List<DateOff> dateOffList){
-        List<DateOff> dateOffs = new ArrayList<>();
-        DateOff dateOffResult = null;
-        for (DateOff dateOff : dateOffList) {
-            dateOffResult = dateOffService.insertNewDateOff(dateOff);
-            if (Objects.isNull(dateOffResult)) {
-                for (DateOff dateOffRemove : dateOffs) {
-                    dateOffService.removeDateOff(dateOffRemove.getId());
-                }
-                return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.DATE_OFF));
-            } else {
-                dateOffs.add(dateOff);
+    @PostMapping("/dateoff/create/{staffId}")
+    public Response insertNewDateOff(@PathVariable Integer staffId,
+                                     @RequestBody DateOff dateOff) {
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findByDateBookingAndStaff(dateOff.getDateOff(),
+                        staffId);
+        if (bookingDetailSteps.size() == 0) {
+            DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);
+            if(Objects.nonNull(dateOffResult)){
+                return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
             }
+        } else {
+            return ResponseHelper.error(String.format(LoggingTemplate.BOOKING_SERVICE_EXISTED));
         }
-        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.DATE_OFF));
     }
 
     @GetMapping("/workingofstaff/findbydatechosen/{staffId}")

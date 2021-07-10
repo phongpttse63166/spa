@@ -62,7 +62,7 @@ public class ConsultantController {
         this.spaTreatmentService = spaTreatmentService;
         this.consultationContentService = consultationContentService;
         this.conversion = new Conversion();
-        this.supportFunctions = new SupportFunctions();
+        this.supportFunctions = new SupportFunctions(bookingDetailStepService, bookingDetailService);
     }
 
     @PutMapping("/editpassword")
@@ -79,22 +79,21 @@ public class ConsultantController {
         }
     }
 
-    @PostMapping("/dateoff/create")
-    public Response insertNewDateOff(@RequestBody List<DateOff> dateOffList) {
-        List<DateOff> dateOffs = new ArrayList<>();
-        DateOff dateOffResult = null;
-        for (DateOff dateOff : dateOffList) {
-            dateOffResult = dateOffService.insertNewDateOff(dateOff);
-            if (Objects.isNull(dateOffResult)) {
-                for (DateOff dateOffRemove : dateOffs) {
-                    dateOffService.removeDateOff(dateOffRemove.getId());
-                }
-                return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.DATE_OFF));
-            } else {
-                dateOffs.add(dateOff);
+    @PostMapping("/dateoff/create/{consultantId}")
+    public Response insertNewDateOff(@PathVariable Integer consultantId,
+                                     @RequestBody DateOff dateOff) {
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findByDateBookingAndConsultant(dateOff.getDateOff(),
+                        consultantId);
+        if (bookingDetailSteps.size() == 0) {
+            DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);
+            if (Objects.nonNull(dateOffResult)) {
+                return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
             }
+        } else {
+            return ResponseHelper.error(String.format(LoggingTemplate.BOOKING_SERVICE_EXISTED));
         }
-        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.DATE_OFF));
     }
 
     @GetMapping("/booking/findbybookingstatus")
@@ -210,10 +209,9 @@ public class ConsultantController {
             staffs.removeAll(staffDateOff);
             countEmployee = staffs.size();
             bookingDetailSteps = bookingDetailStepService
-                    .findByDateBookingAndIsConsultation(Date.valueOf(dateBooking),
+                    .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
                             IsConsultation.FALSE,
-                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()))
-                    .getContent();
+                            staffs.get(0).getSpa().getId());
             Map<Integer, List<BookingDetailStep>> map =
                     supportFunctions.separateBookingDetailStepListAndPutIntoMap(bookingDetailSteps);
             int check = countEmployee - map.size();
@@ -228,6 +226,175 @@ public class ConsultantController {
             }
             timeBookingList =
                     supportFunctions.getBookTime(totalTime, map, check);
+            if (timeBookingList.size() != 0) {
+                timeBookingList =
+                        supportFunctions.checkAndGetListTimeBooking(customerId, timeBookingList,
+                                dateBooking);
+                Page<String> page = new PageImpl<>(timeBookingList,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
+                        timeBookingList.size());
+                return ResponseHelper.ok(page);
+            }
+            return ResponseHelper.ok(LoggingTemplate.NO_EMPLOYEE_FREE);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_TREATMENT));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
+    }
+
+    @GetMapping("/getListCustomerOfConsultant/{consultantId}")
+    public Response getListCustomerOfConsultant(@PathVariable Integer consultantId) {
+        List<User> userList = new ArrayList<>();
+        List<Booking> bookings = new ArrayList<>();
+        List<BookingDetail> bookingDetails = new ArrayList<>();
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findByConsultantIdAndStatusBookingPendingBooking(consultantId);
+        if (Objects.nonNull(bookingDetailSteps)) {
+            for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+                if (bookingDetails.size() == 0) {
+                    bookingDetails.add(bookingDetail);
+                } else {
+                    if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)) {
+                        bookingDetails.add(bookingDetail);
+                    }
+                }
+            }
+            for (BookingDetail bookingDetail : bookingDetails) {
+                Booking booking = bookingDetail.getBooking();
+                if (bookings.size() == 0) {
+                    bookings.add(booking);
+                } else {
+                    if (!supportFunctions.checkBookingExistedInList(booking, bookings)) {
+                        bookings.add(booking);
+                    }
+                }
+            }
+            for (Booking booking : bookings) {
+                User customer = booking.getCustomer().getUser();
+                if (userList.size() == 0) {
+                    userList.add(customer);
+                } else {
+                    if (!supportFunctions.checkUserExistedInList(customer, userList)) {
+                        userList.add(customer);
+                    }
+                }
+            }
+            Page result = new PageImpl(userList,
+                    PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
+                    userList.size());
+            return ResponseHelper.ok(result);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CUSTOMER));
+    }
+
+    @GetMapping("/bookingDetail/findByCustomerAndConsultant/{customerId}/{consultantId}")
+    public Response findBookingDetailByCustomerAndConsultant(@PathVariable Integer customerId,
+                                                             @PathVariable Integer consultantId) {
+        List<BookingDetail> bookingDetailResult = new ArrayList<>();
+        Consultant consultant = consultantService.findByConsultantId(consultantId);
+        if (Objects.nonNull(consultant)) {
+            List<BookingDetail> bookingDetails = bookingDetailService
+                    .findByCustomerAndSpa(customerId, consultant.getSpa().getId());
+            for (BookingDetail bookingDetail : bookingDetails) {
+                List<BookingDetailStep> bookingDetailStepCheck =
+                        bookingDetail.getBookingDetailSteps();
+                for (BookingDetailStep bookingDetailStep : bookingDetailStepCheck) {
+                    if (bookingDetailStep.getConsultant() != null) {
+                        if (bookingDetailStep.getConsultant().equals(consultant)) {
+                            if (bookingDetailResult.size() == 0) {
+                                bookingDetailResult.add(bookingDetail);
+                            } else {
+                                if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetailResult)) {
+                                    bookingDetailResult.add(bookingDetail);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Page<BookingDetail> page = new PageImpl<>(bookingDetailResult,
+                    PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
+                    bookingDetailResult.size());
+            return ResponseHelper.ok(page);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+    }
+
+    @GetMapping("/getListTimeBookForConsultant/{consultantId}")
+    public Response getListTimeBookingForConsultant(@RequestParam Integer spaTreatmentId,
+                                                    @RequestParam String dateBooking,
+                                                    @RequestParam Integer customerId,
+                                                    @PathVariable Integer consultantId) {
+        int countEmployee = 0;
+        List<DateOff> dateOffs = null;
+        List<Staff> staffs = null;
+        List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
+        List<BookingDetailStep> bookingDetailStepRemoveList = new ArrayList<>();
+        // Get List Staff and All Booking Detail Step List
+        Consultant consultant = consultantService.findByConsultantId(consultantId);
+        SpaTreatment spaTreatment = spaTreatmentService.findByTreatmentId(spaTreatmentId);
+        if (Objects.nonNull(spaTreatment)) {
+            dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
+                    spaTreatment.getSpa().getId());
+            for (DateOff dateOff : dateOffs) {
+                if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
+                    return ResponseHelper.ok(String.format(LoggingTemplate.CONSULTANT_DATE_OFF,
+                            dateBooking));
+                }
+            }
+            List<BookingDetailStep> bookingDetailStepsOfConsultant =
+                    bookingDetailStepService.findByDateBookingAndConsultant(Date.valueOf(dateBooking),
+                            consultant.getUser().getId());
+            staffs = staffService.findBySpaId(spaTreatment.getSpa().getId());
+            List<Staff> staffDateOff = new ArrayList<>();
+            for (Staff staff : staffs) {
+                if (staff.getUser().isActive() == true) {
+                    for (DateOff dateOff : dateOffs) {
+                        if (staff.getUser().equals(dateOff.getEmployee())) {
+                            staffDateOff.add(staff);
+                        }
+                    }
+                } else {
+                    staffDateOff.add(staff);
+                }
+            }
+            staffs.removeAll(staffDateOff);
+            countEmployee = staffs.size();
+            bookingDetailSteps = bookingDetailStepService
+                    .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
+                            IsConsultation.FALSE, spaTreatment.getSpa().getId());
+            for (BookingDetailStep bookingDetailStep : bookingDetailStepsOfConsultant) {
+                Time startTime = bookingDetailStep.getStartTime();
+                Time endTime = bookingDetailStep.getEndTime();
+                List<BookingDetailStep> bookingDetailStepList =
+                        bookingDetailStepService.findByDateBookingAndStartEndTimeAndSpa(Date.valueOf(dateBooking),
+                                startTime, endTime, spaTreatment.getSpa().getId());
+                if (bookingDetailStepRemoveList.size() == 0) {
+                    bookingDetailStepRemoveList.addAll(bookingDetailStepList);
+                } else {
+                    for (BookingDetailStep bookingDetailStepCheck : bookingDetailStepList) {
+                        if (!supportFunctions.checkBookingDetailStepExisted(bookingDetailStepCheck,
+                                bookingDetailStepRemoveList)) {
+                            bookingDetailStepRemoveList.add(bookingDetailStepCheck);
+                        }
+                    }
+                }
+            }
+            bookingDetailSteps.removeAll(bookingDetailStepRemoveList);
+            /*
+                Separate bookingDetailSteps into lists with incrementation time
+                and put into map
+            */
+            Map<Integer, List<BookingDetailStep>> map =
+                    supportFunctions.separateBookingDetailStepListAndPutIntoMap(bookingDetailSteps);
+            int check = countEmployee - map.size();
+            List<String> timeBookingList = null;
+            supportFunctions.getBookTime(spaTreatment.getTotalTime(), map, check);
             if (timeBookingList.size() != 0) {
                 timeBookingList =
                         supportFunctions.checkAndGetListTimeBooking(customerId, timeBookingList,
@@ -364,88 +531,5 @@ public class ConsultantController {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
-    }
-
-    @GetMapping("/getListCustomerOfConsultant/{consultantId}")
-    public Response getListCustomerOfConsultant(@PathVariable Integer consultantId) {
-        List<User> userList = new ArrayList<>();
-        List<Booking> bookings = new ArrayList<>();
-        List<BookingDetail> bookingDetails = new ArrayList<>();
-        List<BookingDetailStep> bookingDetailSteps =
-                bookingDetailStepService.findByConsultantIdAndStatusBookingPendingBooking(consultantId);
-        if (Objects.nonNull(bookingDetailSteps)) {
-            for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
-                if (bookingDetails.size() == 0) {
-                    bookingDetails.add(bookingDetail);
-                } else {
-                    if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)) {
-                        bookingDetails.add(bookingDetail);
-                    }
-                }
-            }
-            for (BookingDetail bookingDetail : bookingDetails) {
-                Booking booking = bookingDetail.getBooking();
-                if (bookings.size() == 0) {
-                    bookings.add(booking);
-                } else {
-                    if (!supportFunctions.checkBookingExistedInList(booking, bookings)) {
-                        bookings.add(booking);
-                    }
-                }
-            }
-            for (Booking booking : bookings) {
-                User customer = booking.getCustomer().getUser();
-                if (userList.size() == 0) {
-                    userList.add(customer);
-                } else {
-                    if (!supportFunctions.checkUserExistedInList(customer, userList)) {
-                        userList.add(customer);
-                    }
-                }
-            }
-            Page result = new PageImpl(userList,
-                    PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
-                    userList.size());
-            return ResponseHelper.ok(result);
-        } else {
-            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
-        }
-        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CUSTOMER));
-    }
-
-    @GetMapping("/bookingDetail/findByCustomerAndConsultant/{customerId}/{consultantId}")
-    public Response findBookingDetailByCustomerAndConsultant(@PathVariable Integer customerId,
-                                                             @PathVariable Integer consultantId) {
-        List<BookingDetail> bookingDetailResult = new ArrayList<>();
-        Consultant consultant = consultantService.findByConsultantId(consultantId);
-        if (Objects.nonNull(consultant)) {
-            List<BookingDetail> bookingDetails = bookingDetailService
-                    .findByCustomerAndSpa(customerId, consultant.getSpa().getId());
-            for (BookingDetail bookingDetail : bookingDetails) {
-                List<BookingDetailStep> bookingDetailStepCheck =
-                        bookingDetail.getBookingDetailSteps();
-                for (BookingDetailStep bookingDetailStep : bookingDetailStepCheck) {
-                    if (bookingDetailStep.getConsultant() != null) {
-                        if (bookingDetailStep.getConsultant().equals(consultant)) {
-                            if (bookingDetailResult.size() == 0) {
-                                bookingDetailResult.add(bookingDetail);
-                            } else {
-                                if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetailResult)) {
-                                    bookingDetailResult.add(bookingDetail);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            Page<BookingDetail> page = new PageImpl<>(bookingDetailResult,
-                    PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
-                    bookingDetailResult.size());
-            return ResponseHelper.ok(page);
-        } else {
-            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
-        }
-        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
     }
 }
