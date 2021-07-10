@@ -1,23 +1,16 @@
 package swp490.spa.services;
 
 import com.google.firebase.messaging.*;
-import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
+import com.google.firebase.messaging.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.*;
-import swp490.spa.repositories.UserRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class NotificationService {
