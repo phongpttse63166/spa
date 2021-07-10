@@ -74,7 +74,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                              StatusBooking status1,
                                                              StatusBooking status2);
 
-    List<BookingDetailStep> findByDateBookingAndConsultant_User_Id(Date dateBooking,
+    List<BookingDetailStep> findByDateBookingAndConsultant_User_IdOrderByStartTime(Date dateBooking,
                                                                    Integer consultantId);
 
     List<BookingDetailStep> findByDateBookingAndStaff_User_Id(Date dateBooking, Integer staffId);

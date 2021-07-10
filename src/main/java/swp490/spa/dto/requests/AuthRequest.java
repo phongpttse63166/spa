@@ -12,4 +12,5 @@ public class AuthRequest {
     private String phone;
     private String password;
     private Role role;
+    private String tokenFCM;
 }

@@ -181,67 +181,6 @@ public class ConsultantController {
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
     }
 
-    @GetMapping("/getlisttimebookingtreatment")
-    public Response getListTimeBookingTreatment(@RequestParam Integer treatmentId,
-                                                @RequestParam String dateBooking,
-                                                @RequestParam Integer customerId) {
-        int countEmployee = 0;
-        List<DateOff> dateOffs = null;
-        List<Staff> staffs = null;
-        List<BookingDetailStep> bookingDetailSteps = null;
-        SpaTreatment spaTreatment = spaTreatmentService.findByTreatmentId(treatmentId);
-        if (Objects.nonNull(spaTreatment)) {
-            dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
-                    spaTreatment.getSpa().getId());
-            staffs = staffService.findBySpaId(spaTreatment.getSpa().getId());
-            List<Staff> staffDateOff = new ArrayList<>();
-            for (Staff staff : staffs) {
-                if (staff.getUser().isActive() == true) {
-                    for (DateOff dateOff : dateOffs) {
-                        if (staff.getUser().equals(dateOff.getEmployee())) {
-                            staffDateOff.add(staff);
-                        }
-                    }
-                } else {
-                    staffDateOff.add(staff);
-                }
-            }
-            staffs.removeAll(staffDateOff);
-            countEmployee = staffs.size();
-            bookingDetailSteps = bookingDetailStepService
-                    .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
-                            IsConsultation.FALSE,
-                            staffs.get(0).getSpa().getId());
-            Map<Integer, List<BookingDetailStep>> map =
-                    supportFunctions.separateBookingDetailStepListAndPutIntoMap(bookingDetailSteps);
-            int check = countEmployee - map.size();
-            List<String> timeBookingList = null;
-            int totalTime = 0;
-            List<TreatmentService> treatmentServices =
-                    new ArrayList<>(spaTreatment.getTreatmentServices());
-            for (TreatmentService treatmentService : treatmentServices) {
-                if (treatmentService.getOrdinal().equals(1)) {
-                    totalTime = treatmentService.getSpaService().getDurationMin();
-                }
-            }
-            timeBookingList =
-                    supportFunctions.getBookTime(totalTime, map, check);
-            if (timeBookingList.size() != 0) {
-                timeBookingList =
-                        supportFunctions.checkAndGetListTimeBooking(customerId, timeBookingList,
-                                dateBooking);
-                Page<String> page = new PageImpl<>(timeBookingList,
-                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
-                        timeBookingList.size());
-                return ResponseHelper.ok(page);
-            }
-            return ResponseHelper.ok(LoggingTemplate.NO_EMPLOYEE_FREE);
-        } else {
-            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_TREATMENT));
-        }
-        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
-    }
-
     @GetMapping("/getListCustomerOfConsultant/{consultantId}")
     public Response getListCustomerOfConsultant(@PathVariable Integer consultantId) {
         List<User> userList = new ArrayList<>();
@@ -334,7 +273,6 @@ public class ConsultantController {
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;
         List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
-        List<BookingDetailStep> bookingDetailStepRemoveList = new ArrayList<>();
         // Get List Staff and All Booking Detail Step List
         Consultant consultant = consultantService.findByConsultantId(consultantId);
         SpaTreatment spaTreatment = spaTreatmentService.findByTreatmentId(spaTreatmentId);
@@ -368,24 +306,6 @@ public class ConsultantController {
             bookingDetailSteps = bookingDetailStepService
                     .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
                             IsConsultation.FALSE, spaTreatment.getSpa().getId());
-            for (BookingDetailStep bookingDetailStep : bookingDetailStepsOfConsultant) {
-                Time startTime = bookingDetailStep.getStartTime();
-                Time endTime = bookingDetailStep.getEndTime();
-                List<BookingDetailStep> bookingDetailStepList =
-                        bookingDetailStepService.findByDateBookingAndStartEndTimeAndSpa(Date.valueOf(dateBooking),
-                                startTime, endTime, spaTreatment.getSpa().getId());
-                if (bookingDetailStepRemoveList.size() == 0) {
-                    bookingDetailStepRemoveList.addAll(bookingDetailStepList);
-                } else {
-                    for (BookingDetailStep bookingDetailStepCheck : bookingDetailStepList) {
-                        if (!supportFunctions.checkBookingDetailStepExisted(bookingDetailStepCheck,
-                                bookingDetailStepRemoveList)) {
-                            bookingDetailStepRemoveList.add(bookingDetailStepCheck);
-                        }
-                    }
-                }
-            }
-            bookingDetailSteps.removeAll(bookingDetailStepRemoveList);
             /*
                 Separate bookingDetailSteps into lists with incrementation time
                 and put into map
@@ -397,8 +317,11 @@ public class ConsultantController {
             supportFunctions.getBookTime(spaTreatment.getTotalTime(), map, check);
             if (timeBookingList.size() != 0) {
                 timeBookingList =
-                        supportFunctions.checkAndGetListTimeBooking(customerId, timeBookingList,
+                        supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
                                 dateBooking);
+                timeBookingList =
+                        supportFunctions.checkAndGetListTimeBookingByConsultant(timeBookingList,
+                                bookingDetailStepsOfConsultant);
                 Page<String> page = new PageImpl<>(timeBookingList,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
                         timeBookingList.size());

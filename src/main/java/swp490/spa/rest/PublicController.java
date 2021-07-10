@@ -241,6 +241,10 @@ public class PublicController {
                 if (customer == null) {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.CUSTOMER_NOT_EXISTED);
                 }
+                if(authRequest.getTokenFCM() != null) {
+                    customer.setTokenFCM(authRequest.getTokenFCM());
+                    customer = customerService.editCustomer(customer);
+                }
                 break;
             case "STAFF":
                 Staff staff = staffService.findByStaffId(user.getId());
@@ -248,6 +252,10 @@ public class PublicController {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.STAFF_NOT_EXISTED);
                 }
                 spaId = staff.getSpa().getId();
+                if(authRequest.getTokenFCM() != null) {
+                    staff.setTokenFCM(authRequest.getTokenFCM());
+                    staff = staffService.editStaff(staff);
+                }
                 break;
             case "MANAGER":
                 Manager manager = managerService.findManagerById(user.getId());
@@ -255,6 +263,10 @@ public class PublicController {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.MANAGER_NOT_EXISTED);
                 }
                 spaId = manager.getSpa().getId();
+                if(authRequest.getTokenFCM() != null) {
+                    manager.setTokenFCM(authRequest.getTokenFCM());
+                    manager = managerService.editManager(manager);
+                }
                 break;
             case "ADMIN":
                 break;
@@ -264,6 +276,10 @@ public class PublicController {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.CONSULTANT_NOT_EXISTED);
                 }
                 spaId = consultant.getSpa().getId();
+                if(authRequest.getTokenFCM() != null) {
+                    consultant.setTokenFCM(authRequest.getTokenFCM());
+                    consultant = consultantService.editConsultant(consultant);
+                }
                 break;
             default:
                 isExisted = false;

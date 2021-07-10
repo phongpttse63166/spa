@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import swp490.spa.entities.User;
+import swp490.spa.entities.*;
 import swp490.spa.repositories.UserRepository;
 
 import java.util.ArrayList;
@@ -23,23 +23,71 @@ import java.util.stream.StreamSupport;
 public class NotificationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationService.class);
     @Autowired
-    private UserRepository userRepository;
+    private StaffService staffService;
+    @Autowired
+    private ConsultantService consultantService;
+    @Autowired
+    private ManagerService managerService;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private AdminService adminService;
     private static final int MAX_NOTIFICATION_RETRY = 3;
     private static final long WAIT_NOTIFICATION_RETRY = 10 * 60 * 1000;
 
     @Async
     public CompletableFuture<String> notify(String title, String message,
                                             Map<String, String> data,
-                                            Integer userId) throws FirebaseMessagingException {
-        User user = this.userRepository.findById(userId).get();
-        Message notification = Message.builder()
-                .putAllData(data)
-                .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(message)
-                        .build())
-                .setToken(user.getId().toString())
-                .build();
+                                            Integer userId, Role role) throws FirebaseMessagingException {
+        Message notification = null;
+        switch (role) {
+            case STAFF:
+                Staff staff = staffService.findByStaffId(userId);
+                notification = Message.builder()
+                        .putAllData(data)
+                        .setNotification(Notification.builder()
+                                .setTitle(title)
+                                .setBody(message)
+                                .build())
+                        .setToken(staff.getTokenFCM())
+                        .build();
+                break;
+            case MANAGER:
+                Manager manager = managerService.findManagerById(userId);
+                notification = Message.builder()
+                        .putAllData(data)
+                        .setNotification(Notification.builder()
+                                .setTitle(title)
+                                .setBody(message)
+                                .build())
+                        .setToken(manager.getTokenFCM())
+                        .build();
+                break;
+            case CUSTOMER:
+                Customer customer = customerService.findByUserId(userId);
+                notification = Message.builder()
+                        .putAllData(data)
+                        .setNotification(Notification.builder()
+                                .setTitle(title)
+                                .setBody(message)
+                                .build())
+                        .setToken(customer.getTokenFCM())
+                        .build();
+                break;
+            case CONSULTANT:
+                Consultant consultant = consultantService.findByConsultantId(userId);
+                notification = Message.builder()
+                        .putAllData(data)
+                        .setNotification(Notification.builder()
+                                .setTitle(title)
+                                .setBody(message)
+                                .build())
+                        .setToken(consultant.getTokenFCM())
+                        .build();
+                break;
+            case ADMIN:
+                break;
+        }
         for (int i = 0; i < MAX_NOTIFICATION_RETRY; i++) {
             try {
                 String response = FirebaseMessaging.getInstance().send(notification);
@@ -55,33 +103,6 @@ public class NotificationService {
             }
         }
         return CompletableFuture.completedFuture(FirebaseMessaging.getInstance().send(notification));
-    }
-
-    public BatchResponse notifyMulti(String title, String message,
-                                     Map<String, String> data,
-                                     Integer... userIds) throws FirebaseMessagingException {
-        if (ArrayUtils.isEmpty(userIds)) {
-            throw new IllegalArgumentException("Empty user ids");
-        }
-        List<Integer> userIdListResult = StreamSupport.stream(
-                this.userRepository.findAllById(Arrays.asList(userIds)).spliterator(), false)
-                .map(User::getId)
-                .collect(Collectors.toList());
-        List<String> tokens = new ArrayList<>();
-        for (Integer userId : userIdListResult) {
-            tokens.add(userId.toString());
-        }
-        MulticastMessage multicastNotification = MulticastMessage.builder()
-                .putAllData(data)
-                .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(message)
-                        .build())
-                .addAllTokens(tokens)
-                .build();
-        BatchResponse response = FirebaseMessaging.getInstance().sendMulticast(multicastNotification);
-        LOGGER.info("Sent multicast notification {}", response);
-        return response;
     }
 }
 

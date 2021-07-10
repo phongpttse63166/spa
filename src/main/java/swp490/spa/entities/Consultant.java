@@ -25,4 +25,6 @@ public class Consultant implements Serializable {
     @ManyToOne
     @JoinColumn(name = "spa_id")
     private Spa spa;
+    @Column(name = "token_fcm", length = 65355)
+    private String tokenFCM;
 }

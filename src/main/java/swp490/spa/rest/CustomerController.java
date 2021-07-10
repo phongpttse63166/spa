@@ -197,7 +197,7 @@ public class CustomerController {
             }
             if (timeBookingList.size() != 0) {
                 timeBookingList =
-                        supportFunctions.checkAndGetListTimeBooking(customerId,timeBookingList,
+                        supportFunctions.checkAndGetListTimeBookingByCustomer(customerId,timeBookingList,
                                 dateBooking);
                 Page<String> page = new PageImpl<>(timeBookingList,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),

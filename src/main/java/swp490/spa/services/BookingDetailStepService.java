@@ -103,7 +103,7 @@ public class BookingDetailStepService {
 
     public List<BookingDetailStep> findByDateBookingAndConsultant(Date dateBooking, Integer consultantId) {
         return this.bookingDetailStepRepository
-                .findByDateBookingAndConsultant_User_Id(dateBooking, consultantId);
+                .findByDateBookingAndConsultant_User_IdOrderByStartTime(dateBooking, consultantId);
     }
 
     public List<BookingDetailStep> findByDateBookingAndStaff(Date dateBooking, Integer staffId) {

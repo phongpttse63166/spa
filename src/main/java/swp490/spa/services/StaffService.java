@@ -25,4 +25,8 @@ public class StaffService {
     public Page<Staff> findBySpaIdAndNameLike(Integer spaId, String search, Pageable pageable) {
         return this.staffRepository.findStaffBySpaIdAndNameLike(spaId, search, pageable);
     }
+
+    public Staff editStaff(Staff staff) {
+        return this.staffRepository.save(staff);
+    }
 }

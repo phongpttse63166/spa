@@ -18,4 +18,8 @@ public class CustomerService {
     public Customer insertNewCustomer(Customer customer){
         return this.customerRepository.saveAndFlush(customer);
     }
+
+    public Customer editCustomer(Customer customer) {
+        return this.customerRepository.save(customer);
+    }
 }

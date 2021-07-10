@@ -19,4 +19,8 @@ public class ConsultantService {
     public List<Consultant> findBySpaId(Integer spaId) {
         return this.consultantRepository.findBySpa_Id(spaId);
     }
+
+    public Consultant editConsultant(Consultant consultant) {
+        return this.consultantRepository.save(consultant);
+    }
 }

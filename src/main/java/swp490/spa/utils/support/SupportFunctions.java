@@ -510,8 +510,8 @@ public class SupportFunctions {
         return result;
     }
 
-    public List<String> checkAndGetListTimeBooking(Integer customerId, List<String> timeBookingList,
-                                                   String dateBooking) {
+    public List<String> checkAndGetListTimeBookingByCustomer(Integer customerId, List<String> timeBookingList,
+                                                             String dateBooking) {
         List<String> result = new ArrayList<>();
         List<String> timeShowList = new ArrayList<>();
         List<String> timeRemoveList = new ArrayList<>();
@@ -528,6 +528,50 @@ public class SupportFunctions {
             bookingDetailStepCustomerBooked.addAll(bookingDetailStepsCheck);
         }
         for (BookingDetailStep bookingDetailStep : bookingDetailStepCustomerBooked) {
+            Time startTime = bookingDetailStep.getStartTime();
+            Time endTime = bookingDetailStep.getEndTime();
+            Time nextTime = startTime;
+            int min = nextTime.getMinutes();
+            if (Math.abs(30 - min) % 15 != 0) {
+                nextTime =
+                        Time.valueOf(nextTime.toLocalTime().plusMinutes(15 - (Math.abs(30 - min) % 15)));
+            }
+            if (timeRemoveList.size() == 0) {
+                timeRemoveList.add(startTime.toString());
+            } else {
+                if (!checkTimeExisted(nextTime.toString(), timeRemoveList)) {
+                    timeRemoveList.add(nextTime.toString());
+                }
+            }
+            while (checkOver == false) {
+                nextTime = Time.valueOf(nextTime.toLocalTime()
+                        .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                if (nextTime.compareTo(endTime) > 0) {
+                    checkOver = true;
+                } else {
+                    if (!checkTimeExisted(nextTime.toString(), timeRemoveList)) {
+                        timeRemoveList.add(nextTime.toString());
+                    }
+                }
+            }
+            checkOver = false;
+        }
+        for (String timeCheck : timeBookingList) {
+            if (!checkTimeExisted(timeCheck, timeRemoveList)) {
+                timeShowList.add(timeCheck);
+            }
+        }
+        result = timeShowList;
+        return result;
+    }
+
+    public List<String> checkAndGetListTimeBookingByConsultant(List<String> timeBookingList,
+                                                               List<BookingDetailStep> bookingDetailStepsOfConsultant) {
+        List<String> result = new ArrayList<>();
+        List<String> timeShowList = new ArrayList<>();
+        List<String> timeRemoveList = new ArrayList<>();
+        boolean checkOver = false;
+        for (BookingDetailStep bookingDetailStep : bookingDetailStepsOfConsultant) {
             Time startTime = bookingDetailStep.getStartTime();
             Time endTime = bookingDetailStep.getEndTime();
             Time nextTime = startTime;
@@ -605,16 +649,6 @@ public class SupportFunctions {
     public boolean checkUserExistedInList(User customer, List<User> userList) {
         for (User userCheck : userList) {
             if(userCheck.equals(customer)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean checkBookingDetailStepExisted(BookingDetailStep bookingDetailStep,
-                                                 List<BookingDetailStep> bookingDetailSteps) {
-        for (BookingDetailStep bookingDetailStepCheck : bookingDetailSteps) {
-            if(bookingDetailStepCheck.equals(bookingDetailStep)){
                 return true;
             }
         }

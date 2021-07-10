@@ -24,4 +24,6 @@ public class Customer implements Serializable {
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;
+    @Column(name = "token_fcm", length = 65355)
+    private String tokenFCM;
 }
