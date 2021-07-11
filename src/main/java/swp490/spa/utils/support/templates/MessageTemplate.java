@@ -1,8 +1,8 @@
 package swp490.spa.utils.support.templates;
 
 public class MessageTemplate {
-    public static final String APPROVE_TITLE = "Approved";
-    public static final String APPROVE_MESSAGE = "Your booking at %s has been approved";
+    public static final String BOOKING_TITLE = "Booking";
+    public static final String BOOKING_MESSAGE = "Your booking is at %s successful";
     public static final String REMINDER_TITLE = "Event reminder";
     public static final String REMINDER_MESSAGE = "You have an upcoming event at %s at %s";
     public static final String CLAIM_TITLE = "Claimed";

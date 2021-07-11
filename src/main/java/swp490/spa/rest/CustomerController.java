@@ -1,5 +1,6 @@
 package swp490.spa.rest;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,11 @@ import swp490.spa.services.SpaService;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
+import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -54,6 +57,8 @@ public class CustomerController {
     private BookingDetailService bookingDetailService;
     @Autowired
     private DateOffService dateOffService;
+    @Autowired
+    private NotificationService notificationService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -63,7 +68,7 @@ public class CustomerController {
                               BookingDetailStepService bookingDetailStepService, StaffService staffService,
                               SpaTreatmentService spaTreatmentService, ConsultantService consultantService,
                               BookingService bookingService, BookingDetailService bookingDetailService,
-                              DateOffService dateOffService) {
+                              DateOffService dateOffService, NotificationService notificationService) {
         this.customerService = customerService;
         this.userLocationService = userLocationService;
         this.accountRegisterService = accountRegisterService;
@@ -78,6 +83,7 @@ public class CustomerController {
         this.bookingDetailStepService = bookingDetailStepService;
         this.bookingDetailService = bookingDetailService;
         this.dateOffService = dateOffService;
+        this.notificationService = notificationService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions(bookingDetailStepService, bookingDetailService);
     }
@@ -495,7 +501,19 @@ public class CustomerController {
             }
             if (checkCanInsert) {
                 Booking bookingInsert = bookingService.insertNewBooking(booking);
+                SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
                 if(Objects.nonNull(bookingInsert)){
+                    try {
+                        notificationService.notify(MessageTemplate.BOOKING_TITLE,
+                                String.format(MessageTemplate.BOOKING_MESSAGE,
+                                        formatter.format(bookingInsert.getCreateTime())),
+                                Collections.singletonMap("bookingId", bookingInsert.getId().toString()),
+                                bookingInsert.getCustomer().getUser().getId(),
+                                Role.CUSTOMER);
+                    } catch (FirebaseMessagingException e) {
+                        LOGGER.error(e.getMessage());
+                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
+                    }
                     return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
                 }
             } else {
