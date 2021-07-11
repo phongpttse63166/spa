@@ -1,5 +1,6 @@
 package swp490.spa.rest;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @RequestMapping("/api/manager")
 @RestController
@@ -61,6 +63,8 @@ public class ManagerController {
     private ConsultantService consultantService;
     @Autowired
     private ConsultationContentService consultationContentService;
+    @Autowired
+    private NotificationService notificationService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -71,7 +75,8 @@ public class ManagerController {
                              BookingDetailService bookingDetailService, StaffService staffService,
                              TreatmentServiceService treatmentServiceService, ConsultantService consultantService,
                              BookingDetailStepService bookingDetailStepService,
-                             ConsultationContentService consultationContentService) {
+                             ConsultationContentService consultationContentService,
+                             NotificationService notificationService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
@@ -86,6 +91,7 @@ public class ManagerController {
         this.consultantService = consultantService;
         this.bookingDetailStepService = bookingDetailStepService;
         this.consultationContentService = consultationContentService;
+        this.notificationService = notificationService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions();
     }
@@ -982,5 +988,21 @@ public class ManagerController {
             }
         }
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.CONSULTANT));
+    }
+
+
+    // Test notification
+    @PostMapping("/testNotification/{managerId}")
+    public Response testNotification(@PathVariable Integer managerId,
+                                     @RequestBody Notification notification)
+            throws FirebaseMessagingException {
+        CompletableFuture<String> response =
+                notificationService.notify(notification.getTitle(), notification.getMessage(),
+                        notification.getData(),managerId,Role.MANAGER);
+        if(response!=null){
+            return ResponseHelper.ok(notification);
+        } else {
+            return ResponseHelper.error("");
+        }
     }
 }
