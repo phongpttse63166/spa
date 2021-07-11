@@ -6,6 +6,8 @@ import swp490.spa.entities.Customer;
 import swp490.spa.entities.Manager;
 import swp490.spa.repositories.ManagerRepository;
 
+import java.util.List;
+
 @Service
 public class ManagerService {
     @Autowired
@@ -17,5 +19,9 @@ public class ManagerService {
 
     public Manager editManager(Manager manager) {
         return this.managerRepository.save(manager);
+    }
+
+    public List<Manager> findManagerBySpa(Integer spaId) {
+        return this.managerRepository.findBySpa_IdOrderByIdAsc(spaId);
     }
 }

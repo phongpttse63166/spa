@@ -5,8 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.Manager;
 
+import java.util.List;
+
 @Repository
 public interface ManagerRepository extends JpaRepository<Manager, Integer> {
     @Query("FROM Manager m WHERE m.user.id = ?1")
     Manager findByUserId(Integer userId);
+
+    List<Manager> findBySpa_IdOrderByIdAsc(Integer spaId);
 }

@@ -3,8 +3,8 @@ package swp490.spa.utils.support.templates;
 public class MessageTemplate {
     public static final String BOOKING_TITLE = "Booking";
     public static final String BOOKING_MESSAGE = "Your booking is at %s successful";
-    public static final String REMINDER_TITLE = "Event reminder";
-    public static final String REMINDER_MESSAGE = "You have an upcoming event at %s at %s";
+    public static final String BOOKING_REMINDER_TITLE = "Event reminder";
+    public static final String BOOKING_REMINDER_MESSAGE = "You have a new booking";
     public static final String CLAIM_TITLE = "Claimed";
     public static final String CLAIM_MESSAGE = "Your booking has been claimed";
     public static final String UNARRANGED_TITLE = "Unarrange";
