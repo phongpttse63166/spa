@@ -546,4 +546,35 @@ public class CustomerController {
             return ResponseHelper.error("");
         }
     }
+
+    @GetMapping("/getListConsultantForChat")
+    public Response getListConsultantForChat(@RequestParam Integer customerId){
+        List<Consultant> consultants = new ArrayList<>();
+        List<BookingDetail> bookingDetailList =
+                bookingDetailService.findByCustomer(customerId);
+        if(Objects.nonNull(bookingDetailList)){
+            for (BookingDetail bookingDetail : bookingDetailList) {
+                List<BookingDetailStep> bookingDetailSteps =
+                        bookingDetailStepService.findByBookingDetail(bookingDetail.getId(),
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                        .getContent();
+                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                    if(bookingDetailStep.getConsultant()!=null) {
+                        Consultant consultant = bookingDetailStep.getConsultant();
+                        if (consultants.size() == 0) {
+                            consultants.add(consultant);
+                        } else {
+                            if (!supportFunctions.checkConsultantExistedInList(consultant, consultants)) {
+                                consultants.add(consultant);
+                            }
+                        }
+                    }
+                }
+            }
+            return ResponseHelper.ok(consultants);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.LIST_CONSULTANT_CHATTING));
+    }
 }

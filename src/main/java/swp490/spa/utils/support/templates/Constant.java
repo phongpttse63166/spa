@@ -50,4 +50,5 @@ public class Constant {
     public static final String LIST_CONSULTANT_FREE = "Danh sách Consultant rảnh";
     public static final String TIME_LIST = "Danh sách thời gian";
     public static final String BOOKING_DETAIL_TREATMENT = "Treatment vào Booking Detail";
+    public static final String LIST_CONSULTANT_CHATTING = "Danh sách Consultant cho Chat";
 }

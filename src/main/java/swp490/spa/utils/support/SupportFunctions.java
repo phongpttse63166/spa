@@ -654,4 +654,13 @@ public class SupportFunctions {
         }
         return false;
     }
+
+    public boolean checkConsultantExistedInList(Consultant consultant, List<Consultant> consultants) {
+        for (Consultant consultantCheck : consultants) {
+            if(consultantCheck.equals(consultant)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
