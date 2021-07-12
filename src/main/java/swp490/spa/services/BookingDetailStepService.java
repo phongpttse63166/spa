@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.BookingDetailStep;
 import swp490.spa.entities.IsConsultation;
+import swp490.spa.entities.Staff;
 import swp490.spa.entities.StatusBooking;
 import swp490.spa.repositories.BookingDetailStepRepository;
 
@@ -115,7 +116,17 @@ public class BookingDetailStepService {
                                                                           Time startTime,
                                                                           Time endTime,
                                                                           Integer spaId) {
-        return this.bookingDetailStepRepository.findByDateBookingAndStartEndTimeAndSpa
-        (dateBooking,startTime,endTime,spaId,IsConsultation.FALSE);
+        return this.bookingDetailStepRepository
+                .findByDateBookingAndStartEndTimeAndSpa(dateBooking,startTime,
+                        endTime,spaId,IsConsultation.FALSE);
+    }
+
+
+    public List<BookingDetailStep> findBySpaAndStaffIsNull(Integer spaId) {
+        return this.bookingDetailStepRepository.findBySpaAndStaffIsNull(spaId);
+    }
+
+    public BookingDetailStep findById(Integer bookingDetailStepId) {
+        return this.bookingDetailStepRepository.findById(bookingDetailStepId).get();
     }
 }

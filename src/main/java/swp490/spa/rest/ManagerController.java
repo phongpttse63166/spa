@@ -1,6 +1,5 @@
 package swp490.spa.rest;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 @RequestMapping("/api/manager")
 @RestController
@@ -64,7 +62,7 @@ public class ManagerController {
     @Autowired
     private ConsultationContentService consultationContentService;
     @Autowired
-    private NotificationService notificationService;
+    private NotificationFireBaseService notificationFireBaseService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -76,7 +74,7 @@ public class ManagerController {
                              TreatmentServiceService treatmentServiceService, ConsultantService consultantService,
                              BookingDetailStepService bookingDetailStepService,
                              ConsultationContentService consultationContentService,
-                             NotificationService notificationService) {
+                             NotificationFireBaseService notificationFireBaseService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
@@ -91,7 +89,7 @@ public class ManagerController {
         this.consultantService = consultantService;
         this.bookingDetailStepService = bookingDetailStepService;
         this.consultationContentService = consultationContentService;
-        this.notificationService = notificationService;
+        this.notificationFireBaseService = notificationFireBaseService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions();
     }
@@ -317,9 +315,9 @@ public class ManagerController {
     }
 
     @GetMapping("/spaservices/findbyid/{packageId}")
-    public Response findSpaServicesBySpaPackageId(@PathVariable Integer packageId){
+    public Response findSpaServicesBySpaPackageId(@PathVariable Integer packageId) {
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(packageId);
-        if(Objects.nonNull(spaPackage)){
+        if (Objects.nonNull(spaPackage)) {
             List<SpaService> spaServices = spaPackage.getSpaServices();
             Page<SpaService> spaServicePage =
                     new PageImpl<>(spaServices,
@@ -332,10 +330,10 @@ public class ManagerController {
     }
 
     @GetMapping("/bookings/findbystatusandspaid/{spaId}")
-    public Response findByStatusBookingAndSpaId(@PathVariable Integer spaId){
+    public Response findByStatusBookingAndSpaId(@PathVariable Integer spaId) {
         List<BookingDetailStep> bookingDetailSteps =
                 bookingDetailStepService.findByStatusAndSpaId(StatusBooking.PENDING, spaId);
-        if(Objects.nonNull(bookingDetailSteps)) {
+        if (Objects.nonNull(bookingDetailSteps)) {
             List<BookingDetail> bookingDetails = new ArrayList<>();
             for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                 BookingDetail bookingDetailCheck = bookingDetailStep.getBookingDetail();
@@ -370,25 +368,25 @@ public class ManagerController {
     }
 
     @GetMapping("/getliststafffree/{bookingDetailId}")
-    public Response getListStaffsFreeInOneDate(@PathVariable Integer bookingDetailId){
+    public Response getListStaffsFreeInOneDate(@PathVariable Integer bookingDetailId) {
         List<Staff> staffListResult = new ArrayList<>();
         BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
-        if(Objects.nonNull(bookingDetail)){
+        if (Objects.nonNull(bookingDetail)) {
             List<Staff> allStaffList =
                     staffService.findBySpaId(bookingDetail.getSpaPackage().getSpa().getId());
-            if(Objects.nonNull(allStaffList)){
+            if (Objects.nonNull(allStaffList)) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-                        .getContent();
+                                .getContent();
                 Date dateBooking = bookingDetailSteps.get(0).getDateBooking();
                 Time startTime = bookingDetailSteps.get(0).getStartTime();
-                Time endTime = bookingDetailSteps.get(bookingDetailSteps.size()-1).getEndTime();
+                Time endTime = bookingDetailSteps.get(bookingDetailSteps.size() - 1).getEndTime();
                 for (Staff staff : allStaffList) {
                     List<BookingDetailStep> bookingDetailStepsCheck =
                             bookingDetailStepService.findByDateBookingAndStartEndTimeAndStaffId(dateBooking,
-                                    startTime,endTime,staff.getUser().getId());
-                    if(bookingDetailStepsCheck.size() == 0){
+                                    startTime, endTime, staff.getUser().getId());
+                    if (bookingDetailStepsCheck.size() == 0) {
                         staffListResult.add(staff);
                     }
                 }
@@ -403,25 +401,25 @@ public class ManagerController {
     }
 
     @GetMapping("/getlistconsultantfree/{bookingDetailId}")
-    public Response getListConsultantFreeInOneDate(@PathVariable Integer bookingDetailId){
+    public Response getListConsultantFreeInOneDate(@PathVariable Integer bookingDetailId) {
         List<Consultant> consultantListResult = new ArrayList<>();
         BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
-        if(Objects.nonNull(bookingDetail)){
+        if (Objects.nonNull(bookingDetail)) {
             List<Consultant> allConsultant =
                     consultantService.findBySpaId(bookingDetail.getSpaPackage().getSpa().getId());
-            if(Objects.nonNull(allConsultant)){
+            if (Objects.nonNull(allConsultant)) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                 .getContent();
                 Date dateBooking = bookingDetailSteps.get(0).getDateBooking();
                 Time startTime = bookingDetailSteps.get(0).getStartTime();
-                Time endTime = bookingDetailSteps.get(bookingDetailSteps.size()-1).getEndTime();
+                Time endTime = bookingDetailSteps.get(bookingDetailSteps.size() - 1).getEndTime();
                 for (Consultant consultant : allConsultant) {
                     List<BookingDetailStep> bookingDetailStepsCheck =
                             bookingDetailStepService.findByDateBookingAndStartEndTimeAndConsultantId(dateBooking,
-                                    startTime,endTime,consultant.getUser().getId());
-                    if(bookingDetailStepsCheck.size() == 0){
+                                    startTime, endTime, consultant.getUser().getId());
+                    if (bookingDetailStepsCheck.size() == 0) {
                         consultantListResult.add(consultant);
                     }
                 }
@@ -433,6 +431,27 @@ public class ManagerController {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.LIST_CONSULTANT_FREE));
+    }
+
+    @GetMapping("/bookingDetail/findBySpaAndStaffIsNull")
+    public Response findByBookingDetailStepHaveStaffNullAndSpa(@RequestParam Integer spaId) {
+        List<BookingDetail> bookingDetails = new ArrayList<>();
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findBySpaAndStaffIsNull(spaId);
+        for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+            BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+            if(bookingDetails.size() == 0){
+                bookingDetails.add(bookingDetailStep.getBookingDetail());
+            } else {
+                if(!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)){
+                    bookingDetails.add(bookingDetail);
+                }
+            }
+        }
+        Page<BookingDetail> page = new PageImpl<>(bookingDetails,
+                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()),
+                bookingDetails.size());
+        return ResponseHelper.ok(page);
     }
 
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
@@ -558,15 +577,15 @@ public class ManagerController {
                 TreatmentService treatmentServiceResult =
                         treatmentServiceService.insertNewTreatmentService(treatmentService);
                 if (Objects.isNull(treatmentServiceResult)) {
-                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED,Constant.TREATMENT_SERVICE));
-                    return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED,Constant.TREATMENT_SERVICE));
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.TREATMENT_SERVICE));
+                    return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.TREATMENT_SERVICE));
                 } else {
-                    LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS,Constant.TREATMENT_SERVICE));
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.TREATMENT_SERVICE));
                 }
             }
-            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,Constant.TREATMENT_SERVICE));
+            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.TREATMENT_SERVICE));
         }
-        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED,Constant.TREATMENT_SERVICE));
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.TREATMENT_SERVICE));
     }
 
     @PostMapping(value = "/category/insert",
@@ -774,7 +793,7 @@ public class ManagerController {
         if (Objects.nonNull(categoryResult)) {
             categoryResult.setStatus(Status.DISABLE);
             if (categoryService.removeCategory(categoryResult)) {
-                return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_SUCCESS,Constant.CATEGORY));
+                return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_SUCCESS, Constant.CATEGORY));
             }
         }
         return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_FAILED, Constant.CATEGORY));
@@ -806,7 +825,7 @@ public class ManagerController {
 
     @PutMapping("/bookingdetailstep/addstafft/{bookingDetailId}/{staffId}")
     public Response addStaffIntoBookingDetail(@PathVariable Integer bookingDetailId,
-                                                         @PathVariable Integer staffId){
+                                              @PathVariable Integer staffId) {
         List<BookingDetailStep> bookingDetailStepEdited = new ArrayList<>();
         int count = 0;
         boolean check = true;
@@ -814,22 +833,22 @@ public class ManagerController {
         BookingDetail bookingDetailEdited = null;
         BookingDetail bookingDetailGet =
                 bookingDetailService.findByBookingDetailId(bookingDetailId);
-        if(Objects.nonNull(bookingDetailGet)){
+        if (Objects.nonNull(bookingDetailGet)) {
             List<BookingDetailStep> bookingDetailSteps =
                     bookingDetailStepService.findByBookingDetail(bookingDetailId,
                             PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                             .getContent();
             for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                if(bookingDetailStep.getStaff() != null){
+                if (bookingDetailStep.getStaff() != null) {
                     count++;
                 }
             }
-            if(count == bookingDetailSteps.size()){
+            if (count == bookingDetailSteps.size()) {
                 return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
             } else {
-                if(bookingDetailSteps.size()!= 0 || Objects.nonNull(bookingDetailSteps)){
+                if (bookingDetailSteps.size() != 0 || Objects.nonNull(bookingDetailSteps)) {
                     Staff staff = staffService.findByStaffId(staffId);
-                    if(Objects.nonNull(staff)){
+                    if (Objects.nonNull(staff)) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                             bookingDetailStep.setStaff(staff);
                             bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
@@ -837,28 +856,28 @@ public class ManagerController {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                             BookingDetailStep bookingDetailStepResult =
                                     bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
-                            if(Objects.isNull(bookingDetailStepResult)){
+                            if (Objects.isNull(bookingDetailStepResult)) {
                                 check = false;
                                 LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL_STEP));
                             } else {
                                 bookingDetailStepEdited.add(bookingDetailStepResult);
                             }
                         }
-                        if(bookingDetailSteps.size() == bookingDetailStepEdited.size()){
+                        if (bookingDetailSteps.size() == bookingDetailStepEdited.size()) {
                             bookingDetailGet.setStatusBooking(StatusBooking.BOOKING);
                             bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetailGet);
-                            if(Objects.nonNull(bookingDetailEdited)){
+                            if (Objects.nonNull(bookingDetailEdited)) {
                                 Integer countBookingDetail =
                                         bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
-                                                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                                 .getContent().size();
-                                if(Objects.nonNull(countBookingDetail)){
-                                    if(countBookingDetail == 1) {
+                                if (Objects.nonNull(countBookingDetail)) {
+                                    if (countBookingDetail == 1) {
                                         Booking booking = bookingDetailEdited.getBooking();
                                         booking.setStatusBooking(StatusBooking.BOOKING);
                                         bookingEdited = bookingService.editBooking(booking);
-                                        if(Objects.nonNull(bookingEdited)) {
+                                        if (Objects.nonNull(bookingEdited)) {
                                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
                                         } else {
                                             check = false;
@@ -880,12 +899,12 @@ public class ManagerController {
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
         }
-        if(!check){
-            if(bookingEdited!=null){
+        if (!check) {
+            if (bookingEdited != null) {
                 bookingEdited.setStatusBooking(StatusBooking.PENDING);
                 bookingService.editBooking(bookingEdited);
             }
-            if(bookingDetailEdited!=null){
+            if (bookingDetailEdited != null) {
                 bookingDetailEdited.setStatusBooking(StatusBooking.PENDING);
                 bookingDetailService.editBookingDetail(bookingDetailEdited);
             }
@@ -899,7 +918,7 @@ public class ManagerController {
 
     @PutMapping("/bookingdetailstep/addconsultant/{bookingDetailId}/{consultantId}")
     public Response addConsultantIntoBookingDetail(@PathVariable Integer bookingDetailId,
-                                                   @PathVariable Integer consultantId){
+                                                   @PathVariable Integer consultantId) {
         List<BookingDetailStep> bookingDetailStepEdited = new ArrayList<>();
         int count = 0;
         boolean check = true;
@@ -907,22 +926,22 @@ public class ManagerController {
         BookingDetail bookingDetailEdited = null;
         BookingDetail bookingDetailGet =
                 bookingDetailService.findByBookingDetailId(bookingDetailId);
-        if(Objects.nonNull(bookingDetailGet)){
+        if (Objects.nonNull(bookingDetailGet)) {
             List<BookingDetailStep> bookingDetailSteps =
                     bookingDetailStepService.findByBookingDetail(bookingDetailId,
                             PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                             .getContent();
             for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                if(bookingDetailStep.getConsultant() != null){
+                if (bookingDetailStep.getConsultant() != null) {
                     count++;
                 }
             }
-            if(count == bookingDetailSteps.size()){
+            if (count == bookingDetailSteps.size()) {
                 return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
             } else {
-                if(bookingDetailSteps.size()!= 0 || Objects.nonNull(bookingDetailSteps)){
+                if (bookingDetailSteps.size() != 0 || Objects.nonNull(bookingDetailSteps)) {
                     Consultant consultant = consultantService.findByConsultantId(consultantId);
-                    if(Objects.nonNull(consultant)){
+                    if (Objects.nonNull(consultant)) {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                             bookingDetailStep.setConsultant(consultant);
                             bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
@@ -930,28 +949,28 @@ public class ManagerController {
                         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                             BookingDetailStep bookingDetailStepResult =
                                     bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
-                            if(Objects.isNull(bookingDetailStepResult)){
+                            if (Objects.isNull(bookingDetailStepResult)) {
                                 check = false;
                                 LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL_STEP));
                             } else {
                                 bookingDetailStepEdited.add(bookingDetailStepResult);
                             }
                         }
-                        if(bookingDetailSteps.size() == bookingDetailStepEdited.size()){
+                        if (bookingDetailSteps.size() == bookingDetailStepEdited.size()) {
                             bookingDetailGet.setStatusBooking(StatusBooking.BOOKING);
                             bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetailGet);
-                            if(Objects.nonNull(bookingDetailEdited)){
+                            if (Objects.nonNull(bookingDetailEdited)) {
                                 Integer countBookingDetail =
                                         bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
-                                                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                                 .getContent().size();
-                                if(Objects.nonNull(countBookingDetail)){
-                                    if(countBookingDetail == 1) {
+                                if (Objects.nonNull(countBookingDetail)) {
+                                    if (countBookingDetail == 1) {
                                         Booking booking = bookingDetailEdited.getBooking();
                                         booking.setStatusBooking(StatusBooking.BOOKING);
                                         bookingEdited = bookingService.editBooking(booking);
-                                        if(Objects.nonNull(bookingEdited)) {
+                                        if (Objects.nonNull(bookingEdited)) {
                                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
                                         } else {
                                             check = false;
@@ -973,12 +992,12 @@ public class ManagerController {
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
         }
-        if(!check){
-            if(bookingEdited!=null){
+        if (!check) {
+            if (bookingEdited != null) {
                 bookingEdited.setStatusBooking(StatusBooking.PENDING);
                 bookingService.editBooking(bookingEdited);
             }
-            if(bookingDetailEdited!=null){
+            if (bookingDetailEdited != null) {
                 bookingDetailEdited.setStatusBooking(StatusBooking.PENDING);
                 bookingDetailService.editBookingDetail(bookingDetailEdited);
             }
@@ -990,19 +1009,4 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.CONSULTANT));
     }
 
-
-    // Test notification
-    @PostMapping("/testNotification/{managerId}")
-    public Response testNotification(@PathVariable Integer managerId,
-                                     @RequestBody Notification notification)
-            throws FirebaseMessagingException {
-        CompletableFuture<String> response =
-                notificationService.notify(notification.getTitle(), notification.getMessage(),
-                        notification.getData(),managerId,Role.MANAGER);
-        if(response!=null){
-            return ResponseHelper.ok(notification);
-        } else {
-            return ResponseHelper.error("");
-        }
-    }
 }

@@ -58,7 +58,7 @@ public class CustomerController {
     @Autowired
     private DateOffService dateOffService;
     @Autowired
-    private NotificationService notificationService;
+    private NotificationFireBaseService notificationFireBaseService;
     @Autowired
     private ManagerService managerService;
     private Conversion conversion;
@@ -71,7 +71,7 @@ public class CustomerController {
                               BookingDetailStepService bookingDetailStepService, StaffService staffService,
                               SpaTreatmentService spaTreatmentService, ConsultantService consultantService,
                               BookingService bookingService, BookingDetailService bookingDetailService,
-                              DateOffService dateOffService, NotificationService notificationService,
+                              DateOffService dateOffService, NotificationFireBaseService notificationFireBaseService,
                               ManagerService managerService) {
         this.customerService = customerService;
         this.userLocationService = userLocationService;
@@ -87,7 +87,7 @@ public class CustomerController {
         this.bookingDetailStepService = bookingDetailStepService;
         this.bookingDetailService = bookingDetailService;
         this.dateOffService = dateOffService;
-        this.notificationService = notificationService;
+        this.notificationFireBaseService = notificationFireBaseService;
         this.managerService = managerService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions(bookingDetailStepService, bookingDetailService);
@@ -508,17 +508,12 @@ public class CustomerController {
                 Booking bookingInsert = bookingService.insertNewBooking(booking);
                 if(Objects.nonNull(bookingInsert)){
                     try {
+                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
                         List<Manager> managers =
                                 managerService.findManagerBySpa(spaPackageCheck.getSpa().getId());
-                        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-//                        notificationService.notify(MessageTemplate.BOOKING_TITLE,
-//                                String.format(MessageTemplate.BOOKING_MESSAGE,
-//                                        formatter.format(bookingInsert.getCreateTime())),
-//                                Collections.singletonMap("bookingId", bookingInsert.getId().toString()),
-//                                customer.getUser().getId(), Role.CUSTOMER);
-                        notificationService.notify(MessageTemplate.BOOKING_REMINDER_TITLE,
-                                MessageTemplate.BOOKING_REMINDER_MESSAGE,null,
-                                managers.get(0).getUser().getId(), Role.MANAGER);
+                        notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
+                                String.format(MessageTemplate.BOOKING_MESSAGE,formatter.format(bookingInsert.getCreateTime())),
+                                null, managers.get(0).getUser().getId(), Role.MANAGER);
                     } catch (FirebaseMessagingException e) {
                         LOGGER.error(e.getMessage());
                         return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));

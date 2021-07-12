@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.BookingDetailStep;
 import swp490.spa.entities.IsConsultation;
+import swp490.spa.entities.Staff;
 import swp490.spa.entities.StatusBooking;
 
 import java.sql.Date;
@@ -87,4 +88,9 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     List<BookingDetailStep> findByDateBookingAndStartEndTimeAndSpa(Date dateBooking, Time startTime,
                                                                    Time endTime, Integer spaId,
                                                                    IsConsultation value);
+
+    @Query("FROM BookingDetailStep b WHERE b.bookingDetail.booking.spa.id = ?1 " +
+            "AND (b.staff.id = 0 OR b.staff.id IS NULL) " +
+            "ORDER BY b.bookingDetail.id ASC")
+    List<BookingDetailStep> findBySpaAndStaffIsNull(Integer spaId);
 }

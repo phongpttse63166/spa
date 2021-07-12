@@ -29,4 +29,5 @@ public class LoggingTemplate {
     public static final String EMPLOYEE_EXISTED = "Đã xếp nhân viên cho dich vụ";
     public static final String BOOKING_SERVICE_EXISTED = "Có lịch booking";
     public static final String CONSULTANT_DATE_OFF = "Consultant xin nghỉ ngày %s";
+    public static final String STAFF_DATE_OFF = "Staff xin nghỉ ngày %s";
 }
