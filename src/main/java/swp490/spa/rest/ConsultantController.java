@@ -468,7 +468,8 @@ public class ConsultantController {
                     supportFunctions.separateBookingDetailStepListAndPutIntoMap(bookingDetailSteps);
             int check = countEmployee - map.size();
             List<String> timeBookingList = null;
-            supportFunctions.getBookTime(spaTreatment.getTotalTime(), map, check);
+            timeBookingList =
+                    supportFunctions.getBookTime(spaTreatment.getTotalTime(), map, check);
             if (timeBookingList.size() != 0) {
                 timeBookingList =
                         supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
@@ -537,7 +538,8 @@ public class ConsultantController {
                 Map<Integer, List<BookingDetailStep>> map = new HashMap<>();
                 map.put(staff.getId(),bookingDetailSteps);
                 List<String> timeBookingList = null;
-                supportFunctions.getBookTime(spaService.getDurationMin(), map, 0);
+                timeBookingList =
+                        supportFunctions.getBookTime(spaService.getDurationMin(), map, 0);
                 if (timeBookingList.size() != 0) {
                     timeBookingList =
                             supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
