@@ -385,19 +385,22 @@ public class ManagerController {
                 List<DateOff> dateOffs =
                         dateOffService.findByDateOffAndSpaAndStatusApprove(dateBooking,
                                 bookingDetail.getSpaPackage().getSpa().getId());
-                List<Staff> staffListNotDateOff = new ArrayList<>();
-                for (Staff staff : allStaffList) {
-                    boolean checkDateOff = false;
-                    for (DateOff dateOff : dateOffs) {
-                        if (staff.getUser().equals(dateOff.getEmployee())) {
-                            checkDateOff = true;
+                if(dateOffs.size()!=0) {
+                    List<Staff> staffListNotDateOff = new ArrayList<>();
+                    for (Staff staff : allStaffList) {
+                        boolean checkDateOff = false;
+                        for (DateOff dateOff : dateOffs) {
+                            if (staff.getUser().equals(dateOff.getEmployee())) {
+                                checkDateOff = true;
+                            }
+                        }
+                        if (!checkDateOff) {
+                            staffListNotDateOff.add(staff);
                         }
                     }
-                    if (!checkDateOff) {
-                        staffListNotDateOff.add(staff);
-                    }
+                    allStaffList = staffListNotDateOff;
                 }
-                for (Staff staff : staffListNotDateOff) {
+                for (Staff staff : allStaffList) {
                     List<BookingDetailStep> bookingDetailStepsCheck =
                             bookingDetailStepService.findByDateBookingAndStartEndTimeAndStaffId(dateBooking,
                                     startTime, endTime, staff.getUser().getId());
