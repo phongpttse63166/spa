@@ -1,5 +1,6 @@
 package swp490.spa.rest;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.image.UploadImage;
+import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -852,7 +854,7 @@ public class ManagerController {
 
     @PutMapping("/bookingDetailStep/addStaff/{bookingDetailId}/{staffId}")
     public Response addStaffIntoBookingDetail(@PathVariable Integer bookingDetailId,
-                                              @PathVariable Integer staffId) {
+                                              @PathVariable Integer staffId) throws FirebaseMessagingException {
         List<BookingDetailStep> bookingDetailStepEdited = new ArrayList<>();
         int count = 0;
         boolean check = true;
@@ -932,6 +934,10 @@ public class ManagerController {
                                         booking.setStatusBooking(StatusBooking.BOOKING);
                                         bookingEdited = bookingService.editBooking(booking);
                                         if (Objects.nonNull(bookingEdited)) {
+                                            notificationFireBaseService.notify(MessageTemplate.ASSIGNMENT_TITLE,
+                                                    String.format(MessageTemplate.ASSIGNMENT_MESSAGE,
+                                                            bookingEdited.getCustomer().getUser().getFullname()),
+                                                    null, staff.getUser().getId(), Role.STAFF);
                                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
                                         } else {
                                             check = false;

@@ -91,6 +91,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
 
     @Query("FROM BookingDetailStep b WHERE b.bookingDetail.booking.spa.id = ?1 " +
             "AND (b.staff.id = 0 OR b.staff.id IS NULL) AND b.isConsultation = 0 " +
+            "AND b.bookingDetail.type = 1 " +
             "ORDER BY b.bookingDetail.id ASC")
     List<BookingDetailStep> findBySpaAndStaffIsNull(Integer spaId);
 }
