@@ -436,26 +436,30 @@ public class ConsultantController {
         if (Objects.nonNull(spaTreatment)) {
             dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
                     spaTreatment.getSpa().getId());
-            for (DateOff dateOff : dateOffs) {
-                if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
-                    return ResponseHelper.ok(String.format(LoggingTemplate.CONSULTANT_DATE_OFF,
-                            dateBooking));
-                }
-            }
-            staffs = staffService.findBySpaId(spaTreatment.getSpa().getId());
-            List<Staff> staffDateOff = new ArrayList<>();
-            for (Staff staff : staffs) {
-                if (staff.getUser().isActive() == true) {
-                    for (DateOff dateOff : dateOffs) {
-                        if (staff.getUser().equals(dateOff.getEmployee())) {
-                            staffDateOff.add(staff);
-                        }
+            if (dateOffs.size() != 0) {
+                for (DateOff dateOff : dateOffs) {
+                    if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.CONSULTANT_DATE_OFF,
+                                dateBooking));
                     }
-                } else {
-                    staffDateOff.add(staff);
                 }
+                staffs = staffService.findBySpaId(spaTreatment.getSpa().getId());
+                List<Staff> staffDateOff = new ArrayList<>();
+                for (Staff staff : staffs) {
+                    if (staff.getUser().isActive() == true) {
+                        for (DateOff dateOff : dateOffs) {
+                            if (staff.getUser().equals(dateOff.getEmployee())) {
+                                staffDateOff.add(staff);
+                            }
+                        }
+                    } else {
+                        staffDateOff.add(staff);
+                    }
+                }
+                staffs.removeAll(staffDateOff);
+            } else {
+                staffs = staffService.findBySpaId(spaTreatment.getSpa().getId());
             }
-            staffs.removeAll(staffDateOff);
             countEmployee = staffs.size();
             bookingDetailSteps = bookingDetailStepService
                     .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
@@ -508,21 +512,23 @@ public class ConsultantController {
         List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
         BookingDetailStep bookingDetailStep =
                 bookingDetailStepService.findById(bookingDetailStepId);
-        if(Objects.nonNull(bookingDetailStep)) {
+        if (Objects.nonNull(bookingDetailStep)) {
             Consultant consultant = bookingDetailStep.getConsultant();
             Staff staff = bookingDetailStep.getStaff();
             SpaService spaService = spaServiceService.findBySpaServiceId(spaServiceId);
-            if(Objects.nonNull(spaService)){
+            if (Objects.nonNull(spaService)) {
                 dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
                         spaService.getSpa().getId());
-                for (DateOff dateOff : dateOffs) {
-                    if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
-                        return ResponseHelper.ok(String.format(LoggingTemplate.CONSULTANT_DATE_OFF,
-                                dateBooking));
-                    }
-                    if (dateOff.getEmployee().getId().equals(staff.getUser().getId())) {
-                        return ResponseHelper.ok(String.format(LoggingTemplate.STAFF_DATE_OFF,
-                                dateBooking));
+                if(dateOffs.size()!=0) {
+                    for (DateOff dateOff : dateOffs) {
+                        if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
+                            return ResponseHelper.ok(String.format(LoggingTemplate.CONSULTANT_DATE_OFF,
+                                    dateBooking));
+                        }
+                        if (dateOff.getEmployee().getId().equals(staff.getUser().getId())) {
+                            return ResponseHelper.ok(String.format(LoggingTemplate.STAFF_DATE_OFF,
+                                    dateBooking));
+                        }
                     }
                 }
                 bookingDetailSteps = bookingDetailStepService
@@ -530,13 +536,13 @@ public class ConsultantController {
                                 IsConsultation.FALSE, spaService.getSpa().getId());
                 List<BookingDetailStep> bookingDetailStepsChoose = new ArrayList<>();
                 for (BookingDetailStep bookingDetailStepCheck : bookingDetailSteps) {
-                    if(bookingDetailStepCheck.getStaff().equals(staff)){
+                    if (bookingDetailStepCheck.getStaff().equals(staff)) {
                         bookingDetailStepsChoose.add(bookingDetailStepCheck);
                     }
                 }
                 bookingDetailSteps = bookingDetailStepsChoose;
                 Map<Integer, List<BookingDetailStep>> map = new HashMap<>();
-                map.put(staff.getId(),bookingDetailSteps);
+                map.put(staff.getId(), bookingDetailSteps);
                 List<String> timeBookingList = null;
                 timeBookingList =
                         supportFunctions.getBookTime(spaService.getDurationMin(), map, 0);

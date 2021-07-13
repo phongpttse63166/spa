@@ -151,19 +151,21 @@ public class CustomerController {
                     spaPackage.getSpa().getId());
             if (spaPackage.getType().equals(Type.ONESTEP)) {
                 staffs = staffService.findBySpaId(spaPackage.getSpa().getId());
-                List<Staff> staffDateOff = new ArrayList<>();
-                for (Staff staff : staffs) {
-                    if (staff.getUser().isActive() == true) {
-                        for (DateOff dateOff : dateOffs) {
-                            if (staff.getUser().equals(dateOff.getEmployee())) {
-                                staffDateOff.add(staff);
+                if(dateOffs.size()!=0) {
+                    List<Staff> staffDateOff = new ArrayList<>();
+                    for (Staff staff : staffs) {
+                        if (staff.getUser().isActive() == true) {
+                            for (DateOff dateOff : dateOffs) {
+                                if (staff.getUser().equals(dateOff.getEmployee())) {
+                                    staffDateOff.add(staff);
+                                }
                             }
+                        } else {
+                            staffDateOff.add(staff);
                         }
-                    } else {
-                        staffDateOff.add(staff);
                     }
+                    staffs.removeAll(staffDateOff);
                 }
-                staffs.removeAll(staffDateOff);
                 countEmployee = staffs.size();
                 bookingDetailSteps = bookingDetailStepService
                         .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
@@ -171,19 +173,21 @@ public class CustomerController {
             } else {
                 consultants =
                         consultantService.findBySpaId(spaPackage.getSpa().getId());
-                List<Consultant> consultantDateOff = new ArrayList<>();
-                for (Consultant consultant : consultants) {
-                    if (consultant.getUser().isActive() == true) {
-                        for (DateOff dateOff : dateOffs) {
-                            if (consultant.getUser().equals(dateOff.getEmployee())) {
-                                consultantDateOff.add(consultant);
+                if(dateOffs.size()!=0) {
+                    List<Consultant> consultantDateOff = new ArrayList<>();
+                    for (Consultant consultant : consultants) {
+                        if (consultant.getUser().isActive() == true) {
+                            for (DateOff dateOff : dateOffs) {
+                                if (consultant.getUser().equals(dateOff.getEmployee())) {
+                                    consultantDateOff.add(consultant);
+                                }
                             }
+                        } else {
+                            consultantDateOff.add(consultant);
                         }
-                    } else {
-                        consultantDateOff.add(consultant);
                     }
+                    consultants.removeAll(consultantDateOff);
                 }
-                consultants.removeAll(consultantDateOff);
                 countEmployee = consultants.size();
                 bookingDetailSteps = bookingDetailStepService
                         .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
