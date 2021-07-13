@@ -367,9 +367,12 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
     }
 
-    @GetMapping("/getListStaffFreeTypeOneStep/{bookingDetailId}")
-    public Response getListStaffsFreeTypeOneStep(@PathVariable Integer bookingDetailId) {
+    @GetMapping("/getListStaffFree/{bookingDetailId}")
+    public Response getListStaffsFree(@PathVariable Integer bookingDetailId) {
         List<Staff> staffListResult = new ArrayList<>();
+        Date dateBooking = null;
+        Time startTime = null;
+        Time endTime = null;
         BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
         if (Objects.nonNull(bookingDetail)) {
             List<Staff> allStaffList =
@@ -379,9 +382,15 @@ public class ManagerController {
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                 .getContent();
-                Date dateBooking = bookingDetailSteps.get(0).getDateBooking();
-                Time startTime = bookingDetailSteps.get(0).getStartTime();
-                Time endTime = bookingDetailSteps.get(bookingDetailSteps.size() - 1).getEndTime();
+                if(bookingDetail.getType().equals(Type.ONESTEP)) {
+                    dateBooking = bookingDetailSteps.get(0).getDateBooking();
+                    startTime = bookingDetailSteps.get(0).getStartTime();
+                    endTime = bookingDetailSteps.get(bookingDetailSteps.size() - 1).getEndTime();
+                } else {
+                    dateBooking = bookingDetailSteps.get(1).getDateBooking();
+                    startTime = bookingDetailSteps.get(1).getStartTime();
+                    endTime = bookingDetailSteps.get(1).getEndTime();
+                }
                 List<DateOff> dateOffs =
                         dateOffService.findByDateOffAndSpaAndStatusApprove(dateBooking,
                                 bookingDetail.getSpaPackage().getSpa().getId());
@@ -1026,5 +1035,6 @@ public class ManagerController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.CONSULTANT));
     }
+
 
 }
