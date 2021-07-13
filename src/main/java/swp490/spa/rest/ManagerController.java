@@ -367,8 +367,8 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING));
     }
 
-    @GetMapping("/getliststafffree/{bookingDetailId}")
-    public Response getListStaffsFreeInOneDate(@PathVariable Integer bookingDetailId) {
+    @GetMapping("/getListStaffFreeTypeOneStep/{bookingDetailId}")
+    public Response getListStaffsFreeTypeOneStep(@PathVariable Integer bookingDetailId) {
         List<Staff> staffListResult = new ArrayList<>();
         BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
         if (Objects.nonNull(bookingDetail)) {
@@ -382,7 +382,22 @@ public class ManagerController {
                 Date dateBooking = bookingDetailSteps.get(0).getDateBooking();
                 Time startTime = bookingDetailSteps.get(0).getStartTime();
                 Time endTime = bookingDetailSteps.get(bookingDetailSteps.size() - 1).getEndTime();
+                List<DateOff> dateOffs =
+                        dateOffService.findByDateOffAndSpaAndStatusApprove(dateBooking,
+                                bookingDetail.getSpaPackage().getSpa().getId());
+                List<Staff> staffListNotDateOff = new ArrayList<>();
                 for (Staff staff : allStaffList) {
+                    boolean checkDateOff = false;
+                    for (DateOff dateOff : dateOffs) {
+                        if (staff.getUser().equals(dateOff.getEmployee())) {
+                            checkDateOff = true;
+                        }
+                    }
+                    if (!checkDateOff) {
+                        staffListNotDateOff.add(staff);
+                    }
+                }
+                for (Staff staff : staffListNotDateOff) {
                     List<BookingDetailStep> bookingDetailStepsCheck =
                             bookingDetailStepService.findByDateBookingAndStartEndTimeAndStaffId(dateBooking,
                                     startTime, endTime, staff.getUser().getId());
@@ -440,16 +455,16 @@ public class ManagerController {
                 bookingDetailStepService.findBySpaAndStaffIsNull(spaId);
         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
             BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
-            if(bookingDetails.size() == 0){
+            if (bookingDetails.size() == 0) {
                 bookingDetails.add(bookingDetailStep.getBookingDetail());
             } else {
-                if(!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)){
+                if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)) {
                     bookingDetails.add(bookingDetail);
                 }
             }
         }
         Page<BookingDetail> page = new PageImpl<>(bookingDetails,
-                PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()),
+                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
                 bookingDetails.size());
         return ResponseHelper.ok(page);
     }
@@ -823,9 +838,9 @@ public class ManagerController {
         return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_FAILED, Constant.SERVICE));
     }
 
-    @PutMapping("/bookingdetailstep/addstafft/{bookingDetailId}/{staffId}")
-    public Response addStaffIntoBookingDetail(@PathVariable Integer bookingDetailId,
-                                              @PathVariable Integer staffId) {
+    @PutMapping("/bookingDetailStep/addStaffTypeOneStep/{bookingDetailId}/{staffId}")
+    public Response addStaffIntoBookingDetailTypeOneStep(@PathVariable Integer bookingDetailId,
+                                                         @PathVariable Integer staffId) {
         List<BookingDetailStep> bookingDetailStepEdited = new ArrayList<>();
         int count = 0;
         boolean check = true;

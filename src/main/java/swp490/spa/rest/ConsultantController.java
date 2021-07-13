@@ -257,7 +257,7 @@ public class ConsultantController {
                     BookingDetailStep bookingDetailStep = consultationContent.getBookingDetailStep();
                     bookingDetailStep.setConsultationContent(consultationContent);
                     if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep))) {
-                        LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED,
+                        LOGGER.info(String.format(LoggingTemplate.EDIT_SUCCESS,
                                 Constant.BOOKING_DETAIL_STEP));
                     }
                 }
