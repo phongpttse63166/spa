@@ -351,7 +351,7 @@ public class ManagerController {
             List<Booking> bookings = new ArrayList<>();
             for (int i = 0; i < bookingDetails.size(); i++) {
                 Booking booking = bookingDetails.get(i).getBooking();
-                if(booking.getStatusBooking().equals(StatusBooking.PENDING)) {
+                if (booking.getStatusBooking().equals(StatusBooking.PENDING)) {
                     if (i == 0) {
                         bookings.add(booking);
                     } else {
@@ -906,7 +906,7 @@ public class ManagerController {
                                 }
                             }
                             for (int i = 0; i < bookingDetailSteps.size(); i++) {
-                                if(i!=0){
+                                if (i != 0) {
                                     BookingDetailStep bookingDetailStepResult =
                                             bookingDetailStepService.editBookingDetailStep(bookingDetailSteps.get(i));
                                     if (Objects.isNull(bookingDetailStepResult)) {
@@ -971,7 +971,7 @@ public class ManagerController {
                 bookingDetailService.editBookingDetail(bookingDetailEdited);
             }
             for (BookingDetailStep bookingDetailStep : bookingDetailStepEdited) {
-                if(bookingDetailStep.getIsConsultation() == IsConsultation.FALSE){
+                if (bookingDetailStep.getIsConsultation() == IsConsultation.FALSE) {
                     bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
                     bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
                 }
@@ -1073,5 +1073,85 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.CONSULTANT));
     }
 
+    @GetMapping("/bookingDetail/findByStatusChangeStaff")
+    public Response findBookingDetailByStatusChangeStaff(@RequestParam Integer spaId) {
+        List<BookingDetail> bookingDetails =
+                bookingDetailService.findBySpaAndStatusBookingChangeStaff(spaId,
+                        StatusBooking.CHANGE_STAFF);
+        if (Objects.nonNull(bookingDetails)) {
+            Page<BookingDetail> bookingDetailPage =
+                    new PageImpl<>(bookingDetails,
+                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
+                            bookingDetails.size());
+            return ResponseHelper.ok(bookingDetailPage);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+    }
 
+    @GetMapping("/getListStaffChange")
+    public Response getListStaffChange(@RequestParam Integer bookingDetailId) {
+        List<Staff> staffResult = new ArrayList<>();
+        BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
+        if (Objects.nonNull(bookingDetail)) {
+            Spa spa = bookingDetail.getBooking().getSpa();
+            List<Staff> staffList = staffService.findBySpaId(spa.getId());
+            if(Objects.nonNull(staffList)){
+                List<BookingDetailStep> bookingDetailSteps =
+                        bookingDetailStepService.findByBookingDetail(bookingDetailId,
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                                .getContent();
+                Staff staffOld = bookingDetailSteps.get(1).getStaff();
+                for (Staff staff : staffList) {
+                    if(!staff.equals(staffOld)){
+                        staffResult.add(staff);
+                    }
+                }
+                return ResponseHelper.ok(staffList);
+            } else {
+                LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+    }
+
+    @PutMapping("/bookingDetailStep/changeStaff/{staffId}")
+    public Response changeStaffIntoBookingDetailStep(@PathVariable Integer staffId,
+                                                     @RequestParam Integer bookingDetailId){
+        List<BookingDetailStep> bookingDetailStepEdit = new ArrayList<>();
+        Staff staff = staffService.findByStaffId(staffId);
+        if(Objects.nonNull(staff)){
+            BookingDetail bookingDetail =
+                    bookingDetailService.findByBookingDetailId(bookingDetailId);
+            if(Objects.nonNull(bookingDetail)){
+                List<BookingDetailStep> bookingDetailSteps = bookingDetail.getBookingDetailSteps();
+                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                    if (!bookingDetailStep.getIsConsultation().equals(IsConsultation.TRUE)) {
+                        if (!bookingDetailStep.getStatusBooking().equals(StatusBooking.FINISH)) {
+                            bookingDetailStep.setStaff(staff);
+                        }
+                    }
+                    bookingDetailStepEdit.add(bookingDetailStep);
+                }
+                bookingDetail.setBookingDetailSteps(bookingDetailStepEdit);
+                BookingDetail bookingDetailResult =
+                        bookingDetailService.editBookingDetail(bookingDetail);
+                if(Objects.nonNull(bookingDetailResult)){
+                    ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
+                } else {
+                    bookingDetail.setBookingDetailSteps(bookingDetailSteps);
+                    bookingDetailService.editBookingDetail(bookingDetail);
+                    LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+                }
+            } else {
+                LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+        }
+        return ResponseHelper.error(LoggingTemplate.CHANGE_STAFF_FAILED);
+    }
 }

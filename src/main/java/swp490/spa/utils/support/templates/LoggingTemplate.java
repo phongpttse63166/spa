@@ -24,7 +24,8 @@ public class LoggingTemplate {
     public static final String REMOVE_FAILED = "Xóa %s thất bại";
     public static final String GET_SUCCESS = "Lấy thông tin %s thành công";
     public static final String GET_FAILED = "Lấy thông tin %s thất bại";
-
+    public static final String  CHANGE_STAFF_SUCCESS = "Thay đổi Staff thành công";
+    public static final String  CHANGE_STAFF_FAILED = "Thay đổi Staff thất bại";
 
     public static final String EMPLOYEE_EXISTED = "Đã xếp nhân viên cho dich vụ";
     public static final String BOOKING_SERVICE_EXISTED = "Có lịch booking";

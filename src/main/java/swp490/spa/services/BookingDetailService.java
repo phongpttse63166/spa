@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.BookingDetail;
+import swp490.spa.entities.StatusBooking;
 import swp490.spa.entities.Type;
 import swp490.spa.repositories.BookingDetailRepository;
 
@@ -51,5 +52,9 @@ public class BookingDetailService {
     public List<BookingDetail> findByCustomerAndSpa(Integer customerId, Integer spaId) {
         return this.bookingDetailRepository
                 .findByBooking_Customer_User_IdAndBooking_Spa_IdOrderById(customerId,spaId);
+    }
+
+    public List<BookingDetail> findBySpaAndStatusBookingChangeStaff(Integer spaId, StatusBooking status) {
+        return this.bookingDetailRepository.findByBooking_Spa_IdAndStatusBookingOrderById(spaId,status);
     }
 }

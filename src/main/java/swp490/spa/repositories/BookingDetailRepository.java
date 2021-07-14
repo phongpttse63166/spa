@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.BookingDetail;
+import swp490.spa.entities.StatusBooking;
 import swp490.spa.entities.Type;
 
 import java.util.List;
@@ -20,4 +21,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
 
     List<BookingDetail> findByBooking_Customer_User_IdAndBooking_Spa_IdOrderById(Integer customerId,
                                                                         Integer spaId);
+
+    List<BookingDetail> findByBooking_Spa_IdAndStatusBookingOrderById(Integer spaId,
+                                                                      StatusBooking status);
 }
