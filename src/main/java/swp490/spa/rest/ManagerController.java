@@ -351,11 +351,13 @@ public class ManagerController {
             List<Booking> bookings = new ArrayList<>();
             for (int i = 0; i < bookingDetails.size(); i++) {
                 Booking booking = bookingDetails.get(i).getBooking();
-                if (i == 0) {
-                    bookings.add(booking);
-                } else {
-                    if (!supportFunctions.checkBookingExistedInList(booking, bookings)) {
+                if(booking.getStatusBooking().equals(StatusBooking.PENDING)) {
+                    if (i == 0) {
                         bookings.add(booking);
+                    } else {
+                        if (!supportFunctions.checkBookingExistedInList(booking, bookings)) {
+                            bookings.add(booking);
+                        }
                     }
                 }
             }
