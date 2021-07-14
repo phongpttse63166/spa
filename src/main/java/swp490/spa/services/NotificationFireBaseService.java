@@ -28,7 +28,6 @@ public class NotificationFireBaseService {
     private static final int MAX_NOTIFICATION_RETRY = 3;
     private static final long WAIT_NOTIFICATION_RETRY = 10 * 60 * 1000;
 
-    @Async
     public CompletableFuture<String> notify(String title, String message,
                                             Map<String, String> data,
                                             Integer userId, Role role) throws FirebaseMessagingException {

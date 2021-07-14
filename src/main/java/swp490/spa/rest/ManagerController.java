@@ -936,10 +936,10 @@ public class ManagerController {
                                         booking.setStatusBooking(StatusBooking.BOOKING);
                                         bookingEdited = bookingService.editBooking(booking);
                                         if (Objects.nonNull(bookingEdited)) {
-//                                            notificationFireBaseService.notify(MessageTemplate.ASSIGNMENT_TITLE,
-//                                                    String.format(MessageTemplate.ASSIGNMENT_MESSAGE,
-//                                                            bookingEdited.getCustomer().getUser().getFullname()),
-//                                                    null, staff.getUser().getId(), Role.STAFF);
+                                            notificationFireBaseService.notify(MessageTemplate.ASSIGNMENT_TITLE,
+                                                    String.format(MessageTemplate.ASSIGNMENT_MESSAGE,
+                                                            bookingEdited.getCustomer().getUser().getFullname()),
+                                                    null, staff.getUser().getId(), Role.STAFF);
                                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
                                         } else {
                                             check = false;
