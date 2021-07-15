@@ -1083,7 +1083,7 @@ public class ManagerController {
                     new PageImpl<>(bookingDetails,
                             PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
                             bookingDetails.size());
-            return ResponseHelper.ok(bookingDetailPage);
+            return ResponseHelper.ok(conversion.convertToPageBookingDetailResponse(bookingDetailPage));
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
         }
