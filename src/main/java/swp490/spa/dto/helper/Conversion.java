@@ -22,8 +22,7 @@ public class Conversion {
                         category.getDescription(),
                         category.getCreateTime(),
                         category.getCreateBy(),
-                        category.getStatus(),
-                        category.getSpa()))
+                        category.getStatus()))
                 .collect(Collectors.toList());
 
         long totalElements = categories.getTotalElements();
@@ -82,8 +81,7 @@ public class Conversion {
                         spaService.getType(),
                         spaService.getDurationMin(),
                         spaService.getCreateTime(),
-                        spaService.getCreateBy(),
-                        spaService.getSpa()))
+                        spaService.getCreateBy()))
                 .collect(Collectors.toList());
         long totalElements = spaServices.getTotalElements();
         return new PageImpl<>(spaServiceData, totalElements == 0 ? Pageable.unpaged() : spaServices.getPageable(),
@@ -100,7 +98,6 @@ public class Conversion {
                         spaTreatment.getCreateTime(),
                         spaTreatment.getCreateBy(),
                         spaTreatment.getSpaPackage(),
-                        spaTreatment.getSpa(),
                         spaTreatment.getTreatmentServices()))
                 .collect(Collectors.toList());
         long totalElements = spaTreatments.getTotalElements();
@@ -119,27 +116,11 @@ public class Conversion {
                         spaPackage.getCreateTime(),
                         spaPackage.getCreate_by(),
                         spaPackage.getCategory(),
-                        spaPackage.getSpa(),
                         spaPackage.getSpaServices()))
                 .collect(Collectors.toList());
         long totalElements = spaPackages.getTotalElements();
         return new PageImpl<>(spaPackageData, totalElements == 0 ? Pageable.unpaged() : spaPackages.getPageable(),
                 totalElements);
-    }
-
-    public SpaPackageResponse convertToSpaPackageResponse(SpaPackage spaPackage) {
-        SpaPackageResponse spaPackageResponse = new SpaPackageResponse(spaPackage.getId(),
-                spaPackage.getName(),
-                spaPackage.getDescription(),
-                spaPackage.getImage(),
-                spaPackage.getType(),
-                spaPackage.getStatus(),
-                spaPackage.getCreateTime(),
-                spaPackage.getCreate_by(),
-                spaPackage.getCategory(),
-                spaPackage.getSpa(),
-                spaPackage.getSpaServices());
-        return spaPackageResponse;
     }
 
     public Page<SpaPackageTreatmentResponse> convertToPageSpaPackageTreatmentResponse(Page<SpaPackageTreatmentResponse> page) {

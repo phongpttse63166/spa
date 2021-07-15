@@ -12,9 +12,8 @@ import java.util.List;
 
 @Repository
 public interface SpaPackageRepository extends JpaRepository<SpaPackage, Integer> {
-    @Query("FROM SpaPackage s WHERE s.spa.id = ?1 AND s.status = ?2 AND s.name LIKE %?3% ORDER BY s.id ASC")
-    Page<SpaPackage> findSpaPackageBySpaIdAndStatus(Integer spaId, Status status,
-                                                    String search ,Pageable pageable);
+    @Query("FROM SpaPackage s WHERE s.status = ?1 AND s.name LIKE %?2% ORDER BY s.id ASC")
+    Page<SpaPackage> findSpaPackageByStatus(Status status, String search , Pageable pageable);
 
     Page<SpaPackage> findAllByStatusOrderById(Status status, Pageable pageable);
 

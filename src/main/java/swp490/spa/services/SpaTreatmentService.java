@@ -17,8 +17,8 @@ public class SpaTreatmentService {
     @Autowired
     private SpaTreatmentRepository spaTreatmentRepository;
 
-    public Page<SpaTreatment> findTreatmentBySpaId(Integer spaId, String search, Pageable pageable){
-        return this.spaTreatmentRepository.findTreatmentBySpaId(spaId, search, pageable);
+    public Page<SpaTreatment> findAllSpaTreatment(String search, Pageable pageable){
+        return this.spaTreatmentRepository.findAllSpaTreatment(search, pageable);
     }
 
     public Page<SpaTreatment> findByPackageId(Integer packageId, String search, Pageable pageable){
@@ -29,12 +29,12 @@ public class SpaTreatmentService {
         return this.spaTreatmentRepository.save(spaTreatmentInsert);
     }
 
-    public Page<SpaTreatment> findAllBySpaServiceId(Integer spaServiceId, Integer spaId,
-                                                    Integer page, Integer size, String search) {
+    public Page<SpaTreatment> findAllBySpaServiceId(Integer spaServiceId, Integer page,
+                                                    Integer size, String search) {
         Pageable pageableDefault =
                 PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT, Sort.by("name"));
         List<SpaTreatment> spaTreatments =
-                this.spaTreatmentRepository.findTreatmentBySpaId(spaId,search,pageableDefault).toList();
+                this.spaTreatmentRepository.findAllSpaTreatment(search,pageableDefault).toList();
         List<SpaTreatment> result = new ArrayList<>();
         for (SpaTreatment spaTreatment: spaTreatments) {
             List<TreatmentService> treatmentServices = Lists.newArrayList(spaTreatment.getTreatmentServices());

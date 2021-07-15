@@ -421,11 +421,13 @@ public class ConsultantController {
                 Constant.BOOKING_DETAIL_STEP));
     }
 
+    // Thêm spaId
     @GetMapping("/getListTimeBookingForAddTreatment")
     public Response getListTimeBookingForAddTreatment(@RequestParam Integer spaTreatmentId,
                                                       @RequestParam String dateBooking,
                                                       @RequestParam Integer customerId,
-                                                      @RequestParam Integer consultantId) {
+                                                      @RequestParam Integer consultantId,
+                                                      @RequestParam Integer spaId) {
         int countEmployee = 0;
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;
@@ -435,7 +437,7 @@ public class ConsultantController {
         SpaTreatment spaTreatment = spaTreatmentService.findByTreatmentId(spaTreatmentId);
         if (Objects.nonNull(spaTreatment)) {
             dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
-                    spaTreatment.getSpa().getId());
+                    spaId);
             if (dateOffs.size() != 0) {
                 for (DateOff dateOff : dateOffs) {
                     if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
@@ -443,7 +445,7 @@ public class ConsultantController {
                                 dateBooking));
                     }
                 }
-                staffs = staffService.findBySpaId(spaTreatment.getSpa().getId());
+                staffs = staffService.findBySpaId(spaId);
                 List<Staff> staffDateOff = new ArrayList<>();
                 for (Staff staff : staffs) {
                     if (staff.getUser().isActive() == true) {
@@ -458,12 +460,12 @@ public class ConsultantController {
                 }
                 staffs.removeAll(staffDateOff);
             } else {
-                staffs = staffService.findBySpaId(spaTreatment.getSpa().getId());
+                staffs = staffService.findBySpaId(spaId);
             }
             countEmployee = staffs.size();
             bookingDetailSteps = bookingDetailStepService
                     .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
-                            IsConsultation.FALSE, spaTreatment.getSpa().getId());
+                            IsConsultation.FALSE, spaId);
             /*
                 Separate bookingDetailSteps into lists with incrementation time
                 and put into map
@@ -503,11 +505,13 @@ public class ConsultantController {
         }
     }
 
+    // Thêm spaId
     @GetMapping("/getListTimeBookingForAStep")
     public Response getListTimeBookingForAStep(@RequestParam Integer spaServiceId,
                                                @RequestParam Integer bookingDetailStepId,
                                                @RequestParam String dateBooking,
-                                               @RequestParam Integer customerId) {
+                                               @RequestParam Integer customerId,
+                                               @RequestParam Integer spaId) {
         List<DateOff> dateOffs = null;
         List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
         BookingDetailStep bookingDetailStep =
@@ -518,7 +522,7 @@ public class ConsultantController {
             SpaService spaService = spaServiceService.findBySpaServiceId(spaServiceId);
             if (Objects.nonNull(spaService)) {
                 dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
-                        spaService.getSpa().getId());
+                        spaId);
                 if(dateOffs.size()!=0) {
                     for (DateOff dateOff : dateOffs) {
                         if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
@@ -533,7 +537,7 @@ public class ConsultantController {
                 }
                 bookingDetailSteps = bookingDetailStepService
                         .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
-                                IsConsultation.FALSE, spaService.getSpa().getId());
+                                IsConsultation.FALSE, spaId);
                 List<BookingDetailStep> bookingDetailStepsChoose = new ArrayList<>();
                 for (BookingDetailStep bookingDetailStepCheck : bookingDetailSteps) {
                     if (bookingDetailStepCheck.getStaff().equals(staff)) {

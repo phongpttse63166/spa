@@ -13,5 +13,6 @@ import java.util.List;
 @Setter
 public class BookingRequest {
     private Integer customerId;
+    private Integer spaId;
     private List<BookingData> bookingDataList;
 }

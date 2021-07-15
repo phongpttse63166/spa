@@ -93,38 +93,47 @@ public class PublicController {
         return ResponseHelper.ok(user);
     }
 
-    @GetMapping("/spaservice/findbyspaid")
-    public Response findSpaServiceBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
-                                          @RequestParam String search, Pageable pageable) {
+//    @GetMapping("/spaservice/findbyspaid")
+    @GetMapping("/spaService/findByStatus")
+    public Response findSpaServiceBySpaId(@RequestParam Status status,
+                                          @RequestParam String search,
+                                          Pageable pageable) {
         Page<swp490.spa.entities.SpaService> spaServices =
-                spaServiceService.findBySpaIdAndStatus(spaId, status, search, pageable);
+                spaServiceService.findByStatus(status, search, pageable);
         if (!spaServices.hasContent() && !spaServices.isFirst()) {
-            spaServices = spaServiceService.findBySpaIdAndStatus(spaId, status, search,
+            spaServices = spaServiceService.findByStatus(status, search,
                     PageRequest.of(spaServices.getTotalPages() - 1, spaServices.getSize(), spaServices.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
-    @GetMapping("/spatreatment/findbyspaid")
-    public Response findSpaTreatmentBySpaId(@RequestParam Integer spaId,
-                                            @RequestParam String search, Pageable pageable) {
+//    @GetMapping("/spatreatment/findbyspaid")
+    @GetMapping("/spaTreatment/findAll")
+    public Response findAllSpaTreatment(@RequestParam String search,
+                                        Pageable pageable) {
         Page<SpaTreatment> spaTreatments =
-                spaTreatmentService.findTreatmentBySpaId(spaId, search, pageable);
+                spaTreatmentService.findAllSpaTreatment(search, pageable);
         if (!spaTreatments.hasContent() && !spaTreatments.isFirst()) {
-            spaTreatments = spaTreatmentService.findTreatmentBySpaId(spaId, search,
-                    PageRequest.of(spaTreatments.getTotalPages() - 1, spaTreatments.getSize(), spaTreatments.getSort()));
+            spaTreatments =
+                    spaTreatmentService.findAllSpaTreatment(search,
+                            PageRequest.of(spaTreatments.getTotalPages() - 1,
+                                    spaTreatments.getSize(), spaTreatments.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 
-    @GetMapping("/spapackage/findbyspaid")
-    public Response findSpaPackageBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
-                                          @RequestParam String search, Pageable pageable) {
+//    @GetMapping("/spapackage/findbyspaid")
+    @GetMapping("/spaPackage/findByStatus")
+    public Response findSpaPackageBySpaId(@RequestParam Status status,
+                                          @RequestParam String search,
+                                          Pageable pageable) {
         Page<SpaPackage> spaPackages =
-                spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status, search, pageable);
+                spaPackageService.findSpaPackageByStatus(status, search, pageable);
         if (!spaPackages.hasContent() && !spaPackages.isFirst()) {
-            spaPackages = spaPackageService.findSpaPackageBySpaIdAndStatus(spaId, status, search,
-                    PageRequest.of(spaPackages.getTotalPages() - 1, spaPackages.getSize(), spaPackages.getSort()));
+            spaPackages =
+                    spaPackageService.findSpaPackageByStatus(status, search,
+                            PageRequest.of(spaPackages.getTotalPages() - 1,
+                                    spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
@@ -204,7 +213,7 @@ public class PublicController {
         return ResponseHelper.error(LoggingTemplate.VERIFY_FAILED);
     }
 
-    @GetMapping("/spa/findall")
+    @GetMapping("/spa/findAll")
     public Response getAllSpa(Pageable pageable) {
         Page<Spa> spas = spaService.findAllSpaByStatusAvailable(pageable);
         if (!spas.hasContent() && !spas.isFirst()) {
@@ -241,7 +250,7 @@ public class PublicController {
                 if (customer == null) {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.CUSTOMER_NOT_EXISTED);
                 }
-                if(authRequest.getTokenFCM() != null) {
+                if (authRequest.getTokenFCM() != null) {
                     customer.setTokenFCM(authRequest.getTokenFCM());
                     customer = customerService.editCustomer(customer);
                 }
@@ -252,7 +261,7 @@ public class PublicController {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.STAFF_NOT_EXISTED);
                 }
                 spaId = staff.getSpa().getId();
-                if(authRequest.getTokenFCM() != null) {
+                if (authRequest.getTokenFCM() != null) {
                     staff.setTokenFCM(authRequest.getTokenFCM());
                     staff = staffService.editStaff(staff);
                 }
@@ -263,7 +272,7 @@ public class PublicController {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.MANAGER_NOT_EXISTED);
                 }
                 spaId = manager.getSpa().getId();
-                if(authRequest.getTokenFCM() != null) {
+                if (authRequest.getTokenFCM() != null) {
                     manager.setTokenFCM(authRequest.getTokenFCM());
                     manager = managerService.editManager(manager);
                 }
@@ -276,7 +285,7 @@ public class PublicController {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.CONSULTANT_NOT_EXISTED);
                 }
                 spaId = consultant.getSpa().getId();
-                if(authRequest.getTokenFCM() != null) {
+                if (authRequest.getTokenFCM() != null) {
                     consultant.setTokenFCM(authRequest.getTokenFCM());
                     consultant = consultantService.editConsultant(consultant);
                 }
@@ -295,13 +304,13 @@ public class PublicController {
         return LoginResponse.createSuccessResponse(token, role, userId, spaId);
     }
 
-    @GetMapping("/spaservice/findbyspapackageid")
-    public Response findSpaServiceBySpaPackageId(@RequestParam Integer spaPackageId) {
+    @GetMapping("/spaSerVice/findBySpaPackageId/{spaPackageId}")
+    public Response findSpaServiceBySpaPackageId(@PathVariable Integer spaPackageId) {
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
-        return ResponseHelper.ok(conversion.convertToSpaPackageResponse(spaPackage));
+        return ResponseHelper.ok(spaPackage);
     }
 
-    @GetMapping("/getallspapackage")
+    @GetMapping("/getAllSpaPackage")
     public Response getAllSpaPackage(Pageable pageable) {
         Page<SpaPackage> spaPackages =
                 spaPackageService.findAllStatusAvailable(pageable);
@@ -321,12 +330,11 @@ public class PublicController {
                         spaPackage.getCreateTime(),
                         spaPackage.getCreate_by(),
                         spaPackage.getCategory(),
-                        spaPackage.getSpa(),
                         Constant.TOTAL_TIME_DEFAULT,
                         spaPackage.getSpaServices()))
                 .collect(Collectors.toList());
         for (SpaPackageGetAllResponse spaPackage : sprList) {
-            if(spaPackage.getType().equals(Type.ONESTEP)) {
+            if (spaPackage.getType().equals(Type.ONESTEP)) {
                 SpaTreatment spaTreatment =
                         spaTreatmentService.findByPackageIdAndTypeOneStep(spaPackage.getId());
                 spaPackage.setTotalTime(spaTreatment.getTotalTime());
@@ -338,8 +346,9 @@ public class PublicController {
         return ResponseHelper.ok(page);
     }
 
-    @GetMapping("/spapackage/findbycategoryId")
-    public Response findSpaPackageByCategoryId(@RequestParam Integer categoryId,
+//    @GetMapping("/spapackage/findbycategoryId")
+    @GetMapping("/spaPackage/findByCategoryId/{categoryId}")
+    public Response findSpaPackageByCategoryId(@PathVariable Integer categoryId,
                                                Pageable pageable) {
         Page<SpaPackage> spaPackages =
                 spaPackageService.findByCategoryIdOrderByDate(categoryId, pageable);

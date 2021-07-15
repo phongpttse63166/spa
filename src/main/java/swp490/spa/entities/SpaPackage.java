@@ -36,9 +36,6 @@ public class SpaPackage implements Serializable {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-    @ManyToOne
-    @JoinColumn(name = "spa_id")
-    private Spa spa;
     @JsonBackReference
     @ManyToMany(cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
     @JoinTable(

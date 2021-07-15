@@ -18,31 +18,24 @@ public class SpaPackageService {
     @Autowired
     private SpaPackageRepository spaPackageRepository;
 
-    public Page<SpaPackage> findSpaPackageBySpaIdAndStatus(Integer spaId, Status status,
-                                                           String search, Pageable pageable){
-        return this.spaPackageRepository.findSpaPackageBySpaIdAndStatus(spaId, status, search ,pageable);
+    public Page<SpaPackage> findSpaPackageByStatus(Status status, String search, Pageable pageable){
+        return this.spaPackageRepository.findSpaPackageByStatus(status, search ,pageable);
     }
 
     public Page<SpaPackage> findAllStatusAvailable(Pageable pageable){
         return this.spaPackageRepository.findAllByStatusOrderById(Status.AVAILABLE, pageable);
     }
 
-    public Page<SpaPackage> findSpaPackageBySpaIdAndStatusAvailable(Integer spaId, String search,
-                                                                    Pageable pageable){
-        return this.spaPackageRepository
-                .findSpaPackageBySpaIdAndStatus(spaId, Status.AVAILABLE, search ,pageable);
-    }
-
     public SpaPackage insertNewSpaPackage(SpaPackage spaPackage) {
         return this.spaPackageRepository.saveAndFlush(spaPackage);
     }
 
-    public Page<SpaPackage> findAllBySpaServiceId(Integer spaServiceId, Integer spaId ,
-                                                  Integer page, Integer size, String search){
+    public Page<SpaPackage> findAllBySpaServiceId(Integer spaServiceId, Integer page,
+                                                  Integer size, String search){
 
         Pageable pageableDefault = PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT, Sort.by("name"));
         List<SpaPackage> spaPackages =
-                this.spaPackageRepository.findSpaPackageBySpaIdAndStatus(spaId, Status.AVAILABLE,
+                this.spaPackageRepository.findSpaPackageByStatus(Status.AVAILABLE,
                         search, pageableDefault)
                         .toList();
         List<SpaPackage> result = new ArrayList<>();

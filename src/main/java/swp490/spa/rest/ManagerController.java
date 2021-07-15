@@ -21,7 +21,6 @@ import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.image.UploadImage;
-import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -102,22 +101,22 @@ public class ManagerController {
         return ResponseHelper.ok(manager);
     }
 
-    @GetMapping("/spapackage/findbyspaid")
-    public Response getSpaPackageBySpaId(@RequestParam Integer spaId,
-                                         @RequestParam String search,
-                                         Pageable pageable) {
+    @GetMapping("/spaPackage/findByStatus")
+    public Response findSpaPackageBySpaId(@RequestParam Status status,
+                                          @RequestParam String search,
+                                          Pageable pageable) {
         Page<SpaPackage> spaPackages =
-                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search, pageable);
+                spaPackageService.findSpaPackageByStatus(status, search, pageable);
         if (!spaPackages.hasContent() && !spaPackages.isFirst()) {
-            spaPackages = spaPackageService
-                    .findSpaPackageBySpaIdAndStatusAvailable(spaId, search,
+            spaPackages =
+                    spaPackageService.findSpaPackageByStatus(status, search,
                             PageRequest.of(spaPackages.getTotalPages() - 1,
                                     spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
-    @GetMapping("/spatreatment/findbypackageId")
+    @GetMapping("/spaTreatment/findByPackageId")
     public Response findSpaTreatmentByPackageId(@RequestParam Integer packageId,
                                                 @RequestParam String search, Pageable pageable) {
         long totalItem = spaTreatmentService.findByPackageId(packageId, Constant.SEARCH_NO_CONTENT,
@@ -141,55 +140,54 @@ public class ManagerController {
                 spaTreatmentCheck.getTreatmentServices().add(treatmentService);
             }
             spaTreatmentList.add(spaTreatmentCheck);
-            System.out.println("aaaaaaaaaaaaa");
         }
         Page<SpaTreatment> pageResult = new PageImpl<>(spaTreatmentList, pageable, totalItem);
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(pageResult));
     }
 
-    @GetMapping("/spaservice/findbyspaId")
-    public Response findSpaServiceBySpaId(@RequestParam Integer spaId, @RequestParam Status status,
-                                          @RequestParam String search, Pageable pageable) {
+    @GetMapping("/spaService/findByStatus")
+    public Response findSpaServiceByStatus(@RequestParam Status status,
+                                           @RequestParam String search,
+                                           Pageable pageable) {
         Page<swp490.spa.entities.SpaService> spaServices =
-                spaServiceService.findBySpaIdAndStatus(spaId, status, search, pageable);
+                spaServiceService.findByStatus(status, search, pageable);
         if (!spaServices.hasContent() && !spaServices.isFirst()) {
-            spaServices = spaServiceService.findBySpaIdAndStatus(spaId, status, search,
-                    PageRequest.of(spaServices.getTotalPages() - 1, spaServices.getSize(), spaServices.getSort()));
+            spaServices =
+                    spaServiceService.findByStatus(status, search,
+                            PageRequest.of(spaServices.getTotalPages() - 1,
+                                    spaServices.getSize(), spaServices.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
-    @GetMapping("/spapackage/findbyserviceId")
+    @GetMapping("/spaPackage/findByServiceId")
     public Response findSpaPackageBySpaServiceId(@RequestParam Integer spaServiceId,
-                                                 @RequestParam Integer spaId,
                                                  @RequestParam Integer page,
                                                  @RequestParam Integer size,
                                                  @RequestParam String search) {
         Page<SpaPackage> spaPackages =
-                spaPackageService.findAllBySpaServiceId(spaServiceId, spaId, page, size, search);
+                spaPackageService.findAllBySpaServiceId(spaServiceId, page, size, search);
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
 
     @GetMapping("/spatreatment/findbyserviceId")
     public Response findSpaTreatmentBySpaServiceId(@RequestParam Integer spaServiceId,
-                                                   @RequestParam Integer spaId,
                                                    @RequestParam Integer page,
                                                    @RequestParam Integer size,
                                                    @RequestParam String search) {
         Page<SpaTreatment> spaTreatments =
-                spaTreatmentService.findAllBySpaServiceId(spaServiceId, spaId, page, size, search);
+                spaTreatmentService.findAllBySpaServiceId(spaServiceId, page, size, search);
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 
-    @GetMapping("/spapackagetreatment/findbyspaId")
-    public Response findSpaPackageTreatmentBySpaId(@RequestParam Integer spaId,
-                                                   @RequestParam String search,
-                                                   Pageable pageable) {
+    @GetMapping("/spaPackageTreatment/findByStatus")
+    public Response findSpaPackageTreatmentByStatus(@RequestParam String search,
+                                                    Pageable pageable) {
         List<SpaPackageTreatmentResponse> result = new ArrayList<>();
         Page<SpaPackage> spaPackages =
-                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId, search, pageable);
+                spaPackageService.findSpaPackageByStatus(Status.AVAILABLE, search, pageable);
         long totalItem =
-                spaPackageService.findSpaPackageBySpaIdAndStatusAvailable(spaId,
+                spaPackageService.findSpaPackageByStatus(Status.AVAILABLE,
                         Constant.SEARCH_NO_CONTENT,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                         .getTotalElements();
@@ -210,38 +208,39 @@ public class ManagerController {
         return ResponseHelper.ok(conversion.convertToPageSpaPackageTreatmentResponse(page));
     }
 
-    @GetMapping("/spaservice/findbyspaidandtype")
-    public Response findSpaServiceBySpaIdAndType(@RequestParam Integer spaId,
-                                                 @RequestParam Type type,
-                                                 @RequestParam String search,
-                                                 Pageable pageable) {
-        Page<SpaService> spaServices = spaServiceService.findBySpaIdAndType(spaId, type, search, pageable);
+    @GetMapping("/spaService/findByType")
+    public Response findSpaServiceByType(@RequestParam Type type,
+                                         @RequestParam String search,
+                                         Pageable pageable) {
+        Page<SpaService> spaServices = spaServiceService.findByType(type, search, pageable);
         if (!spaServices.hasContent() && !spaServices.isFirst()) {
-            spaServices = spaServiceService.findBySpaIdAndType(spaId, type, search,
-                    PageRequest.of(spaServices.getTotalPages() - 1, spaServices.getSize(), spaServices.getSort()));
+            spaServices =
+                    spaServiceService.findByType(type, search,
+                            PageRequest.of(spaServices.getTotalPages() - 1,
+                                    spaServices.getSize(), spaServices.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
-    @GetMapping("/categoryspapackages/findbyspaId")
-    public Response findCategorySpaPackagesBySpaId(@RequestParam Integer spaId,
-                                                   @RequestParam Status status,
-                                                   @RequestParam String search,
-                                                   Pageable pageable) {
+    @GetMapping("/categorySpaPackages/findByStatus")
+    public Response findCategorySpaPackagesByStatus(@RequestParam Status status,
+                                                    @RequestParam String search,
+                                                    Pageable pageable) {
         List<Category> categories;
         long totalItem = 0;
         if (search == "") {
-            totalItem = categoryService.findBySpaIdAndStatusNoSearch(spaId, status,
+            totalItem = categoryService.findAllByStatus(status,
                     PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                     .getContent().size();
-            categories = categoryService.findBySpaIdAndStatusNoSearch(spaId, status, pageable)
+            categories = categoryService.findAllByStatus(status, pageable)
                     .getContent();
         } else {
             totalItem =
-                    categoryService.findCategoryBySpaId(spaId, status, search,
+                    categoryService.findCategoryByStatusAndName(status, search,
                             PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                             .getContent().size();
-            categories = categoryService.findCategoryBySpaId(spaId, status, search, pageable).getContent();
+            categories =
+                    categoryService.findCategoryByStatusAndName(status, search, pageable).getContent();
         }
         if (Objects.nonNull(categories)) {
             List<CategorySpaPackageResponse> categorySpaPackageResponses = new ArrayList<>();
@@ -379,8 +378,9 @@ public class ManagerController {
         Time endTime = null;
         BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
         if (Objects.nonNull(bookingDetail)) {
+            Spa spa = bookingDetail.getBooking().getSpa();
             List<Staff> allStaffList =
-                    staffService.findBySpaId(bookingDetail.getSpaPackage().getSpa().getId());
+                    staffService.findBySpaId(spa.getId());
             if (Objects.nonNull(allStaffList)) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
@@ -396,8 +396,7 @@ public class ManagerController {
                     endTime = bookingDetailSteps.get(1).getEndTime();
                 }
                 List<DateOff> dateOffs =
-                        dateOffService.findByDateOffAndSpaAndStatusApprove(dateBooking,
-                                bookingDetail.getSpaPackage().getSpa().getId());
+                        dateOffService.findByDateOffAndSpaAndStatusApprove(dateBooking, spa.getId());
                 if (dateOffs.size() != 0) {
                     List<Staff> staffListNotDateOff = new ArrayList<>();
                     for (Staff staff : allStaffList) {
@@ -436,8 +435,9 @@ public class ManagerController {
         List<Consultant> consultantListResult = new ArrayList<>();
         BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
         if (Objects.nonNull(bookingDetail)) {
+            Spa spa = bookingDetail.getBooking().getSpa();
             List<Consultant> allConsultant =
-                    consultantService.findBySpaId(bookingDetail.getSpaPackage().getSpa().getId());
+                    consultantService.findBySpaId(spa.getId());
             if (Objects.nonNull(allConsultant)) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
@@ -496,7 +496,6 @@ public class ManagerController {
                     LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
                     return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
                 }
-                Spa spa = manager.getSpa();
                 SpaService spaService = new SpaService();
                 spaService.setName(spaServiceRequest.getName());
                 spaService.setDescription(spaServiceRequest.getDescription());
@@ -507,7 +506,6 @@ public class ManagerController {
                 spaService.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
                 spaService.setCreateBy(spaServiceRequest.getCreateBy().toString());
                 spaService.setImage(imageLink);
-                spaService.setSpa(spa);
                 SpaService serviceResult = spaServiceService.insertNewSpaService(spaService);
                 if (Objects.nonNull(serviceResult)) {
                     return ResponseHelper.ok(serviceResult);
@@ -533,13 +531,8 @@ public class ManagerController {
                 if (Objects.isNull(category)) {
                     return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
                 }
-                Spa spa = spaService.findById(spaPackage.getSpaId());
-                if (Objects.isNull(spa)) {
-                    return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
-                }
                 SpaPackage spaPackageInsert = new SpaPackage();
                 spaPackageInsert.setName(spaPackage.getName());
-                spaPackageInsert.setSpa(spa);
                 spaPackageInsert.setCategory(category);
                 spaPackageInsert.setCreate_by(spaPackage.getCreateBy());
                 spaPackageInsert.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
@@ -552,7 +545,7 @@ public class ManagerController {
                     return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.SPA_PACKAGE_SERVICE));
                 }
                 for (Integer serviceId : spaPackage.getListSpaServiceId()) {
-                    swp490.spa.entities.SpaService spaService = spaServiceService.findBySpaId(serviceId);
+                    swp490.spa.entities.SpaService spaService = spaServiceService.findById(serviceId);
                     if (Objects.isNull(spaService)) {
                         ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SERVICE));
                     }
@@ -578,16 +571,12 @@ public class ManagerController {
         if (Objects.isNull(spaPackage)) {
             return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
         }
-        Spa spa = spaService.findById(spaTreatmentRequest.getSpaId());
-        if (Objects.isNull(spa)) {
-            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
-        }
         int ordinal = 1;
         int totalTime = 0;
         double totalPrice = 0.0;
         for (int i = 0; i < spaTreatmentRequest.getListSpaServiceId().size(); i++) {
             swp490.spa.entities.SpaService spaService =
-                    spaServiceService.findBySpaId(spaTreatmentRequest.getListSpaServiceId().get(i));
+                    spaServiceService.findById(spaTreatmentRequest.getListSpaServiceId().get(i));
             if (Objects.isNull(spaService)) {
                 ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SERVICE));
             }
@@ -601,7 +590,7 @@ public class ManagerController {
                 spaTreatmentRequest.getDescription(), totalTime,
                 Date.valueOf(LocalDateTime.now().toLocalDate()),
                 spaTreatmentRequest.getCreateBy(),
-                spaPackage, spa, treatmentServices, totalPrice);
+                spaPackage, treatmentServices, totalPrice);
         if (Objects.nonNull(spaTreatmentService.insertNewSpaTreatment(spaTreatmentInsert))) {
             for (TreatmentService treatmentService : treatmentServices) {
                 treatmentService.setSpaTreatment(spaTreatmentInsert);
@@ -626,25 +615,19 @@ public class ManagerController {
         if (Objects.nonNull(categoryRequest.getFile())) {
             String imageLink = UploadImage.uploadImage(categoryRequest.getFile());
             if (imageLink != "") {
-                Spa spa = spaService.findById(categoryRequest.getSpaId());
-                if (Objects.nonNull(spa)) {
-                    Category categoryNew = new Category();
-                    categoryNew.setName(categoryRequest.getName());
-                    categoryNew.setIcon(imageLink);
-                    categoryNew.setDescription(categoryRequest.getDescription());
-                    categoryNew.setStatus(Status.AVAILABLE);
-                    categoryNew.setCreateBy(categoryRequest.getCreateBy());
-                    categoryNew.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
-                    categoryNew.setSpa(spa);
-                    Category categoryResult = categoryService.insertNewCategory(categoryNew);
-                    if (Objects.nonNull(categoryResult)) {
-                        LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CATEGORY));
-                        return ResponseHelper.ok(categoryResult);
-                    }
-                    LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.CATEGORY));
-                } else {
-                    LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
+                Category categoryNew = new Category();
+                categoryNew.setName(categoryRequest.getName());
+                categoryNew.setIcon(imageLink);
+                categoryNew.setDescription(categoryRequest.getDescription());
+                categoryNew.setStatus(Status.AVAILABLE);
+                categoryNew.setCreateBy(categoryRequest.getCreateBy());
+                categoryNew.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
+                Category categoryResult = categoryService.insertNewCategory(categoryNew);
+                if (Objects.nonNull(categoryResult)) {
+                    LOGGER.info(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CATEGORY));
+                    return ResponseHelper.ok(categoryResult);
                 }
+                LOGGER.info(String.format(LoggingTemplate.INSERT_FAILED, Constant.CATEGORY));
             } else {
                 LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
             }
@@ -1097,14 +1080,14 @@ public class ManagerController {
         if (Objects.nonNull(bookingDetail)) {
             Spa spa = bookingDetail.getBooking().getSpa();
             List<Staff> staffList = staffService.findBySpaId(spa.getId());
-            if(Objects.nonNull(staffList)){
+            if (Objects.nonNull(staffList)) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                 .getContent();
                 Staff staffOld = bookingDetailSteps.get(1).getStaff();
                 for (Staff staff : staffList) {
-                    if(!staff.equals(staffOld)){
+                    if (!staff.equals(staffOld)) {
                         staffResult.add(staff);
                     }
                 }
@@ -1120,13 +1103,13 @@ public class ManagerController {
 
     @PutMapping("/bookingDetailStep/changeStaff/{staffId}")
     public Response changeStaffIntoBookingDetailStep(@PathVariable Integer staffId,
-                                                     @RequestParam Integer bookingDetailId){
+                                                     @RequestParam Integer bookingDetailId) {
         List<BookingDetailStep> bookingDetailStepEdit = new ArrayList<>();
         Staff staff = staffService.findByStaffId(staffId);
-        if(Objects.nonNull(staff)){
+        if (Objects.nonNull(staff)) {
             BookingDetail bookingDetail =
                     bookingDetailService.findByBookingDetailId(bookingDetailId);
-            if(Objects.nonNull(bookingDetail)){
+            if (Objects.nonNull(bookingDetail)) {
                 List<BookingDetailStep> bookingDetailSteps = bookingDetail.getBookingDetailSteps();
                 for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                     if (!bookingDetailStep.getIsConsultation().equals(IsConsultation.TRUE)) {
@@ -1139,7 +1122,7 @@ public class ManagerController {
                 bookingDetail.setBookingDetailSteps(bookingDetailStepEdit);
                 BookingDetail bookingDetailResult =
                         bookingDetailService.editBookingDetail(bookingDetail);
-                if(Objects.nonNull(bookingDetailResult)){
+                if (Objects.nonNull(bookingDetailResult)) {
                     ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
                 } else {
                     bookingDetail.setBookingDetailSteps(bookingDetailSteps);

@@ -16,22 +16,21 @@ public class SpaServiceService {
     @Autowired
     private SpaServiceRepository spaServiceRepository;
 
-    public Page<SpaService> findBySpaIdAndStatus(Integer spaId, Status status, String search, Pageable pageable){
-        return this.spaServiceRepository.findBySpaIdAndStatus(spaId, status, search, pageable);
+    public Page<SpaService> findByStatus(Status status, String search, Pageable pageable){
+        return this.spaServiceRepository.findByStatus(status, search, pageable);
     }
 
     public SpaService insertNewSpaService(SpaService spaService) {
         return this.spaServiceRepository.saveAndFlush(spaService);
     }
 
-    public SpaService findBySpaId(Integer serviceId) {
-        return this.spaServiceRepository.findBySpaId(serviceId);
+    public SpaService findById(Integer serviceId) {
+        return this.spaServiceRepository.findById(serviceId).get();
     }
 
-    public Page<SpaService> findBySpaIdAndType(Integer spaId, Type type, String search, Pageable pageable) {
+    public Page<SpaService> findByType(Type type, String search, Pageable pageable) {
         return this.spaServiceRepository
-                .findBySpa_IdAndTypeAndNameContainingAndStatusOrderById(spaId, type,
-                        search, Status.AVAILABLE, pageable);
+                .findByTypeAndNameContainingAndStatusOrderById(type, search, Status.AVAILABLE, pageable);
     }
 
     public SpaService editBySpaService(SpaService spaService) {

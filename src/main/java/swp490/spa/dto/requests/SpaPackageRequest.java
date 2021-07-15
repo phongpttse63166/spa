@@ -21,7 +21,6 @@ public class SpaPackageRequest {
     private Date createTime;
     private Integer createBy;
     private Integer categoryId;
-    private Integer spaId;
     private List<Integer> listSpaServiceId;
     private MultipartFile file;
 }

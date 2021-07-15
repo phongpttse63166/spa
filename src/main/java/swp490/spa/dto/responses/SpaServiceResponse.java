@@ -36,7 +36,4 @@ public class SpaServiceResponse {
     private Date createTime;
     @JsonProperty("create_by")
     private String createBy;
-    @JsonProperty("spa")
-    @JsonIgnore
-    private Spa spa;
 }

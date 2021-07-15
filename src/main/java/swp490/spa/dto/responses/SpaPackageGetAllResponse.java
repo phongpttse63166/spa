@@ -31,8 +31,6 @@ public class SpaPackageGetAllResponse {
     private Integer create_by;
     @JsonProperty("category_id")
     private Category category;
-    @JsonProperty("spa_id")
-    private Spa spa;
     @JsonProperty("total_time")
     private Integer totalTime;
     @JsonProperty("services")

@@ -27,6 +27,4 @@ public class CategoryResponse {
     private Integer createBy;
     @JsonProperty("status")
     private Status status;
-    @JsonProperty("spa")
-    private Spa spa;
 }

@@ -135,10 +135,12 @@ public class CustomerController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
     }
 
+    // Thêm spaId
     @GetMapping("/getlisttimebook")
     public Response getListTimeBookingForCustomer(@RequestParam Integer spaPackageId,
                                                   @RequestParam String dateBooking,
-                                                  @RequestParam Integer customerId) {
+                                                  @RequestParam Integer customerId,
+                                                  @RequestParam Integer spaId) {
         int countEmployee = 0;
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;
@@ -148,9 +150,9 @@ public class CustomerController {
         SpaPackage spaPackage = spaPackageService.findBySpaPackageId(spaPackageId);
         if (Objects.nonNull(spaPackage)) {
             dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
-                    spaPackage.getSpa().getId());
+                    spaId);
             if (spaPackage.getType().equals(Type.ONESTEP)) {
-                staffs = staffService.findBySpaId(spaPackage.getSpa().getId());
+                staffs = staffService.findBySpaId(spaId);
                 if(dateOffs.size()!=0) {
                     List<Staff> staffDateOff = new ArrayList<>();
                     for (Staff staff : staffs) {
@@ -169,10 +171,10 @@ public class CustomerController {
                 countEmployee = staffs.size();
                 bookingDetailSteps = bookingDetailStepService
                         .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
-                                IsConsultation.FALSE, spaPackage.getSpa().getId());
+                                IsConsultation.FALSE, spaId);
             } else {
                 consultants =
-                        consultantService.findBySpaId(spaPackage.getSpa().getId());
+                        consultantService.findBySpaId(spaId);
                 if(dateOffs.size()!=0) {
                     List<Consultant> consultantDateOff = new ArrayList<>();
                     for (Consultant consultant : consultants) {
@@ -191,7 +193,7 @@ public class CustomerController {
                 countEmployee = consultants.size();
                 bookingDetailSteps = bookingDetailStepService
                         .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
-                                IsConsultation.TRUE, spaPackage.getSpa().getId());
+                                IsConsultation.TRUE, spaId);
             }
             /*
                 Separate bookingDetailSteps into lists with incrementation time
@@ -232,20 +234,21 @@ public class CustomerController {
         return ResponseHelper.ok(userLocation);
     }
 
+    // Thêm trong BookingRequest spaId
     @PostMapping("/booking/create")
     public Response insertBooking(@RequestBody BookingRequest bookingRequest) {
         boolean checkNoEmployForBooking = false;
         SpaPackage spaPackageCheck = spaPackageService
                 .findBySpaPackageId(bookingRequest.getBookingDataList().get(0).getPackageId());
-        List<Staff> staffList = staffService.findBySpaId(spaPackageCheck.getSpa().getId());
+        List<Staff> staffList = staffService.findBySpaId(bookingRequest.getSpaId());
         List<Consultant> consultantList =
-                consultantService.findBySpaId(spaPackageCheck.getSpa().getId());
+                consultantService.findBySpaId(bookingRequest.getSpaId());
         for (BookingData bookingData : bookingRequest.getBookingDataList()) {
             spaPackageCheck = spaPackageService.findBySpaPackageId(bookingData.getPackageId());
             Time startTime = bookingData.getTimeBooking();
             List<DateOff> dateOffs =
                     dateOffService.findByDateOffAndSpaAndStatusApprove(bookingData.getDateBooking(),
-                            spaPackageCheck.getSpa().getId());
+                            bookingRequest.getSpaId());
             List<Staff> staffBookingList = staffList;
             List<Consultant> consultantBookingList = consultantList;
             if (dateOffs.size() != 0) {
@@ -337,7 +340,7 @@ public class CustomerController {
             boolean checkCanInsert = true;
             Double totalPrice = 0.0;
             Integer totalTime = 0;
-            Spa spa = null;
+            Spa spa = spaService.findById(bookingRequest.getSpaId());
             Customer customer = customerService.findByUserId(bookingRequest.getCustomerId());
             if (Objects.isNull(customer)) {
                 ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CUSTOMER));
@@ -347,7 +350,6 @@ public class CustomerController {
                 if (Objects.nonNull(spaPackageSearchResult)) {
                     if(!supportFunctions.checkSpaPackageExisted(spaPackageSearchResult, spaPackageList)) {
                         spaPackageList.add(spaPackageSearchResult);
-                        spa = spaPackageSearchResult.getSpa();
                         if (spaPackageSearchResult.getType().equals(Type.MORESTEP)) {
                             isOnlyOneStep = false;
                         }

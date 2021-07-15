@@ -29,7 +29,4 @@ public class Category implements Serializable {
     private Integer createBy;
     @Column(name = "status")
     private Status status;
-    @ManyToOne
-    @JoinColumn(name = "spa_id")
-    private Spa spa;
 }

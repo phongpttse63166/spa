@@ -33,8 +33,6 @@ public class SpaTreatmentResponse {
     private Integer createBy;
     @JsonProperty("spa_package")
     private SpaPackage spaPackage;
-    @JsonProperty("spa")
-    private Spa spa;
     @JsonProperty("treatmentservices")
     private Set<TreatmentService> treatmentServices;
 }

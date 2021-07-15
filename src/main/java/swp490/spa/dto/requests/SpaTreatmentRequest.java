@@ -17,6 +17,5 @@ public class SpaTreatmentRequest {
     private String image;
     private Integer createBy;
     private Integer packageId;
-    private Integer spaId;
     private List<Integer> listSpaServiceId;
 }

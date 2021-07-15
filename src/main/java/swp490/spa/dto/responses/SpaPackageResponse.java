@@ -31,8 +31,6 @@ public class SpaPackageResponse {
     private Integer create_by;
     @JsonProperty("category_id")
     private Category category;
-    @JsonProperty("spa_id")
-    private Spa spa;
     @JsonProperty("services")
     private List<SpaService> spaServices;
 }

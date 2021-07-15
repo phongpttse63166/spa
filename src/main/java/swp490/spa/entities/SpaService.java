@@ -42,9 +42,6 @@ public class SpaService implements Serializable {
     private Date createTime;
     @Column(name = "create_by")
     private String createBy;
-    @ManyToOne
-    @JoinColumn(name = "spa_id")
-    private Spa spa;
     @ManyToMany(mappedBy = "spaServices",
             cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
 //    @JsonBackReference

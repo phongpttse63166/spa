@@ -40,9 +40,6 @@ public class SpaTreatment implements Serializable {
     @ManyToOne
     @JoinColumn(name = "spa_package_id")
     private SpaPackage spaPackage;
-    @ManyToOne
-    @JoinColumn(name = "spa_id")
-    private Spa spa;
     @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL)
     private Set<TreatmentService> treatmentServices;
@@ -50,7 +47,7 @@ public class SpaTreatment implements Serializable {
     public SpaTreatment(String name, String description,
                         Integer totalTime, Date createTime ,
                         Integer createBy, SpaPackage spaPackage,
-                        Spa spa, List<TreatmentService> treatmentServices,
+                        List<TreatmentService> treatmentServices,
                         Double totalPrice){
         this.name = name;
         this.description = description;
@@ -59,7 +56,6 @@ public class SpaTreatment implements Serializable {
         this.createBy = createBy;
         this.spaPackage = spaPackage;
         this.totalPrice = totalPrice;
-        this.spa = spa;
         for(TreatmentService treatmentService : treatmentServices) treatmentService.setSpaTreatment(this);
         this.treatmentServices = new HashSet<>(treatmentServices);
     }
