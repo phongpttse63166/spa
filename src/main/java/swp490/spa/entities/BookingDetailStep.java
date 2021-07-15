@@ -31,8 +31,8 @@ public class BookingDetailStep implements Serializable {
     private Double bookingPrice;
     @Column(name = "status_booking")
     private StatusBooking statusBooking;
-    @Column(name = "reason_cancel" , length = 65355)
-    private String reasonCancel;
+    @Column(name = "reason" , length = 65355)
+    private String reason;
     @Column(name = "is_consultation")
     private IsConsultation isConsultation;
     @ManyToOne
@@ -102,12 +102,20 @@ public class BookingDetailStep implements Serializable {
         this.statusBooking = statusBooking;
     }
 
-    public String getReasonCancel() {
-        return reasonCancel;
+    public String getReason() {
+        return reason;
     }
 
-    public void setReasonCancel(String reasonCancel) {
-        this.reasonCancel = reasonCancel;
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public IsConsultation getIsConsultation() {
+        return isConsultation;
+    }
+
+    public void setIsConsultation(IsConsultation isConsultation) {
+        this.isConsultation = isConsultation;
     }
 
     public TreatmentService getTreatmentService() {
