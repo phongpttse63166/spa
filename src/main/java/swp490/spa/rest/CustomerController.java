@@ -93,12 +93,6 @@ public class CustomerController {
         this.supportFunctions = new SupportFunctions(bookingDetailStepService, bookingDetailService);
     }
 
-    @GetMapping("/search/{userId}")
-    public Response getCustomerById(@PathVariable Integer userId) {
-        Customer customer = customerService.findByUserId(userId);
-        return ResponseHelper.ok(customer);
-    }
-
     @GetMapping("/getprofile")
     public Response getUserProfile(@RequestParam String userId) {
         Customer customer = customerService.findByUserId(Integer.parseInt(userId));
@@ -135,7 +129,6 @@ public class CustomerController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
     }
 
-    // Thêm spaId
     @GetMapping("/getlisttimebook")
     public Response getListTimeBookingForCustomer(@RequestParam Integer spaPackageId,
                                                   @RequestParam String dateBooking,

@@ -95,7 +95,7 @@ public class PublicController {
 
 //    @GetMapping("/spaservice/findbyspaid")
     @GetMapping("/spaService/findByStatus")
-    public Response findSpaServiceBySpaId(@RequestParam Status status,
+    public Response findSpaServiceByStatus(@RequestParam Status status,
                                           @RequestParam String search,
                                           Pageable pageable) {
         Page<swp490.spa.entities.SpaService> spaServices =
@@ -124,7 +124,7 @@ public class PublicController {
 
 //    @GetMapping("/spapackage/findbyspaid")
     @GetMapping("/spaPackage/findByStatus")
-    public Response findSpaPackageBySpaId(@RequestParam Status status,
+    public Response findSpaPackageByStatus(@RequestParam Status status,
                                           @RequestParam String search,
                                           Pageable pageable) {
         Page<SpaPackage> spaPackages =

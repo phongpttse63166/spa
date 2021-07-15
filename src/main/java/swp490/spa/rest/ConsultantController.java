@@ -421,7 +421,6 @@ public class ConsultantController {
                 Constant.BOOKING_DETAIL_STEP));
     }
 
-    // Thêm spaId
     @GetMapping("/getListTimeBookingForAddTreatment")
     public Response getListTimeBookingForAddTreatment(@RequestParam Integer spaTreatmentId,
                                                       @RequestParam String dateBooking,
@@ -505,7 +504,6 @@ public class ConsultantController {
         }
     }
 
-    // Thêm spaId
     @GetMapping("/getListTimeBookingForAStep")
     public Response getListTimeBookingForAStep(@RequestParam Integer spaServiceId,
                                                @RequestParam Integer bookingDetailStepId,
