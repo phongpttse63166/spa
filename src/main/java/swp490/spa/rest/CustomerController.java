@@ -513,7 +513,7 @@ public class CustomerController {
                         Map<String, String> map = new HashMap<>();
                         map.put(MessageTemplate.BOOKING_TITLE, bookingInsert.getId().toString());
                         if(notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
-                                String.format(MessageTemplate.BOOKING_MESSAGE,formatter.format(bookingInsert.getCreateTime())),
+                                String.format(MessageTemplate.BOOKING_MESSAGE,formatter.format(LocalTime.now())),
                                 map, managers.get(0).getUser().getId(), Role.MANAGER)){
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
                         }
