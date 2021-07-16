@@ -590,6 +590,24 @@ public class ConsultantController {
         return ResponseHelper.error(LoggingTemplate.REQUEST_CHANGE_STAFF_FAILED);
     }
 
+    @PutMapping("/consultationContent/edit/{consultationContentId}")
+    public Response editConsultationContent(@PathVariable Integer consultationContentId,
+                                            @RequestBody ConsultationContent consultationContent){
+        ConsultationContent consultationContentGet =
+                consultationContentService.findByConsultationContentId(consultationContentId);
+        if(Objects.nonNull(consultationContentGet)){
+            consultationContentGet.setExpectation(consultationContent.getExpectation());
+            if(consultationContent.getExpectation()!=null){
+                consultationContentGet.setNote(consultationContent.getNote());
+            }
+            if(consultationContentService.editByConsultationContent(consultationContentGet)!=null){
+                return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS,Constant.CONSULTATION_CONTENT));
+            }
+        }
+        LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTATION_CONTENT));
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED,Constant.CONSULTATION_CONTENT));
+    }
+
     @PutMapping("/bookingDetailStep/addTimeNextStep/{bookingDetailStepId}")
     public Response addTimeForNextStep(@PathVariable Integer bookingDetailStepId,
                                        @RequestParam String dateBooking,
