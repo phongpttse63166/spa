@@ -24,11 +24,14 @@ public class LoggingTemplate {
     public static final String REMOVE_FAILED = "Xóa %s thất bại";
     public static final String GET_SUCCESS = "Lấy thông tin %s thành công";
     public static final String GET_FAILED = "Lấy thông tin %s thất bại";
-    public static final String  CHANGE_STAFF_SUCCESS = "Thay đổi Staff thành công";
-    public static final String  CHANGE_STAFF_FAILED = "Thay đổi Staff thất bại";
+    public static final String CHANGE_STAFF_SUCCESS = "Thay đổi Staff thành công";
+    public static final String CHANGE_STAFF_FAILED = "Thay đổi Staff thất bại";
+    public static final String REQUEST_CHANGE_STAFF_SUCCESS = "Yêu cầu đổi staff thành công";
+    public static final String REQUEST_CHANGE_STAFF_FAILED = "Yêu cầu đổi staff thất bại";
 
     public static final String EMPLOYEE_EXISTED = "Đã xếp nhân viên cho dich vụ";
     public static final String BOOKING_SERVICE_EXISTED = "Có lịch booking";
     public static final String CONSULTANT_DATE_OFF = "Consultant xin nghỉ ngày %s";
     public static final String STAFF_DATE_OFF = "Staff xin nghỉ ngày %s";
+
 }

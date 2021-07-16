@@ -566,4 +566,24 @@ public class ConsultantController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
     }
+
+    @PutMapping("/bookingDetailStep/requestChangeStaff")
+    public Response requestChangeStaffForMoreStep(@RequestBody BookingDetailStep requestChangeStaff){
+        BookingDetailStep bookingDetailStep =
+                bookingDetailStepService.findById(requestChangeStaff.getId());
+        if(Objects.nonNull(bookingDetailStep)){
+            bookingDetailStep.setReason(Constant.CHANGE_STAFF_STATUS + "-" +
+                    requestChangeStaff.getReason());
+            bookingDetailStep.setStatusBooking(StatusBooking.CHANGE_STAFF);
+            BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+            bookingDetail.setStatusBooking(StatusBooking.CHANGE_STAFF);
+            if(Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep)) &&
+                    Objects.nonNull(bookingDetailService.editBookingDetail(bookingDetail))){
+                return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED,Constant.BOOKING_DETAIL_STEP));
+        }
+        return ResponseHelper.error(LoggingTemplate.REQUEST_CHANGE_STAFF_FAILED);
+    }
 }

@@ -51,4 +51,7 @@ public class Constant {
     public static final String TIME_LIST = "Danh sách thời gian";
     public static final String BOOKING_DETAIL_TREATMENT = "Treatment vào Booking Detail";
     public static final String LIST_CONSULTANT_CHATTING = "Danh sách Consultant cho Chat";
+    public static final String CHANGE_STAFF_STATUS = "CHANGE_STAFF";
+    public static final String SKIP_STATUS = "SKIP";
+    public static final String CANCEL_STATUS = "CANCEL";
 }

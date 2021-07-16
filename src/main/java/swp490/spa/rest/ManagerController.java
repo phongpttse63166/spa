@@ -1091,7 +1091,7 @@ public class ManagerController {
                         staffResult.add(staff);
                     }
                 }
-                return ResponseHelper.ok(staffList);
+                return ResponseHelper.ok(staffResult);
             } else {
                 LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
             }
