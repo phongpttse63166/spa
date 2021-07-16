@@ -54,4 +54,5 @@ public class Constant {
     public static final String CHANGE_STAFF_STATUS = "CHANGE_STAFF";
     public static final String SKIP_STATUS = "SKIP";
     public static final String CANCEL_STATUS = "CANCEL";
+    public static final String ZONE_ID = "Asia/Ho_Chi_Minh";
 }

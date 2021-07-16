@@ -24,6 +24,7 @@ import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -513,9 +514,9 @@ public class CustomerController {
                                 managerService.findManagerBySpa(spa.getId());
                         Map<String, String> map = new HashMap<>();
                         map.put(MessageTemplate.BOOKING_STATUS,"bookingId " + bookingInsert.getId().toString());
-                        String a = LocalTime.now().format(dtf);
                         if(notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
-                                String.format(MessageTemplate.BOOKING_MESSAGE,LocalTime.now().format(dtf)),
+                                String.format(MessageTemplate.BOOKING_MESSAGE,
+                                        LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
                                 map, managers.get(0).getUser().getId(), Role.MANAGER)){
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
                         }
