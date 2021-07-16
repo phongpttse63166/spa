@@ -24,6 +24,7 @@ import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -507,12 +508,13 @@ public class CustomerController {
                 Booking bookingInsert = bookingService.insertNewBooking(booking);
                 if(Objects.nonNull(bookingInsert)){
                     try {
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
                         List<Manager> managers =
                                 managerService.findManagerBySpa(spa.getId());
                         Map<String, String> map = new HashMap<>();
-                        map.put(MessageTemplate.BOOKING_TITLE, bookingInsert.getId().toString());
+                        map.put(MessageTemplate.BOOKING_STATUS, bookingInsert.getId().toString());
                         if(notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
-                                String.format(MessageTemplate.BOOKING_MESSAGE,LocalTime.now().toString()),
+                                String.format(MessageTemplate.BOOKING_MESSAGE,LocalTime.now().format(dtf)),
                                 map, managers.get(0).getUser().getId(), Role.MANAGER)){
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
                         }
