@@ -1115,20 +1115,16 @@ public class ManagerController {
                     if (!bookingDetailStep.getIsConsultation().equals(IsConsultation.TRUE)) {
                         if (!bookingDetailStep.getStatusBooking().equals(StatusBooking.FINISH)) {
                             bookingDetailStep.setStaff(staff);
+                            bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                            bookingDetailStep.setReason(null);
                         }
                     }
                     bookingDetailStepEdit.add(bookingDetailStep);
                 }
                 bookingDetail.setBookingDetailSteps(bookingDetailStepEdit);
-                BookingDetail bookingDetailResult =
-                        bookingDetailService.editBookingDetail(bookingDetail);
-                if (Objects.nonNull(bookingDetailResult)) {
-                    ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
-                } else {
-                    bookingDetail.setBookingDetailSteps(bookingDetailSteps);
-                    bookingDetailService.editBookingDetail(bookingDetail);
-                    LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
-                }
+                bookingDetail.setStatusBooking(StatusBooking.BOOKING);
+                bookingDetailService.editBookingDetail(bookingDetail);
+                return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
             } else {
                 LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
             }
