@@ -508,11 +508,12 @@ public class CustomerController {
                 Booking bookingInsert = bookingService.insertNewBooking(booking);
                 if(Objects.nonNull(bookingInsert)){
                     try {
-                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                         List<Manager> managers =
                                 managerService.findManagerBySpa(spa.getId());
                         Map<String, String> map = new HashMap<>();
-                        map.put(MessageTemplate.BOOKING_STATUS, bookingInsert.getId().toString());
+                        map.put(MessageTemplate.BOOKING_STATUS,"bookingId " + bookingInsert.getId().toString());
+                        String a = LocalTime.now().format(dtf);
                         if(notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
                                 String.format(MessageTemplate.BOOKING_MESSAGE,LocalTime.now().format(dtf)),
                                 map, managers.get(0).getUser().getId(), Role.MANAGER)){
