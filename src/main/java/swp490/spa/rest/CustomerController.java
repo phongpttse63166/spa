@@ -519,6 +519,8 @@ public class CustomerController {
                                         LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
                                 map, managers.get(0).getUser().getId(), Role.MANAGER)){
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
+                        } else {
+                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
                         }
                     } catch (FirebaseMessagingException e) {
                         LOGGER.error(e.getMessage());

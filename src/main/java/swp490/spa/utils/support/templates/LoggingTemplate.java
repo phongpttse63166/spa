@@ -34,4 +34,6 @@ public class LoggingTemplate {
     public static final String CONSULTANT_DATE_OFF = "Consultant xin nghỉ ngày %s";
     public static final String STAFF_DATE_OFF = "Staff xin nghỉ ngày %s";
 
+    public static final String CONFIRM_FINISH_SUCCESS = "Xác nhận hoàn thành thành công";
+    public static final String CONFIRM_FINISH_FAILED = "Xác nhận hoàn thành thất bại";
 }

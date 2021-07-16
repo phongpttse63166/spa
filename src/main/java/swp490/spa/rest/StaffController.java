@@ -18,7 +18,6 @@ import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -124,4 +123,18 @@ public class StaffController {
         }
     }
 
+//    @PutMapping("/bookingDetailStep/confirmFinishAStep/{bookingDetailStepId}")
+//    public Response confirmFinishAStep(@PathVariable Integer bookingDetailStepId,
+//                                       @RequestBody ConsultationContent consultationContent){
+//        boolean checkFinishAll = false;
+//        BookingDetailStep bookingDetailStep =
+//                bookingDetailStepService.findById(bookingDetailStepId);
+//        if(Objects.nonNull(bookingDetailStep)){
+//            ConsultationContent consultationContentGet = bookingDetailStep.getConsultationContent();
+//            consultationContentGet.setResult(consultationContent.getResult());
+//        } else {
+//            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+//        }
+//        return ResponseHelper.error(LoggingTemplate.CONFIRM_FINISH_FAILED);
+//    }
 }

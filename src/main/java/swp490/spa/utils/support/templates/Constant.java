@@ -55,4 +55,5 @@ public class Constant {
     public static final String SKIP_STATUS = "SKIP";
     public static final String CANCEL_STATUS = "CANCEL";
     public static final String ZONE_ID = "Asia/Ho_Chi_Minh";
+    public static final String TIME_NEXT_STEP = "thời gian cho step kế tiếp";
 }

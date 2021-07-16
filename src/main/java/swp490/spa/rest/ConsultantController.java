@@ -19,6 +19,7 @@ import swp490.spa.utils.support.templates.LoggingTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.*;
 
 @RestController
@@ -230,6 +231,8 @@ public class ConsultantController {
                             if (bookingDetailStep.getIsConsultation().equals(IsConsultation.FALSE)) {
                                 ConsultationContent consultationContent = new ConsultationContent();
                                 consultationContent.setBookingDetailStep(bookingDetailStep);
+                                consultationContent.setDescription(bookingDetailStep.getTreatmentService()
+                                        .getSpaService().getDescription());
                                 consultationContentList.add(consultationContent);
                                 ConsultationContent result =
                                         consultationContentService.insertNewConsultationContent(consultationContent);
@@ -521,7 +524,7 @@ public class ConsultantController {
             if (Objects.nonNull(spaService)) {
                 dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
                         spaId);
-                if(dateOffs.size()!=0) {
+                if (dateOffs.size() != 0) {
                     for (DateOff dateOff : dateOffs) {
                         if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
                             return ResponseHelper.ok(String.format(LoggingTemplate.CONSULTANT_DATE_OFF,
@@ -568,22 +571,44 @@ public class ConsultantController {
     }
 
     @PutMapping("/bookingDetailStep/requestChangeStaff")
-    public Response requestChangeStaffForMoreStep(@RequestBody BookingDetailStep requestChangeStaff){
+    public Response requestChangeStaffForMoreStep(@RequestBody BookingDetailStep requestChangeStaff) {
         BookingDetailStep bookingDetailStep =
                 bookingDetailStepService.findById(requestChangeStaff.getId());
-        if(Objects.nonNull(bookingDetailStep)){
+        if (Objects.nonNull(bookingDetailStep)) {
             bookingDetailStep.setReason(Constant.CHANGE_STAFF_STATUS + "-" +
                     requestChangeStaff.getReason());
             bookingDetailStep.setStatusBooking(StatusBooking.CHANGE_STAFF);
             BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
             bookingDetail.setStatusBooking(StatusBooking.CHANGE_STAFF);
-            if(Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep)) &&
-                    Objects.nonNull(bookingDetailService.editBookingDetail(bookingDetail))){
+            if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep)) &&
+                    Objects.nonNull(bookingDetailService.editBookingDetail(bookingDetail))) {
                 return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
             }
         } else {
-            LOGGER.error(String.format(LoggingTemplate.GET_FAILED,Constant.BOOKING_DETAIL_STEP));
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
         }
         return ResponseHelper.error(LoggingTemplate.REQUEST_CHANGE_STAFF_FAILED);
+    }
+
+    @PutMapping("/bookingDetailStep/addTimeNextStep/{bookingDetailStepId}")
+    public Response addTimeForNextStep(@PathVariable Integer bookingDetailStepId,
+                                       @RequestParam String dateBooking,
+                                       @RequestParam String timeBooking) {
+        BookingDetailStep bookingDetailStep =
+                bookingDetailStepService.findById(bookingDetailStepId);
+        int duration = bookingDetailStep.getTreatmentService().getSpaService().getDurationMin();
+        Time starTime = Time.valueOf(timeBooking);
+        Time endTime = Time.valueOf(LocalTime.parse(timeBooking).plusMinutes(duration));
+        bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+        bookingDetailStep.setStartTime(starTime);
+        bookingDetailStep.setEndTime(endTime);
+        bookingDetailStep.setDateBooking(Date.valueOf(dateBooking));
+        if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep))) {
+            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
+                    Constant.TIME_NEXT_STEP));
+        }
+        LOGGER.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.TIME_NEXT_STEP));
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED,
+                Constant.TIME_NEXT_STEP));
     }
 }
