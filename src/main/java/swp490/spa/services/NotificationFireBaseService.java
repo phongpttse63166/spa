@@ -28,9 +28,9 @@ public class NotificationFireBaseService {
     private static final int MAX_NOTIFICATION_RETRY = 3;
     private static final long WAIT_NOTIFICATION_RETRY = 10 * 60 * 1000;
 
-    public CompletableFuture<String> notify(String title, String message,
-                                            Map<String, String> data,
-                                            Integer userId, Role role) throws FirebaseMessagingException {
+    public boolean notify(String title, String message,
+                       Map<String, String> data,
+                       Integer userId, Role role) throws FirebaseMessagingException {
         Message notification = null;
         switch (role) {
             case STAFF:
@@ -80,21 +80,25 @@ public class NotificationFireBaseService {
             case ADMIN:
                 break;
         }
-        for (int i = 0; i < MAX_NOTIFICATION_RETRY; i++) {
-            try {
-                String response = FirebaseMessaging.getInstance().send(notification);
-                LOGGER.info("Notification sent {}", response);
-                return CompletableFuture.completedFuture(response);
-            } catch (FirebaseMessagingException ex) {
-                try {
-                    Thread.sleep(WAIT_NOTIFICATION_RETRY);
-                } catch (InterruptedException exception) {
-                    LOGGER.error("Error when retrying sending notification");
-                    ex.printStackTrace();
-                }
-            }
+//        for (int i = 0; i < MAX_NOTIFICATION_RETRY; i++) {
+//            try {
+//                String response = FirebaseMessaging.getInstance().send(notification);
+//                LOGGER.info("Notification sent {}", response);
+//            } catch (FirebaseMessagingException ex) {
+//                try {
+//                    Thread.sleep(WAIT_NOTIFICATION_RETRY);
+//                } catch (InterruptedException exception) {
+//                    LOGGER.error("Error when retrying sending notification");
+//                    ex.printStackTrace();
+//                }
+//            }
+//        }
+        try {
+            String response = FirebaseMessaging.getInstance().send(notification);
+            return true;
+        } catch (FirebaseMessagingException ex) {
+            return false;
         }
-        return CompletableFuture.completedFuture(FirebaseMessaging.getInstance().send(notification));
     }
 }
 

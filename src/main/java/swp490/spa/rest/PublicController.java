@@ -1,5 +1,6 @@
 package swp490.spa.rest;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,9 @@ import swp490.spa.utils.support.templates.LoggingTemplate;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -54,6 +57,8 @@ public class PublicController {
     private SpaPackageService spaPackageService;
     @Autowired
     private AccountRegisterService accountRegisterService;
+    @Autowired
+    private NotificationFireBaseService notificationFireBaseService;
     private Conversion conversion;
     @Autowired
     JWTUtils jwtUtils;
@@ -63,7 +68,8 @@ public class PublicController {
                             CustomerService customerService, StaffService staffService,
                             AdminService adminService, ConsultantService consultantService,
                             ManagerService managerService, SpaTreatmentService spaTreatmentService,
-                            SpaPackageService spaPackageService, AccountRegisterService accountRegisterService) {
+                            SpaPackageService spaPackageService, AccountRegisterService accountRegisterService,
+                            NotificationFireBaseService notificationFireBaseService) {
         this.userService = userService;
         this.categoryService = categoryService;
         this.spaService = spaService;
@@ -74,6 +80,7 @@ public class PublicController {
         this.spaTreatmentService = spaTreatmentService;
         this.spaPackageService = spaPackageService;
         this.accountRegisterService = accountRegisterService;
+        this.notificationFireBaseService = notificationFireBaseService;
         this.conversion = new Conversion();
     }
 
@@ -359,5 +366,17 @@ public class PublicController {
                                     spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
+    }
+
+    //Test notification
+    @PostMapping("/testNotification")
+    public Response testNotification(@RequestBody Notification notification) throws FirebaseMessagingException {
+        Map<String, String> map = new HashMap<>();
+        map.put("test","test_string");
+        if(notificationFireBaseService.notify(notification.getTitle(),
+                notification.getMessage(),map, 2, Role.MANAGER)){
+            return ResponseHelper.ok("gui roi");
+        }
+        return ResponseHelper.error("ko gui dc");
     }
 }
