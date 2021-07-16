@@ -80,25 +80,21 @@ public class NotificationFireBaseService {
             case ADMIN:
                 break;
         }
-//        for (int i = 0; i < MAX_NOTIFICATION_RETRY; i++) {
-//            try {
-//                String response = FirebaseMessaging.getInstance().send(notification);
-//                LOGGER.info("Notification sent {}", response);
-//            } catch (FirebaseMessagingException ex) {
-//                try {
-//                    Thread.sleep(WAIT_NOTIFICATION_RETRY);
-//                } catch (InterruptedException exception) {
-//                    LOGGER.error("Error when retrying sending notification");
-//                    ex.printStackTrace();
-//                }
-//            }
-//        }
-        try {
-            String response = FirebaseMessaging.getInstance().send(notification);
-            return true;
-        } catch (FirebaseMessagingException ex) {
-            return false;
+        for (int i = 0; i < MAX_NOTIFICATION_RETRY; i++) {
+            try {
+                String response = FirebaseMessaging.getInstance().send(notification);
+                LOGGER.info("Notification sent {}", response);
+                return true;
+            } catch (FirebaseMessagingException ex) {
+                try {
+                    Thread.sleep(WAIT_NOTIFICATION_RETRY);
+                } catch (InterruptedException exception) {
+                    LOGGER.error("Error when retrying sending notification");
+                    ex.printStackTrace();
+                }
+            }
         }
+        return false;
     }
 }
 

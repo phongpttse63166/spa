@@ -506,18 +506,19 @@ public class CustomerController {
             if (checkCanInsert) {
                 Booking bookingInsert = bookingService.insertNewBooking(booking);
                 if(Objects.nonNull(bookingInsert)){
-//                    try {
-//                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-//                        List<Manager> managers =
-//                                managerService.findManagerBySpa(spaPackageCheck.getSpa().getId());
-//                        notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
-//                                String.format(MessageTemplate.BOOKING_MESSAGE,formatter.format(bookingInsert.getCreateTime())),
-//                                null, managers.get(0).getUser().getId(), Role.MANAGER);
-//                    } catch (FirebaseMessagingException e) {
-//                        LOGGER.error(e.getMessage());
-//                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
-//                    }
-                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
+                    try {
+                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+                        List<Manager> managers =
+                                managerService.findManagerBySpa(spa.getId());
+                        if(notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
+                                String.format(MessageTemplate.BOOKING_MESSAGE,formatter.format(bookingInsert.getCreateTime())),
+                                null, managers.get(0).getUser().getId(), Role.MANAGER)){
+                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
+                        }
+                    } catch (FirebaseMessagingException e) {
+                        LOGGER.error(e.getMessage());
+                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
+                    }
                 }
             } else {
                 return ResponseHelper.error(LoggingTemplate.BOOKING_OVERTIME);
