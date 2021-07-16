@@ -510,9 +510,11 @@ public class CustomerController {
                         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
                         List<Manager> managers =
                                 managerService.findManagerBySpa(spa.getId());
+                        Map<String, String> map = new HashMap<>();
+                        map.put(MessageTemplate.BOOKING_TITLE, bookingInsert.getId().toString());
                         if(notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
                                 String.format(MessageTemplate.BOOKING_MESSAGE,formatter.format(bookingInsert.getCreateTime())),
-                                null, managers.get(0).getUser().getId(), Role.MANAGER)){
+                                map, managers.get(0).getUser().getId(), Role.MANAGER)){
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
                         }
                     } catch (FirebaseMessagingException e) {
