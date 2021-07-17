@@ -310,18 +310,18 @@ public class ManagerController {
     public Response findAllEmployeeBySpaId(@PathVariable Integer spaId,
                                            @RequestParam String search) {
         Map<String, List<User>> map = new HashMap<>();
-        List<User> users = new ArrayList<>();
+        List<User> staffUser = new ArrayList<>();
+        List<User> consultantUser = new ArrayList<>();
         List<Staff> staffs = staffService.findBySpaIdAndNameLike(spaId, search);
         List<Consultant> consultants = consultantService.findBySpaIdAndNameLike(spaId, search);
         for (Staff staff : staffs) {
-            users.add(staff.getUser());
+            staffUser.add(staff.getUser());
         }
-        map.put("Staff", users);
-        users.clear();
+        map.put("Staff", staffUser);
         for (Consultant consultant : consultants) {
-            users.add(consultant.getUser());
+            consultantUser.add(consultant.getUser());
         }
-        map.put("Consultant", users);
+        map.put("Consultant", consultantUser);
         return ResponseHelper.ok(map);
     }
 
