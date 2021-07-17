@@ -18,8 +18,8 @@ public class Notification implements Serializable {
     private String title;
     @Column(name = "type")
     private String type;
-    @Column(name = "data")
-    private Integer data;
+    @Column(name = "data", length = 65535)
+    private String data;
     @Column(name = "message", length = 65535)
     private String message;
     @Column(name = "role")

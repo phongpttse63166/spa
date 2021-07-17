@@ -1,5 +1,6 @@
 package swp490.spa.rest;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,13 @@ import swp490.spa.services.*;
 import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
+import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -34,6 +38,8 @@ public class ConsultantController {
     @Autowired
     private BookingService bookingService;
     @Autowired
+    private ManagerService managerService;
+    @Autowired
     private BookingDetailService bookingDetailService;
     @Autowired
     private BookingDetailStepService bookingDetailStepService;
@@ -47,6 +53,8 @@ public class ConsultantController {
     private StaffService staffService;
     @Autowired
     private SpaServiceService spaServiceService;
+    @Autowired
+    private NotificationFireBaseService notificationFireBaseService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -55,7 +63,8 @@ public class ConsultantController {
                                 BookingDetailService bookingDetailService, StaffService staffService,
                                 BookingDetailStepService bookingDetailStepService,
                                 SpaTreatmentService spaTreatmentService, SpaServiceService spaServiceService,
-                                ConsultationContentService consultationContentService) {
+                                ConsultationContentService consultationContentService, ManagerService managerService,
+                                NotificationFireBaseService notificationFireBaseService) {
         this.consultantService = consultantService;
         this.userService = userService;
         this.dateOffService = dateOffService;
@@ -63,9 +72,11 @@ public class ConsultantController {
         this.staffService = staffService;
         this.bookingDetailService = bookingDetailService;
         this.bookingDetailStepService = bookingDetailStepService;
+        this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaTreatmentService = spaTreatmentService;
         this.consultationContentService = consultationContentService;
+        this.notificationFireBaseService = notificationFireBaseService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions(bookingDetailStepService, bookingDetailService);
     }
@@ -571,18 +582,31 @@ public class ConsultantController {
     }
 
     @PutMapping("/bookingDetailStep/requestChangeStaff")
-    public Response requestChangeStaffForMoreStep(@RequestBody BookingDetailStep requestChangeStaff) {
+    public Response requestChangeStaffForMoreStep(@RequestBody BookingDetailStep requestChangeStaff) throws FirebaseMessagingException {
         BookingDetailStep bookingDetailStep =
                 bookingDetailStepService.findById(requestChangeStaff.getId());
         if (Objects.nonNull(bookingDetailStep)) {
-            bookingDetailStep.setReason(Constant.CHANGE_STAFF_STATUS + "-" +
+            bookingDetailStep.setReason(Constant.CHANGE_STAFF_STATUS_REASON + "-" +
                     requestChangeStaff.getReason());
             bookingDetailStep.setStatusBooking(StatusBooking.CHANGE_STAFF);
             BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
             bookingDetail.setStatusBooking(StatusBooking.CHANGE_STAFF);
             if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep)) &&
                     Objects.nonNull(bookingDetailService.editBookingDetail(bookingDetail))) {
-                return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                List<Manager> managers =
+                        managerService.findManagerBySpa(bookingDetail.getBooking().getSpa().getId());
+                Map<String, String> map = new HashMap<>();
+                map.put(MessageTemplate.CHANGE_STAFF_STATUS, "bookingDetailId "
+                        + bookingDetail.getId().toString());
+                if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
+                        String.format(MessageTemplate.CHANGE_STAFF_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                        map, managers.get(0).getUser().getId(), Role.MANAGER)) {
+                    return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
+                } else {
+                    return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
+                }
             }
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));

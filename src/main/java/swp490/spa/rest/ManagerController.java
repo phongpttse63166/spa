@@ -21,10 +21,14 @@ import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.image.UploadImage;
+import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RequestMapping("/api/manager")
@@ -64,6 +68,8 @@ public class ManagerController {
     private ConsultationContentService consultationContentService;
     @Autowired
     private NotificationFireBaseService notificationFireBaseService;
+    @Autowired
+    private NotificationService notificationService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -75,7 +81,8 @@ public class ManagerController {
                              TreatmentServiceService treatmentServiceService, ConsultantService consultantService,
                              BookingDetailStepService bookingDetailStepService,
                              ConsultationContentService consultationContentService,
-                             NotificationFireBaseService notificationFireBaseService) {
+                             NotificationFireBaseService notificationFireBaseService,
+                             NotificationService notificationService) {
         this.managerService = managerService;
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
@@ -91,14 +98,9 @@ public class ManagerController {
         this.bookingDetailStepService = bookingDetailStepService;
         this.consultationContentService = consultationContentService;
         this.notificationFireBaseService = notificationFireBaseService;
+        this.notificationService = notificationService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions();
-    }
-
-    @GetMapping("/search/{userId}")
-    public Response findManagerById(@PathVariable Integer userId) {
-        Manager manager = managerService.findManagerById(userId);
-        return ResponseHelper.ok(manager);
     }
 
     @GetMapping("/spaPackage/findByStatus")
@@ -303,16 +305,19 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
     }
 
-    @GetMapping("/staff/findbyspa")
-    public Response findStaffBySpaId(@RequestParam Integer spaId,
-                                     @RequestParam String search,
-                                     Pageable pageable) {
-        Page<Staff> staffs = staffService.findBySpaIdAndNameLike(spaId, search, pageable);
-        if (!staffs.hasContent() && !staffs.isFirst()) {
-            staffs = staffService.findBySpaIdAndNameLike(spaId, search,
-                    PageRequest.of(staffs.getTotalPages() - 1, staffs.getSize(), staffs.getSort()));
+    @GetMapping("/getAllEmployeeBySpa/{spaId}")
+    public Response findAllEmployeeBySpaId(@PathVariable Integer spaId,
+                                           @RequestParam String search) {
+        List<User> employeeList = new ArrayList<>();
+        List<Staff> staffs = staffService.findBySpaIdAndNameLike(spaId, search);
+        List<Consultant> consultants = consultantService.findBySpaIdAndNameLike(spaId, search);
+        for (Staff staff : staffs) {
+            employeeList.add(staff.getUser());
         }
-        return ResponseHelper.ok(conversion.convertToPageStaffResponse(staffs));
+        for (Consultant consultant : consultants) {
+            employeeList.add(consultant.getUser());
+        }
+        return ResponseHelper.ok(employeeList);
     }
 
     @GetMapping("/spaservices/findbyid/{packageId}")
@@ -1099,7 +1104,7 @@ public class ManagerController {
 
     @PutMapping("/bookingDetailStep/changeStaff/{staffId}")
     public Response changeStaffIntoBookingDetailStep(@PathVariable Integer staffId,
-                                                     @RequestParam Integer bookingDetailId) {
+                                                     @RequestParam Integer bookingDetailId) throws FirebaseMessagingException {
         List<BookingDetailStep> bookingDetailStepEdit = new ArrayList<>();
         Staff staff = staffService.findByStaffId(staffId);
         if (Objects.nonNull(staff)) {
@@ -1120,7 +1125,26 @@ public class ManagerController {
                 bookingDetail.setBookingDetailSteps(bookingDetailStepEdit);
                 bookingDetail.setStatusBooking(StatusBooking.BOOKING);
                 bookingDetailService.editBookingDetail(bookingDetail);
-                return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                Customer customer = bookingDetail.getBooking().getCustomer();
+                Map<String, String> map = new HashMap<>();
+                map.put(MessageTemplate.CHANGE_STAFF_STATUS, "bookingDetailId "
+                        + bookingDetail.getId().toString());
+                if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
+                        String.format(MessageTemplate.CHANGE_STAFF_FINISH_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                        map, customer.getUser().getId(), Role.CUSTOMER)) {
+                    Notification notification = new Notification();
+                    notification.setRole(Role.CUSTOMER);
+                    notification.setTitle(MessageTemplate.CHANGE_STAFF_TITLE);
+                    notification.setMessage(MessageTemplate.CHANGE_STAFF_FINISH_MESSAGE);
+                    notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
+                    notification.setType(Constant.CHANGE_STAFF_TYPE);
+                    notificationService.insertNewNotification(notification);
+                    return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
+                } else {
+                    return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
+                }
             } else {
                 LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
             }

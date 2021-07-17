@@ -18,8 +18,8 @@ public class NotificationResponse {
     private String title;
     @JsonProperty("type")
     private String type;
-    @JsonProperty("data_id")
-    private Integer data;
+    @JsonProperty("data")
+    private String data;
     @JsonProperty("message")
     private String message;
     @JsonIgnore

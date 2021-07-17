@@ -43,6 +43,7 @@ public class Constant {
     public static final String MANAGER = "Manager";
     public static final String ADMIN = "Admin";
     public static final String SPA = "Spa";
+    public static final String RATING = "Rating";
     public static final String SERVICES = "Danh sách Service";
     public static final String WORKING_STAFF = "lịch làm việc của Staff";
     public static final String WORKING_CONSULTANT = "lịch làm việc của Consultant";
@@ -51,9 +52,17 @@ public class Constant {
     public static final String TIME_LIST = "Danh sách thời gian";
     public static final String BOOKING_DETAIL_TREATMENT = "Treatment vào Booking Detail";
     public static final String LIST_CONSULTANT_CHATTING = "Danh sách Consultant cho Chat";
-    public static final String CHANGE_STAFF_STATUS = "CHANGE_STAFF";
-    public static final String SKIP_STATUS = "SKIP";
-    public static final String CANCEL_STATUS = "CANCEL";
+    public static final String CHANGE_STAFF_STATUS_REASON = "CHANGE_STAFF";
+    public static final String SKIP_STATUS_REASON = "SKIP";
+    public static final String CANCEL_STATUS_REASON = "CANCEL";
     public static final String ZONE_ID = "Asia/Ho_Chi_Minh";
     public static final String TIME_NEXT_STEP = "thời gian cho step kế tiếp";
+
+    // TYPE Notification
+    public static final String TREATMENT_FINISH_TYPE = "TREATMENT_FINISH";
+    public static final String STEP_FINISH_TYPE = "STEP_FINISH";
+    public static final String REMIND_TYPE = "REMIND";
+    public static final String CHANGE_STAFF_TYPE = "CHANGE_STAFF";
+    public static final String SKIP_TYPE = "SKIP";
+    public static final String CANCEL_TYPE = "CANCEL";
 }

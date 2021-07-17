@@ -17,5 +17,5 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
     List<Staff> findBySpa_Id(Integer spaId);
 
     @Query("FROM Staff s WHERE s.spa.id = ?1 AND s.user.fullname LIKE %?2% ORDER BY s.id")
-    Page<Staff> findStaffBySpaIdAndNameLike(Integer spaId, String search, Pageable pageable);
+    List<Staff> findStaffBySpaIdAndNameLike(Integer spaId, String search);
 }
