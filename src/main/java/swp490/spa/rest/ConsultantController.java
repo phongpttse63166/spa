@@ -98,6 +98,16 @@ public class ConsultantController {
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.DATE_OFF));
     }
 
+    @GetMapping("/findById/{id}")
+    public Response getProfile(@PathVariable Integer id) {
+        Consultant consultant = consultantService.findByConsultantId(id);
+        if (Objects.nonNull(consultant)) {
+            return ResponseHelper.ok(consultant);
+        }
+        LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
+    }
+
     @PutMapping("/editprofile")
     public Response editProfileStaff(@RequestBody User user) {
         Consultant consultant = consultantService.findByConsultantId(user.getId());
@@ -616,20 +626,20 @@ public class ConsultantController {
 
     @PutMapping("/consultationContent/edit/{consultationContentId}")
     public Response editConsultationContent(@PathVariable Integer consultationContentId,
-                                            @RequestBody ConsultationContent consultationContent){
+                                            @RequestBody ConsultationContent consultationContent) {
         ConsultationContent consultationContentGet =
                 consultationContentService.findByConsultationContentId(consultationContentId);
-        if(Objects.nonNull(consultationContentGet)){
+        if (Objects.nonNull(consultationContentGet)) {
             consultationContentGet.setExpectation(consultationContent.getExpectation());
-            if(consultationContent.getExpectation()!=null){
+            if (consultationContent.getExpectation() != null) {
                 consultationContentGet.setNote(consultationContent.getNote());
             }
-            if(consultationContentService.editByConsultationContent(consultationContentGet)!=null){
-                return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS,Constant.CONSULTATION_CONTENT));
+            if (consultationContentService.editByConsultationContent(consultationContentGet) != null) {
+                return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.CONSULTATION_CONTENT));
             }
         }
         LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTATION_CONTENT));
-        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED,Constant.CONSULTATION_CONTENT));
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
     }
 
     @PutMapping("/bookingDetailStep/addTimeNextStep/{bookingDetailStepId}")
