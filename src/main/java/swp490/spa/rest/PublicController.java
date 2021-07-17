@@ -273,6 +273,11 @@ public class PublicController {
                 }
                 break;
             case "ADMIN":
+                Admin admin = adminService.findByUserId(user.getId());
+                if (Objects.isNull(admin)) {
+                    return LoginResponse.createErrorResponse(LoginResponse.Error.ADMIN_NOT_EXISTED);
+                }
+                spaId = null;
                 break;
             case "CONSULTANT":
                 Consultant consultant = consultantService.findByConsultantId(user.getId());
