@@ -308,16 +308,20 @@ public class ManagerController {
     @GetMapping("/getAllEmployeeBySpa/{spaId}")
     public Response findAllEmployeeBySpaId(@PathVariable Integer spaId,
                                            @RequestParam String search) {
-        List<User> employeeList = new ArrayList<>();
+        Map<String,List<User>> map = new HashMap<>();
+        List<User> users = new ArrayList<>();
         List<Staff> staffs = staffService.findBySpaIdAndNameLike(spaId, search);
         List<Consultant> consultants = consultantService.findBySpaIdAndNameLike(spaId, search);
         for (Staff staff : staffs) {
-            employeeList.add(staff.getUser());
+            users.add(staff.getUser());
         }
+        map.put("Staff",users);
+        users.clear();
         for (Consultant consultant : consultants) {
-            employeeList.add(consultant.getUser());
+            users.add(consultant.getUser());
         }
-        return ResponseHelper.ok(employeeList);
+        map.put("Consultant", users);
+        return ResponseHelper.ok(map);
     }
 
     @GetMapping("/spaservices/findbyid/{packageId}")
