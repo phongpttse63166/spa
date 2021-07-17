@@ -1,6 +1,7 @@
 package swp490.spa.rest;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -308,14 +309,14 @@ public class ManagerController {
     @GetMapping("/getAllEmployeeBySpa/{spaId}")
     public Response findAllEmployeeBySpaId(@PathVariable Integer spaId,
                                            @RequestParam String search) {
-        Map<String,List<User>> map = new HashMap<>();
+        Map<String, List<User>> map = new HashMap<>();
         List<User> users = new ArrayList<>();
         List<Staff> staffs = staffService.findBySpaIdAndNameLike(spaId, search);
         List<Consultant> consultants = consultantService.findBySpaIdAndNameLike(spaId, search);
         for (Staff staff : staffs) {
             users.add(staff.getUser());
         }
-        map.put("Staff",users);
+        map.put("Staff", users);
         users.clear();
         for (Consultant consultant : consultants) {
             users.add(consultant.getUser());
@@ -646,6 +647,70 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.CATEGORY));
     }
 
+    @PostMapping(value = "/employee/insert",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response insertNewEmployee(EmployeeCreateRequest employeeRequest) {
+        User user = userService.findByPhone(employeeRequest.getPhone());
+        Spa spa = spaService.findById(employeeRequest.getSpaId());
+        String password = "";
+        if (Objects.isNull(user)) {
+            if (Objects.nonNull(employeeRequest.getFile())) {
+                String imageLink = UploadImage.uploadImage(employeeRequest.getFile());
+                user = new User();
+                if (imageLink != "") {
+                    password = RandomStringUtils.random(Constant.PASSWORD_LENGTH,true,true);
+                    user.setFullname(employeeRequest.getFullname());
+                    user.setPhone(employeeRequest.getPhone());
+                    user.setGender(employeeRequest.getGender());
+                    user.setBirthdate(employeeRequest.getBirthdate());
+                    user.setAddress(employeeRequest.getAddress());
+                    user.setEmail(employeeRequest.getEmail());
+                    user.setActive(true);
+                    user.setImage(imageLink);
+                    user.setPassword(password);
+                    User userResult = userService.insertNewUser(user);
+                    if (Objects.nonNull(userResult)) {
+                        user = userResult;
+                    }
+                }
+            } else {
+                LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
+                return ResponseHelper.error(LoggingTemplate.FILE_NOT_EXISTED);
+            }
+        } else {
+            if (employeeRequest.getRole().equals(Role.STAFF)) {
+                Staff staff = staffService.findByStaffId(user.getId());
+                if (Objects.isNull(staff)) {
+                    staff = new Staff();
+                    staff.setId(user.getId());
+                    staff.setUser(user);
+                    staff.setSpa(spa);
+                    Staff staffResult = staffService.insertNewStaff(staff);
+                    if(Objects.nonNull(staffResult)){
+                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
+                    }
+                }
+                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
+            }
+            if (employeeRequest.getRole().equals(Role.CONSULTANT)) {
+                Consultant consultant = consultantService.findByConsultantId(user.getId());
+                if(Objects.isNull(consultant)){
+                    consultant = new Consultant();
+                    consultant.setId(user.getId());
+                    consultant.setUser(user);
+                    consultant.setSpa(spa);
+                    Consultant consultantResult = consultantService.insertNewConsultant(consultant);
+                    if(Objects.nonNull(consultantResult)){
+                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
+                    }
+                }
+                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
+            }
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.EMPLOYEE));
+    }
+
     @PutMapping("/editpassword")
     public Response editPassword(@RequestBody AccountPasswordRequest account) {
         Manager manager = managerService.findManagerById(account.getId());
@@ -867,7 +932,7 @@ public class ManagerController {
                 }
             }
             if (count == bookingDetailSteps.size()) {
-                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
+                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_ASSIGNED));
             } else {
                 if (bookingDetailSteps.size() != 0 || Objects.nonNull(bookingDetailSteps)) {
                     Staff staff = staffService.findByStaffId(staffId);
@@ -989,7 +1054,7 @@ public class ManagerController {
                 }
             }
             if (count == bookingDetailSteps.size()) {
-                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
+                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_ASSIGNED));
             } else {
                 if (bookingDetailSteps.size() != 0 || Objects.nonNull(bookingDetailSteps)) {
                     Consultant consultant = consultantService.findByConsultantId(consultantId);

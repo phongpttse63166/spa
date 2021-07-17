@@ -22,6 +22,7 @@ public class Constant {
     public static final String DATABASE_URL = "https://testuploadimgae-default-rtdb.asia-southeast1.firebasedatabase.app/";
     // Properties
     public static final Integer TOTAL_TIME_DEFAULT = 0;
+    public static final int PASSWORD_LENGTH = 12;
     public static final String PROFILE = "Profile";
     public static final String SERVICE = "Service";
     public static final String CATEGORY = "Category";
@@ -44,6 +45,7 @@ public class Constant {
     public static final String ADMIN = "Admin";
     public static final String SPA = "Spa";
     public static final String RATING = "Rating";
+    public static final String EMPLOYEE = "Nhân viên";
     public static final String SERVICES = "Danh sách Service";
     public static final String WORKING_STAFF = "lịch làm việc của Staff";
     public static final String WORKING_CONSULTANT = "lịch làm việc của Consultant";
@@ -65,4 +67,6 @@ public class Constant {
     public static final String CHANGE_STAFF_TYPE = "CHANGE_STAFF";
     public static final String SKIP_TYPE = "SKIP";
     public static final String CANCEL_TYPE = "CANCEL";
+
+
 }

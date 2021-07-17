@@ -93,7 +93,6 @@ public class PublicController {
         return ResponseHelper.ok(user);
     }
 
-//    @GetMapping("/spaservice/findbyspaid")
     @GetMapping("/spaService/findByStatus")
     public Response findSpaServiceByStatus(@RequestParam Status status,
                                           @RequestParam String search,
@@ -107,7 +106,6 @@ public class PublicController {
         return ResponseHelper.ok(conversion.convertToPageSpaServiceResponse(spaServices));
     }
 
-//    @GetMapping("/spatreatment/findbyspaid")
     @GetMapping("/spaTreatment/findAll")
     public Response findAllSpaTreatment(@RequestParam String search,
                                         Pageable pageable) {
@@ -122,7 +120,6 @@ public class PublicController {
         return ResponseHelper.ok(conversion.convertToPageSpaTreatmentResponse(spaTreatments));
     }
 
-//    @GetMapping("/spapackage/findbyspaid")
     @GetMapping("/spaPackage/findByStatus")
     public Response findSpaPackageByStatus(@RequestParam Status status,
                                           @RequestParam String search,
@@ -207,8 +204,6 @@ public class PublicController {
             } else {
                 return ResponseHelper.error(String.format(LoggingTemplate.INSERT_SUCCESS, newUser.getFullname()));
             }
-
-
         }
         return ResponseHelper.error(LoggingTemplate.VERIFY_FAILED);
     }
@@ -346,7 +341,6 @@ public class PublicController {
         return ResponseHelper.ok(page);
     }
 
-//    @GetMapping("/spapackage/findbycategoryId")
     @GetMapping("/spaPackage/findByCategoryId/{categoryId}")
     public Response findSpaPackageByCategoryId(@PathVariable Integer categoryId,
                                                Pageable pageable) {

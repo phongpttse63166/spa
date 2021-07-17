@@ -1,7 +1,5 @@
 package swp490.spa.utils.support;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import swp490.spa.entities.*;
 import swp490.spa.services.BookingDetailService;

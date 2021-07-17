@@ -30,4 +30,8 @@ public class ConsultantService {
     public List<Consultant> findBySpaIdAndNameLike(Integer spaId, String search) {
         return this.consultantRepository.findConsultantBySpaIdAndNameLike(spaId, search);
     }
+
+    public Consultant insertNewConsultant(Consultant consultant) {
+        return this.consultantRepository.save(consultant);
+    }
 }

@@ -29,4 +29,8 @@ public class StaffService {
     public Staff editStaff(Staff staff) {
         return this.staffRepository.save(staff);
     }
+
+    public Staff insertNewStaff(Staff staff) {
+        return this.staffRepository.save(staff);
+    }
 }
