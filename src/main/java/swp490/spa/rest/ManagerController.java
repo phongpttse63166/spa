@@ -671,7 +671,23 @@ public class ManagerController {
                     user.setPassword(password);
                     User userResult = userService.insertNewUser(user);
                     if (Objects.nonNull(userResult)) {
-                        user = userResult;
+                        if (employeeRequest.getRole().equals(Role.STAFF)) {
+                            Staff staff = new Staff();
+                            staff.setUser(userResult);
+                            staff.setSpa(spa);
+                            Staff staffResult = staffService.insertNewStaff(staff);
+                            if(Objects.nonNull(staffResult)){
+                                return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
+                            }
+                        } else {
+                            Consultant consultant = new Consultant();
+                            consultant.setUser(userResult);
+                            consultant.setSpa(spa);
+                            Consultant consultantResult = consultantService.insertNewConsultant(consultant);
+                            if(Objects.nonNull(consultantResult)){
+                                return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
+                            }
+                        }
                     }
                 }
             } else {
