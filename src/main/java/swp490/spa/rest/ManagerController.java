@@ -650,7 +650,7 @@ public class ManagerController {
     @PostMapping(value = "/employee/insert",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Response insertNewEmployee(EmployeeCreateRequest employeeRequest) {
+    public Response insertNewEmployee(EmployeeRequest employeeRequest) {
         User user = userService.findByPhone(employeeRequest.getPhone());
         Spa spa = spaService.findById(employeeRequest.getSpaId());
         String password = "";
@@ -659,7 +659,7 @@ public class ManagerController {
                 String imageLink = UploadImage.uploadImage(employeeRequest.getFile());
                 user = new User();
                 if (imageLink != "") {
-                    password = RandomStringUtils.random(Constant.PASSWORD_LENGTH,true,true);
+                    password = RandomStringUtils.random(Constant.PASSWORD_LENGTH, true, true);
                     user.setFullname(employeeRequest.getFullname());
                     user.setPhone(employeeRequest.getPhone());
                     user.setGender(employeeRequest.getGender());
@@ -676,7 +676,7 @@ public class ManagerController {
                             staff.setUser(userResult);
                             staff.setSpa(spa);
                             Staff staffResult = staffService.insertNewStaff(staff);
-                            if(Objects.nonNull(staffResult)){
+                            if (Objects.nonNull(staffResult)) {
                                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                             }
                         } else {
@@ -684,7 +684,7 @@ public class ManagerController {
                             consultant.setUser(userResult);
                             consultant.setSpa(spa);
                             Consultant consultantResult = consultantService.insertNewConsultant(consultant);
-                            if(Objects.nonNull(consultantResult)){
+                            if (Objects.nonNull(consultantResult)) {
                                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                             }
                         }
@@ -702,7 +702,7 @@ public class ManagerController {
                     staff.setUser(user);
                     staff.setSpa(spa);
                     Staff staffResult = staffService.insertNewStaff(staff);
-                    if(Objects.nonNull(staffResult)){
+                    if (Objects.nonNull(staffResult)) {
                         return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                     }
                 }
@@ -710,12 +710,12 @@ public class ManagerController {
             }
             if (employeeRequest.getRole().equals(Role.CONSULTANT)) {
                 Consultant consultant = consultantService.findByConsultantId(user.getId());
-                if(Objects.isNull(consultant)){
+                if (Objects.isNull(consultant)) {
                     consultant = new Consultant();
                     consultant.setUser(user);
                     consultant.setSpa(spa);
                     Consultant consultantResult = consultantService.insertNewConsultant(consultant);
-                    if(Objects.nonNull(consultantResult)){
+                    if (Objects.nonNull(consultantResult)) {
                         return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                     }
                 }
@@ -1138,6 +1138,45 @@ public class ManagerController {
             }
         }
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.CONSULTANT));
+    }
+
+    @PutMapping(value = "/editProfileEmployee/{userId}",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editProfileStaff(@PathVariable Integer userId,
+                                     EmployeeRequest user) {
+        User userResult = userService.findByUserId(userId);
+        if (Objects.nonNull(userResult)) {
+            if (Objects.nonNull(user.getFile())) {
+                String imageLink = UploadImage.uploadImage(user.getFile());
+                if (imageLink != "") {
+                    userResult.setImage(imageLink);
+                } else {
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
+                }
+            }
+            if (Objects.nonNull(user.getFullname())) {
+                userResult.setFullname(user.getFullname());
+            }
+            if (Objects.nonNull(user.getEmail())) {
+                userResult.setEmail(user.getEmail());
+            }
+            if (Objects.nonNull(user.getAddress())) {
+                userResult.setAddress(user.getAddress());
+            }
+            if (Objects.nonNull(user.getBirthdate())) {
+                userResult.setBirthdate(user.getBirthdate());
+            }
+            if (Objects.nonNull(user.getGender())) {
+                userResult.setGender(user.getGender());
+            }
+            if (Objects.nonNull(userService.editUser(userResult))) {
+                return ResponseHelper.ok(userResult);
+            }
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.USER));
     }
 
     @GetMapping("/bookingDetail/findByStatusChangeStaff")

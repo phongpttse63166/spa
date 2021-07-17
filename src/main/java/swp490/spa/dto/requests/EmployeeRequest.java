@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Setter
 @Getter
-public class EmployeeCreateRequest implements Serializable {
+public class EmployeeRequest implements Serializable {
     private String fullname;
     private String phone;
     private String gender;

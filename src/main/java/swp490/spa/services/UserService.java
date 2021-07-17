@@ -10,10 +10,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-//    public User findByPhoneAndPassword(String phone, String password, String role){
-//        return this.userRepository.findUserByPhoneAndPasswordAndRole(phone, password, role);
-//    }
-
     public User findByPhone(String phone){
         return this.userRepository.findByPhone(phone);
     }
@@ -24,5 +20,9 @@ public class UserService {
 
     public User editUser(User user){
         return this.userRepository.save(user);
+    }
+
+    public User findByUserId(Integer userId) {
+        return this.userRepository.findById(userId).get();
     }
 }
