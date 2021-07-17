@@ -699,7 +699,6 @@ public class ManagerController {
                 Staff staff = staffService.findByStaffId(user.getId());
                 if (Objects.isNull(staff)) {
                     staff = new Staff();
-                    staff.setId(user.getId());
                     staff.setUser(user);
                     staff.setSpa(spa);
                     Staff staffResult = staffService.insertNewStaff(staff);
@@ -713,7 +712,6 @@ public class ManagerController {
                 Consultant consultant = consultantService.findByConsultantId(user.getId());
                 if(Objects.isNull(consultant)){
                     consultant = new Consultant();
-                    consultant.setId(user.getId());
                     consultant.setUser(user);
                     consultant.setSpa(spa);
                     Consultant consultantResult = consultantService.insertNewConsultant(consultant);
