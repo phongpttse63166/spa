@@ -247,7 +247,7 @@ public class PublicController {
                 }
                 if (authRequest.getTokenFCM() != null) {
                     customer.setTokenFCM(authRequest.getTokenFCM());
-                    customer = customerService.editCustomer(customer);
+                    customerService.editCustomer(customer);
                 }
                 break;
             case "STAFF":
@@ -255,10 +255,14 @@ public class PublicController {
                 if (Objects.isNull(staff)) {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.STAFF_NOT_EXISTED);
                 }
-                spaId = staff.getSpa().getId();
-                if (authRequest.getTokenFCM() != null) {
-                    staff.setTokenFCM(authRequest.getTokenFCM());
-                    staff = staffService.editStaff(staff);
+                if(staff.getStatus().equals(Status.AVAILABLE)) {
+                    spaId = staff.getSpa().getId();
+                    if (authRequest.getTokenFCM() != null) {
+                        staff.setTokenFCM(authRequest.getTokenFCM());
+                        staffService.editStaff(staff);
+                    }
+                } else {
+                    return LoginResponse.createErrorResponse(LoginResponse.Error.STAFF_NOT_EXISTED);
                 }
                 break;
             case "MANAGER":
@@ -266,10 +270,14 @@ public class PublicController {
                 if (Objects.isNull(manager)) {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.MANAGER_NOT_EXISTED);
                 }
-                spaId = manager.getSpa().getId();
-                if (authRequest.getTokenFCM() != null) {
-                    manager.setTokenFCM(authRequest.getTokenFCM());
-                    manager = managerService.editManager(manager);
+                if(manager.getStatus().equals(Status.AVAILABLE)) {
+                    spaId = manager.getSpa().getId();
+                    if (authRequest.getTokenFCM() != null) {
+                        manager.setTokenFCM(authRequest.getTokenFCM());
+                        managerService.editManager(manager);
+                    }
+                } else {
+                    return LoginResponse.createErrorResponse(LoginResponse.Error.MANAGER_NOT_EXISTED);
                 }
                 break;
             case "ADMIN":
@@ -284,10 +292,14 @@ public class PublicController {
                 if (Objects.isNull(consultant)) {
                     return LoginResponse.createErrorResponse(LoginResponse.Error.CONSULTANT_NOT_EXISTED);
                 }
-                spaId = consultant.getSpa().getId();
-                if (authRequest.getTokenFCM() != null) {
-                    consultant.setTokenFCM(authRequest.getTokenFCM());
-                    consultant = consultantService.editConsultant(consultant);
+                if(consultant.getStatus().equals(Status.AVAILABLE)) {
+                    spaId = consultant.getSpa().getId();
+                    if (authRequest.getTokenFCM() != null) {
+                        consultant.setTokenFCM(authRequest.getTokenFCM());
+                        consultantService.editConsultant(consultant);
+                    }
+                } else {
+                    return LoginResponse.createErrorResponse(LoginResponse.Error.CONSULTANT_NOT_EXISTED);
                 }
                 break;
             default:

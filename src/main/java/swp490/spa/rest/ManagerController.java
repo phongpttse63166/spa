@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
@@ -1191,6 +1192,28 @@ public class ManagerController {
             return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.USER));
+    }
+
+    @PutMapping("/employee/remove/{userId}")
+    public Response removeEmployee(@PathVariable Integer userId,
+                                   @RequestParam Role role){
+        if(role == Role.STAFF){
+            Staff staff = staffService.findByStaffId(userId);
+            staff.setStatus(Status.DISABLE);
+            Staff staffResult = staffService.editStaff(staff);
+            if(staffResult!=null){
+                return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_SUCCESS, Constant.STAFF));
+            }
+            return ResponseHelper.error(String.format(LoggingTemplate.REMOVE_FAILED, Constant.STAFF));
+        } else {
+            Consultant consultant = consultantService.findByConsultantId(userId);
+            consultant.setStatus(Status.DISABLE);
+            Consultant consultantResult =consultantService.editConsultant(consultant);
+            if(consultantResult!=null){
+                return ResponseHelper.ok(String.format(LoggingTemplate.REMOVE_SUCCESS, Constant.CONSULTANT));
+            }
+            return ResponseHelper.error(String.format(LoggingTemplate.REMOVE_FAILED, Constant.CONSULTANT));
+        }
     }
 
     @GetMapping("/bookingDetail/findByStatusChangeStaff")
