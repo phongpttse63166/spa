@@ -1197,7 +1197,7 @@ public class ManagerController {
 
     @PutMapping("/employee/remove/{userId}")
     public Response removeEmployee(@PathVariable Integer userId,
-                                   @RequestParam Role role) {
+                                   @RequestBody Role role) {
         if (role == Role.STAFF) {
             Staff staff = staffService.findByStaffId(userId);
             staff.setStatus(Status.DISABLE);
@@ -1262,9 +1262,9 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
     }
 
-    @PutMapping("/bookingDetailStep/changeStaff/{staffId}")
+    @PutMapping("/bookingDetailStep/changeStaff/{staffId}/{bookingDetailId}")
     public Response changeStaffIntoBookingDetailStep(@PathVariable Integer staffId,
-                                                     @RequestParam Integer bookingDetailId) throws FirebaseMessagingException {
+                                                     @PathVariable Integer bookingDetailId) throws FirebaseMessagingException {
         List<BookingDetailStep> bookingDetailStepEdit = new ArrayList<>();
         Staff staff = staffService.findByStaffId(staffId);
         if (Objects.nonNull(staff)) {
