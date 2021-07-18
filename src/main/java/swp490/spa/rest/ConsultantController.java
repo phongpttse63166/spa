@@ -647,17 +647,16 @@ public class ConsultantController {
 
     @PutMapping("/bookingDetailStep/addTimeNextStep/{bookingDetailStepId}")
     public Response addTimeForNextStep(@PathVariable Integer bookingDetailStepId,
-                                       @RequestParam String dateBooking,
-                                       @RequestParam String timeBooking) {
+                                       @RequestBody BookingDetailStep bookingDetailStepInput) {
         BookingDetailStep bookingDetailStep =
                 bookingDetailStepService.findById(bookingDetailStepId);
         int duration = bookingDetailStep.getTreatmentService().getSpaService().getDurationMin();
-        Time starTime = Time.valueOf(timeBooking);
-        Time endTime = Time.valueOf(LocalTime.parse(timeBooking).plusMinutes(duration));
+        Time starTime = bookingDetailStepInput.getStartTime();
+        Time endTime = Time.valueOf(starTime.toLocalTime().plusMinutes(duration));
         bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
         bookingDetailStep.setStartTime(starTime);
         bookingDetailStep.setEndTime(endTime);
-        bookingDetailStep.setDateBooking(Date.valueOf(dateBooking));
+        bookingDetailStep.setDateBooking(bookingDetailStepInput.getDateBooking());
         if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep))) {
             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                     Constant.TIME_NEXT_STEP));
