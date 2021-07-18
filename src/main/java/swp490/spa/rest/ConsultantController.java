@@ -645,11 +645,10 @@ public class ConsultantController {
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
     }
 
-    @PutMapping("/bookingDetailStep/addTimeNextStep/{bookingDetailStepId}")
-    public Response addTimeForNextStep(@PathVariable Integer bookingDetailStepId,
-                                       @RequestBody BookingDetailStep bookingDetailStepInput) {
+    @PutMapping("/bookingDetailStep/addTimeNextStep")
+    public Response addTimeForNextStep(@RequestBody BookingDetailStep bookingDetailStepInput) {
         BookingDetailStep bookingDetailStep =
-                bookingDetailStepService.findById(bookingDetailStepId);
+                bookingDetailStepService.findById(bookingDetailStepInput.getId());
         int duration = bookingDetailStep.getTreatmentService().getSpaService().getDurationMin();
         Time starTime = bookingDetailStepInput.getStartTime();
         Time endTime = Time.valueOf(starTime.toLocalTime().plusMinutes(duration));
