@@ -698,32 +698,42 @@ public class ManagerController {
             }
         } else {
             if (employeeRequest.getRole().equals(Role.STAFF)) {
-                Staff staff = staffService.findByStaffId(user.getId());
-                if (Objects.isNull(staff)) {
-                    staff = new Staff();
-                    staff.setUser(user);
-                    staff.setSpa(spa);
-                    staff.setStatus(Status.AVAILABLE);
-                    Staff staffResult = staffService.insertNewStaff(staff);
-                    if (Objects.nonNull(staffResult)) {
-                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
+                Consultant consultant = consultantService.findByConsultantId(user.getId());
+                if(consultant == null) {
+                    Staff staff = staffService.findByStaffId(user.getId());
+                    if (Objects.isNull(staff)) {
+                        staff = new Staff();
+                        staff.setUser(user);
+                        staff.setSpa(spa);
+                        staff.setStatus(Status.AVAILABLE);
+                        Staff staffResult = staffService.insertNewStaff(staff);
+                        if (Objects.nonNull(staffResult)) {
+                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
+                        }
                     }
+                    return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
+                } else {
+                    return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_HAS_OTHER_ROLE));
                 }
-                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
             }
             if (employeeRequest.getRole().equals(Role.CONSULTANT)) {
-                Consultant consultant = consultantService.findByConsultantId(user.getId());
-                if (Objects.isNull(consultant)) {
-                    consultant = new Consultant();
-                    consultant.setUser(user);
-                    consultant.setSpa(spa);
-                    consultant.setStatus(Status.AVAILABLE);
-                    Consultant consultantResult = consultantService.insertNewConsultant(consultant);
-                    if (Objects.nonNull(consultantResult)) {
-                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
+                Staff staff = staffService.findByStaffId(user.getId());
+                if(staff == null) {
+                    Consultant consultant = consultantService.findByConsultantId(user.getId());
+                    if (Objects.isNull(consultant)) {
+                        consultant = new Consultant();
+                        consultant.setUser(user);
+                        consultant.setSpa(spa);
+                        consultant.setStatus(Status.AVAILABLE);
+                        Consultant consultantResult = consultantService.insertNewConsultant(consultant);
+                        if (Objects.nonNull(consultantResult)) {
+                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
+                        }
                     }
+                    return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
+                } else {
+                    return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_HAS_OTHER_ROLE));
                 }
-                return ResponseHelper.error(String.format(LoggingTemplate.EMPLOYEE_EXISTED));
             }
         }
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.EMPLOYEE));

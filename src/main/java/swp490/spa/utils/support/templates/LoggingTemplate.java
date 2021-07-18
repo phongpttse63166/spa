@@ -37,4 +37,5 @@ public class LoggingTemplate {
     public static final String CONFIRM_FINISH_SUCCESS = "Xác nhận hoàn thành thành công";
     public static final String CONFIRM_FINISH_FAILED = "Xác nhận hoàn thành thất bại";
     public static final String EMPLOYEE_EXISTED = "Nhân viên đã có tài khoản";
+    public static final String EMPLOYEE_HAS_OTHER_ROLE = "Tài khoản đã có role khác";
 }
