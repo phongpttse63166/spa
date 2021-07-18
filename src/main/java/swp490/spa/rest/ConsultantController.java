@@ -5,7 +5,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;
@@ -15,6 +17,7 @@ import swp490.spa.entities.*;
 import swp490.spa.entities.SpaService;
 import swp490.spa.services.*;
 import swp490.spa.utils.support.SupportFunctions;
+import swp490.spa.utils.support.image.UploadImage;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.templates.MessageTemplate;
@@ -662,5 +665,32 @@ public class ConsultantController {
         LOGGER.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.TIME_NEXT_STEP));
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED,
                 Constant.TIME_NEXT_STEP));
+    }
+
+    @PutMapping(value = "/image/edit/{userId}",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editImage(@PathVariable Integer userId, MultipartFile file) {
+        User user = userService.findByUserId(userId);
+        if (Objects.nonNull(user)) {
+            if (!file.isEmpty()) {
+                String imageLink = UploadImage.uploadImage(file);
+                if (imageLink != "") {
+                    user.setImage(imageLink);
+                    User userResult = userService.editUser(user);
+                    if(Objects.nonNull(userResult)){
+                        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.IMAGE));
+                    }
+                } else {
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
+                }
+            } else {
+                LOGGER.error(LoggingTemplate.FILE_NOT_EXISTED);
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.USER));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.IMAGE));
     }
 }

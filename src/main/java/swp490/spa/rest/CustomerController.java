@@ -5,7 +5,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.requests.AccountPasswordRequest;
@@ -14,6 +16,7 @@ import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
 import swp490.spa.services.SpaService;
+import swp490.spa.utils.support.image.UploadImage;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
@@ -147,7 +150,7 @@ public class CustomerController {
                     spaId);
             if (spaPackage.getType().equals(Type.ONESTEP)) {
                 staffs = staffService.findBySpaIdAndStatusAvailable(spaId);
-                if(dateOffs.size()!=0) {
+                if (dateOffs.size() != 0) {
                     List<Staff> staffDateOff = new ArrayList<>();
                     for (Staff staff : staffs) {
                         if (staff.getUser().isActive() == true) {
@@ -169,7 +172,7 @@ public class CustomerController {
             } else {
                 consultants =
                         consultantService.findBySpaIdAndStatusAvailable(spaId);
-                if(dateOffs.size()!=0) {
+                if (dateOffs.size() != 0) {
                     List<Consultant> consultantDateOff = new ArrayList<>();
                     for (Consultant consultant : consultants) {
                         if (consultant.getUser().isActive() == true) {
@@ -208,7 +211,7 @@ public class CustomerController {
             }
             if (timeBookingList.size() != 0) {
                 timeBookingList =
-                        supportFunctions.checkAndGetListTimeBookingByCustomer(customerId,timeBookingList,
+                        supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
                                 dateBooking);
                 Page<String> page = new PageImpl<>(timeBookingList,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
@@ -342,7 +345,7 @@ public class CustomerController {
             for (BookingData bookingData : bookingDataList) {
                 spaPackageSearchResult = spaPackageService.findBySpaPackageId(bookingData.getPackageId());
                 if (Objects.nonNull(spaPackageSearchResult)) {
-                    if(!supportFunctions.checkSpaPackageExisted(spaPackageSearchResult, spaPackageList)) {
+                    if (!supportFunctions.checkSpaPackageExisted(spaPackageSearchResult, spaPackageList)) {
                         spaPackageList.add(spaPackageSearchResult);
                         if (spaPackageSearchResult.getType().equals(Type.MORESTEP)) {
                             isOnlyOneStep = false;
@@ -506,17 +509,17 @@ public class CustomerController {
             }
             if (checkCanInsert) {
                 Booking bookingInsert = bookingService.insertNewBooking(booking);
-                if(Objects.nonNull(bookingInsert)){
+                if (Objects.nonNull(bookingInsert)) {
                     try {
                         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                         List<Manager> managers =
                                 managerService.findManagerBySpaAndStatusAvailable(spa.getId());
                         Map<String, String> map = new HashMap<>();
-                        map.put(MessageTemplate.BOOKING_STATUS,"bookingId " + bookingInsert.getId().toString());
-                        if(notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
+                        map.put(MessageTemplate.BOOKING_STATUS, "bookingId " + bookingInsert.getId().toString());
+                        if (notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
                                 String.format(MessageTemplate.BOOKING_MESSAGE,
                                         LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
-                                map, managers.get(0).getUser().getId(), Role.MANAGER)){
+                                map, managers.get(0).getUser().getId(), Role.MANAGER)) {
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
                         } else {
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.BOOKING));
@@ -561,6 +564,34 @@ public class CustomerController {
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));
     }
 
+    @PutMapping(value = "/image/edit/{userId}",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editImage(@PathVariable Integer userId, MultipartFile file) {
+        User user = userService.findByUserId(userId);
+        if (Objects.nonNull(user)) {
+            if (!file.isEmpty()) {
+                String imageLink = UploadImage.uploadImage(file);
+                if (imageLink != "") {
+                    user.setImage(imageLink);
+                    User userResult = userService.editUser(user);
+                    if(Objects.nonNull(userResult)){
+                        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.IMAGE));
+                    }
+                } else {
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
+                }
+            } else {
+                LOGGER.error(LoggingTemplate.FILE_NOT_EXISTED);
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.USER));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.IMAGE));
+    }
+
+
     @PutMapping("/editpassword")
     public Response editPassword(@RequestBody AccountPasswordRequest account) {
         Customer customer = customerService.findByUserId(account.getId());
@@ -576,18 +607,18 @@ public class CustomerController {
     }
 
     @GetMapping("/getListConsultantForChat")
-    public Response getListConsultantForChat(@RequestParam Integer customerId){
+    public Response getListConsultantForChat(@RequestParam Integer customerId) {
         List<Consultant> consultants = new ArrayList<>();
         List<BookingDetail> bookingDetailList =
                 bookingDetailService.findByCustomer(customerId);
-        if(Objects.nonNull(bookingDetailList)){
+        if (Objects.nonNull(bookingDetailList)) {
             for (BookingDetail bookingDetail : bookingDetailList) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetail.getId(),
                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-                        .getContent();
+                                .getContent();
                 for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                    if(bookingDetailStep.getConsultant()!=null) {
+                    if (bookingDetailStep.getConsultant() != null) {
                         Consultant consultant = bookingDetailStep.getConsultant();
                         if (consultants.size() == 0) {
                             consultants.add(consultant);

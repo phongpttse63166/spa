@@ -12,6 +12,7 @@ public class Constant {
     public static final String TIME_START_RELAX = "12:00:00";
     public static final String TIME_END_RELAX = "13:00:00";
     // Setting Booking
+    public static final String DATE_DEFAULT = "2000-02-02";
     public static final String TIME_DEFAULT = "00:00:00";
     public static final int TIME_BETWEEN_TWO_BOOKING = 15;
     public static final int DURATION_OF_CONSULTATION = 30;
@@ -46,6 +47,7 @@ public class Constant {
     public static final String SPA = "Spa";
     public static final String RATING = "Rating";
     public static final String EMPLOYEE = "Nhân viên";
+    public static final String IMAGE = "Hình ảnh";
     public static final String SERVICES = "Danh sách Service";
     public static final String WORKING_STAFF = "lịch làm việc của Staff";
     public static final String WORKING_CONSULTANT = "lịch làm việc của Consultant";
@@ -67,6 +69,5 @@ public class Constant {
     public static final String CHANGE_STAFF_TYPE = "CHANGE_STAFF";
     public static final String SKIP_TYPE = "SKIP";
     public static final String CANCEL_TYPE = "CANCEL";
-
 
 }

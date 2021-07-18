@@ -43,4 +43,11 @@ public class DateOffService {
     public void removeDateOff(Integer dateOffId) {
         this.dateOffRepository.deleteById(dateOffId);
     }
+
+    public List<DateOff> findBySpaAndFromToDateAndStatus(Integer spaId, Date startDate,
+                                                         Date endDate, StatusDateOff status) {
+        return this.dateOffRepository
+                .findBySpa_IdAndDateOffBetweenAndStatusDateOffOrderByDateOffAsc(spaId, startDate,
+                        endDate, status);
+    }
 }
