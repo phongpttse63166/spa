@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.Staff;
+import swp490.spa.entities.Status;
 import swp490.spa.repositories.StaffRepository;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class StaffService {
         return this.staffRepository.findByUserId(userId);
     }
 
-    public List<Staff> findBySpaId(Integer spaId) {
-        return this.staffRepository.findBySpa_Id(spaId);
+    public List<Staff> findBySpaIdAndStatusAvailable(Integer spaId) {
+        return this.staffRepository.findBySpa_IdAndStatus(spaId, Status.AVAILABLE);
     }
 
     public List<Staff> findBySpaIdAndNameLike(Integer spaId, String search) {

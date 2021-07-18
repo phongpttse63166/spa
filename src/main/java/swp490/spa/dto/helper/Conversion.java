@@ -1,6 +1,5 @@
 package swp490.spa.dto.helper;
 
-import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -8,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import swp490.spa.dto.responses.*;
 import swp490.spa.entities.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -213,16 +211,6 @@ public class Conversion {
                 .collect(Collectors.toList());
         long totalElements = dateOffPage.getTotalElements();
         return new PageImpl<>(dateOffData, totalElements == 0 ? Pageable.unpaged() : dateOffPage.getPageable(),
-                totalElements);
-    }
-
-    public Page<StaffResponse> convertToPageStaffResponse(Page<Staff> staffs) {
-        List<StaffResponse> staffData = staffs.getContent().stream()
-                .map(staff -> new StaffResponse(staff.getUser(),
-                        staff.getSpa()))
-                .collect(Collectors.toList());
-        long totalElements = staffs.getTotalElements();
-        return new PageImpl<>(staffData, totalElements == 0 ? Pageable.unpaged() : staffs.getPageable(),
                 totalElements);
     }
 

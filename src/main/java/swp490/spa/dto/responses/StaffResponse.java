@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import swp490.spa.entities.Spa;
+import swp490.spa.entities.Status;
 import swp490.spa.entities.User;
 
 @Data
@@ -17,4 +18,6 @@ public class StaffResponse {
     private User user;
     @JsonProperty("spa")
     private Spa spa;
+    @JsonProperty("status")
+    private Status status;
 }

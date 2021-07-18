@@ -468,7 +468,7 @@ public class ConsultantController {
                                 dateBooking));
                     }
                 }
-                staffs = staffService.findBySpaId(spaId);
+                staffs = staffService.findBySpaIdAndStatusAvailable(spaId);
                 List<Staff> staffDateOff = new ArrayList<>();
                 for (Staff staff : staffs) {
                     if (staff.getUser().isActive() == true) {
@@ -483,7 +483,7 @@ public class ConsultantController {
                 }
                 staffs.removeAll(staffDateOff);
             } else {
-                staffs = staffService.findBySpaId(spaId);
+                staffs = staffService.findBySpaIdAndStatusAvailable(spaId);
             }
             countEmployee = staffs.size();
             bookingDetailSteps = bookingDetailStepService
@@ -605,7 +605,7 @@ public class ConsultantController {
                     Objects.nonNull(bookingDetailService.editBookingDetail(bookingDetail))) {
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 List<Manager> managers =
-                        managerService.findManagerBySpa(bookingDetail.getBooking().getSpa().getId());
+                        managerService.findManagerBySpaAndStatusAvailable(bookingDetail.getBooking().getSpa().getId());
                 Map<String, String> map = new HashMap<>();
                 map.put(MessageTemplate.CHANGE_STAFF_STATUS, "bookingDetailId "
                         + bookingDetail.getId().toString());

@@ -27,4 +27,6 @@ public class Staff implements Serializable {
     private Spa spa;
     @Column(name = "token_fcm", length = 65355)
     private String tokenFCM;
+    @Column(name = "status")
+    private Status status;
 }

@@ -21,7 +21,6 @@ import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -147,7 +146,7 @@ public class CustomerController {
             dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
                     spaId);
             if (spaPackage.getType().equals(Type.ONESTEP)) {
-                staffs = staffService.findBySpaId(spaId);
+                staffs = staffService.findBySpaIdAndStatusAvailable(spaId);
                 if(dateOffs.size()!=0) {
                     List<Staff> staffDateOff = new ArrayList<>();
                     for (Staff staff : staffs) {
@@ -169,7 +168,7 @@ public class CustomerController {
                                 IsConsultation.FALSE, spaId);
             } else {
                 consultants =
-                        consultantService.findBySpaId(spaId);
+                        consultantService.findBySpaIdAndStatusAvailable(spaId);
                 if(dateOffs.size()!=0) {
                     List<Consultant> consultantDateOff = new ArrayList<>();
                     for (Consultant consultant : consultants) {
@@ -235,9 +234,9 @@ public class CustomerController {
         boolean checkNoEmployForBooking = false;
         SpaPackage spaPackageCheck = spaPackageService
                 .findBySpaPackageId(bookingRequest.getBookingDataList().get(0).getPackageId());
-        List<Staff> staffList = staffService.findBySpaId(bookingRequest.getSpaId());
+        List<Staff> staffList = staffService.findBySpaIdAndStatusAvailable(bookingRequest.getSpaId());
         List<Consultant> consultantList =
-                consultantService.findBySpaId(bookingRequest.getSpaId());
+                consultantService.findBySpaIdAndStatusAvailable(bookingRequest.getSpaId());
         for (BookingData bookingData : bookingRequest.getBookingDataList()) {
             spaPackageCheck = spaPackageService.findBySpaPackageId(bookingData.getPackageId());
             Time startTime = bookingData.getTimeBooking();
@@ -511,7 +510,7 @@ public class CustomerController {
                     try {
                         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                         List<Manager> managers =
-                                managerService.findManagerBySpa(spa.getId());
+                                managerService.findManagerBySpaAndStatusAvailable(spa.getId());
                         Map<String, String> map = new HashMap<>();
                         map.put(MessageTemplate.BOOKING_STATUS,"bookingId " + bookingInsert.getId().toString());
                         if(notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,

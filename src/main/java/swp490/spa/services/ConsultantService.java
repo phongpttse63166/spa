@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.Consultant;
+import swp490.spa.entities.Status;
 import swp490.spa.repositories.ConsultantRepository;
 
 import java.net.ContentHandler;
@@ -15,12 +16,12 @@ public class ConsultantService {
     @Autowired
     ConsultantRepository consultantRepository;
 
-    public Consultant findByConsultantId(Integer consultanId){
-        return this.consultantRepository.findConsultantByUserId(consultanId);
+    public Consultant findByConsultantId(Integer consultantId){
+        return this.consultantRepository.findConsultantByUserId(consultantId);
     }
 
-    public List<Consultant> findBySpaId(Integer spaId) {
-        return this.consultantRepository.findBySpa_Id(spaId);
+    public List<Consultant> findBySpaIdAndStatusAvailable(Integer spaId) {
+        return this.consultantRepository.findBySpa_IdAndStatus(spaId, Status.AVAILABLE);
     }
 
     public Consultant editConsultant(Consultant consultant) {

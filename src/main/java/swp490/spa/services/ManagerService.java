@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.Customer;
 import swp490.spa.entities.Manager;
+import swp490.spa.entities.Status;
 import swp490.spa.repositories.ManagerRepository;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class ManagerService {
         return this.managerRepository.save(manager);
     }
 
-    public List<Manager> findManagerBySpa(Integer spaId) {
-        return this.managerRepository.findBySpa_IdOrderByIdAsc(spaId);
+    public List<Manager> findManagerBySpaAndStatusAvailable(Integer spaId) {
+        return this.managerRepository.findBySpa_IdAndStatusOrderByIdAsc(spaId, Status.AVAILABLE);
     }
 }

@@ -390,7 +390,7 @@ public class ManagerController {
         if (Objects.nonNull(bookingDetail)) {
             Spa spa = bookingDetail.getBooking().getSpa();
             List<Staff> allStaffList =
-                    staffService.findBySpaId(spa.getId());
+                    staffService.findBySpaIdAndStatusAvailable(spa.getId());
             if (Objects.nonNull(allStaffList)) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
@@ -447,7 +447,7 @@ public class ManagerController {
         if (Objects.nonNull(bookingDetail)) {
             Spa spa = bookingDetail.getBooking().getSpa();
             List<Consultant> allConsultant =
-                    consultantService.findBySpaId(spa.getId());
+                    consultantService.findBySpaIdAndStatusAvailable(spa.getId());
             if (Objects.nonNull(allConsultant)) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
@@ -675,6 +675,7 @@ public class ManagerController {
                             Staff staff = new Staff();
                             staff.setUser(userResult);
                             staff.setSpa(spa);
+                            staff.setStatus(Status.AVAILABLE);
                             Staff staffResult = staffService.insertNewStaff(staff);
                             if (Objects.nonNull(staffResult)) {
                                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
@@ -683,6 +684,7 @@ public class ManagerController {
                             Consultant consultant = new Consultant();
                             consultant.setUser(userResult);
                             consultant.setSpa(spa);
+                            consultant.setStatus(Status.AVAILABLE);
                             Consultant consultantResult = consultantService.insertNewConsultant(consultant);
                             if (Objects.nonNull(consultantResult)) {
                                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
@@ -701,6 +703,7 @@ public class ManagerController {
                     staff = new Staff();
                     staff.setUser(user);
                     staff.setSpa(spa);
+                    staff.setStatus(Status.AVAILABLE);
                     Staff staffResult = staffService.insertNewStaff(staff);
                     if (Objects.nonNull(staffResult)) {
                         return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
@@ -714,6 +717,7 @@ public class ManagerController {
                     consultant = new Consultant();
                     consultant.setUser(user);
                     consultant.setSpa(spa);
+                    consultant.setStatus(Status.AVAILABLE);
                     Consultant consultantResult = consultantService.insertNewConsultant(consultant);
                     if (Objects.nonNull(consultantResult)) {
                         return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
@@ -1202,7 +1206,7 @@ public class ManagerController {
         BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
         if (Objects.nonNull(bookingDetail)) {
             Spa spa = bookingDetail.getBooking().getSpa();
-            List<Staff> staffList = staffService.findBySpaId(spa.getId());
+            List<Staff> staffList = staffService.findBySpaIdAndStatusAvailable(spa.getId());
             if (Objects.nonNull(staffList)) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetailId,
