@@ -26,4 +26,6 @@ public interface DateOffRepository extends JpaRepository<DateOff, Integer> {
                                                                          Date startDate,
                                                                          Date endDate,
                                                                          StatusDateOff status);
+
+    DateOff findByEmployee_IdAndDateOff(Integer employeeId, Date dateOff);
 }

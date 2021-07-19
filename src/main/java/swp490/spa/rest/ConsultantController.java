@@ -196,6 +196,7 @@ public class ConsultantController {
                 }
                 if (bookingDetail.getBookingDetailSteps().size() == 1
                         && bookingDetailBeforeEdit.getId().equals(bookingDetail.getId())) {
+                    bookingDetail.getBookingDetailSteps().get(0).setStatusBooking(StatusBooking.FINISH);
                     bookingDetailEdit = bookingDetail;
                 }
             }

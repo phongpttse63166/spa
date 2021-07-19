@@ -1417,4 +1417,17 @@ public class ManagerController {
         }
         return ResponseHelper.ok(result);
     }
+
+    @GetMapping("/dateOff/findByIdAndDateOff")
+    public Response findByIdAndDateOff(@RequestParam Integer userId,
+                                       @RequestParam String dateOff){
+        Date dateOffSearch = Date.valueOf(dateOff);
+        DateOff dateOffResult = dateOffService.findByEmployeeAndDateOff(userId,dateOffSearch);
+        if(Objects.nonNull(dateOffResult)){
+            return ResponseHelper.ok(dateOffResult);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
+    }
 }
