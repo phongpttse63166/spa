@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;
+import swp490.spa.dto.requests.DateOffRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
@@ -118,11 +119,18 @@ public class StaffController {
 
     @PostMapping("/dateoff/create/{staffId}")
     public Response insertNewDateOff(@PathVariable Integer staffId,
-                                     @RequestBody DateOff dateOff) {
+                                     @RequestBody DateOffRequest dateOffRequest) {
+        Date dateRegister = Date.valueOf(dateOffRequest.getDateOff());
         List<BookingDetailStep> bookingDetailSteps =
-                bookingDetailStepService.findByDateBookingAndStaff(dateOff.getDateOff(),
+                bookingDetailStepService.findByDateBookingAndConsultant(dateRegister,
                         staffId);
         if (bookingDetailSteps.size() == 0) {
+            DateOff dateOff = new DateOff();
+            Staff staff = staffService.findByStaffId(staffId);
+            dateOff.setStatusDateOff(StatusDateOff.WAITING);
+            dateOff.setReasonCancel(dateOffRequest.getReasonDateOff());
+            dateOff.setEmployee(staff.getUser());
+            dateOff.setSpa(staff.getSpa());
             DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);
             if (Objects.nonNull(dateOffResult)) {
                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));

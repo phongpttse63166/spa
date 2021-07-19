@@ -12,6 +12,7 @@ import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.BookingDetailEditRequest;
+import swp490.spa.dto.requests.DateOffRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.entities.SpaService;
@@ -86,11 +87,18 @@ public class ConsultantController {
 
     @PostMapping("/dateoff/create/{consultantId}")
     public Response insertNewDateOff(@PathVariable Integer consultantId,
-                                     @RequestBody DateOff dateOff) {
+                                     @RequestBody DateOffRequest dateOffRequest) {
+        Date dateRegister = Date.valueOf(dateOffRequest.getDateOff());
         List<BookingDetailStep> bookingDetailSteps =
-                bookingDetailStepService.findByDateBookingAndConsultant(dateOff.getDateOff(),
+                bookingDetailStepService.findByDateBookingAndConsultant(dateRegister,
                         consultantId);
         if (bookingDetailSteps.size() == 0) {
+            DateOff dateOff = new DateOff();
+            Consultant consultant = consultantService.findByConsultantId(consultantId);
+            dateOff.setStatusDateOff(StatusDateOff.WAITING);
+            dateOff.setReasonCancel(dateOffRequest.getReasonDateOff());
+            dateOff.setEmployee(consultant.getUser());
+            dateOff.setSpa(consultant.getSpa());
             DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);
             if (Objects.nonNull(dateOffResult)) {
                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));

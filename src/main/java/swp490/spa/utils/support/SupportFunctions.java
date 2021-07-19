@@ -35,9 +35,7 @@ public class SupportFunctions {
             for (Map.Entry<Integer, List<BookingDetailStep>> entry : map.entrySet()) {
                 String bookTimeFinal = "";
                 if (entry.getValue().size() < 2) {
-                    Time startTime = entry.getValue().get(0).getStartTime();
-                    Time endTime = entry.getValue().get(0).getEndTime();
-                    if (entry.getValue().get(0).getEndTime().compareTo(Time.valueOf(Constant.TIME_START_RELAX)) > 0) {
+                    if(entry.getValue().size() == 0){
                         loop = calculateTimeDuration(Time.valueOf(Constant.TIME_START_RELAX),
                                 Time.valueOf(Constant.TIME_START_DATE), totalTime);
                         for (int i = 0; i <= loop; i++) {
@@ -48,80 +46,6 @@ public class SupportFunctions {
                                         .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
                             }
                             bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
-                        }
-                        if (calculateTimeDuration(startTime,
-                                Time.valueOf(Constant.TIME_END_RELAX), totalTime) != -1) {
-                            loop = calculateTimeDuration(startTime,
-                                    Time.valueOf(Constant.TIME_END_RELAX), totalTime);
-                            for (int i = 0; i <= loop; i++) {
-                                if (i == 0) {
-                                    timeAdd = Time.valueOf(Constant.TIME_END_RELAX);
-                                } else {
-                                    timeAdd = Time.valueOf(timeAdd.toLocalTime()
-                                            .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
-                                }
-                                bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
-                            }
-                        }
-                        if (calculateTimeDuration(Time.valueOf(Constant.TIME_END_DATE),
-                                endTime, totalTime) != -1) {
-                            loop = calculateTimeDuration(Time.valueOf(Constant.TIME_END_DATE),
-                                    endTime, totalTime);
-                            for (int i = 0; i <= loop; i++) {
-                                if (i == 0) {
-                                    int min = endTime.getMinutes();
-                                    if (Math.abs(30 - min) % 15 == 0) {
-                                        timeAdd = endTime;
-                                    } else {
-                                        timePlus = 15 - (Math.abs(30 - min) % 15);
-                                        timeAdd = Time.valueOf(endTime.toLocalTime()
-                                                .plusMinutes(timePlus));
-                                    }
-                                } else {
-                                    timeAdd = Time.valueOf(timeAdd.toLocalTime()
-                                            .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
-                                }
-                                if (i == loop) {
-                                    bookTimeFinal = bookTimeFinal + timeAdd.toString();
-                                } else {
-                                    bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
-                                }
-                            }
-                        }
-                        timeResult = Arrays.asList(bookTimeFinal.split("-"));
-                    } else {
-                        if (calculateTimeDuration(startTime, Time.valueOf(Constant.TIME_START_DATE), totalTime) != -1) {
-                            loop = calculateTimeDuration(startTime, Time.valueOf(Constant.TIME_START_DATE), totalTime);
-                            for (int i = 0; i <= loop; i++) {
-                                if (i == 0) {
-                                    timeAdd = Time.valueOf(Constant.TIME_START_DATE);
-                                } else {
-                                    timeAdd = Time.valueOf(timeAdd.toLocalTime()
-                                            .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
-                                }
-                                bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
-                            }
-                        }
-                        if (calculateTimeDuration(Time.valueOf(Constant.TIME_START_RELAX),
-                                endTime, totalTime) != -1) {
-                            loop = calculateTimeDuration(Time.valueOf(Constant.TIME_START_RELAX),
-                                    endTime, totalTime);
-                            for (int i = 0; i <= loop; i++) {
-                                if (i == 0) {
-                                    int min = endTime.getMinutes();
-                                    if (Math.abs(30 - min) % 15 == 0) {
-                                        timeAdd = endTime;
-                                    } else {
-                                        timePlus = 15 - (Math.abs(30 - min) % 15);
-                                        timeAdd = Time.valueOf(endTime.toLocalTime()
-                                                .plusMinutes(timePlus));
-                                    }
-                                } else {
-                                    timeAdd = Time.valueOf(timeAdd.toLocalTime()
-                                            .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
-                                }
-                                bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
-                            }
                         }
                         loop = calculateTimeDuration(Time.valueOf(Constant.TIME_END_DATE),
                                 Time.valueOf(Constant.TIME_END_RELAX), totalTime);
@@ -139,6 +63,112 @@ public class SupportFunctions {
                             }
                         }
                         timeResult = Arrays.asList(bookTimeFinal.split("-"));
+                    } else {
+                        Time startTime = entry.getValue().get(0).getStartTime();
+                        Time endTime = entry.getValue().get(0).getEndTime();
+                        if (entry.getValue().get(0).getEndTime().compareTo(Time.valueOf(Constant.TIME_START_RELAX)) > 0) {
+                            loop = calculateTimeDuration(Time.valueOf(Constant.TIME_START_RELAX),
+                                    Time.valueOf(Constant.TIME_START_DATE), totalTime);
+                            for (int i = 0; i <= loop; i++) {
+                                if (i == 0) {
+                                    timeAdd = Time.valueOf(Constant.TIME_START_DATE);
+                                } else {
+                                    timeAdd = Time.valueOf(timeAdd.toLocalTime()
+                                            .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                                }
+                                bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
+                            }
+                            if (calculateTimeDuration(startTime,
+                                    Time.valueOf(Constant.TIME_END_RELAX), totalTime) != -1) {
+                                loop = calculateTimeDuration(startTime,
+                                        Time.valueOf(Constant.TIME_END_RELAX), totalTime);
+                                for (int i = 0; i <= loop; i++) {
+                                    if (i == 0) {
+                                        timeAdd = Time.valueOf(Constant.TIME_END_RELAX);
+                                    } else {
+                                        timeAdd = Time.valueOf(timeAdd.toLocalTime()
+                                                .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                                    }
+                                    bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
+                                }
+                            }
+                            if (calculateTimeDuration(Time.valueOf(Constant.TIME_END_DATE),
+                                    endTime, totalTime) != -1) {
+                                loop = calculateTimeDuration(Time.valueOf(Constant.TIME_END_DATE),
+                                        endTime, totalTime);
+                                for (int i = 0; i <= loop; i++) {
+                                    if (i == 0) {
+                                        int min = endTime.getMinutes();
+                                        if (Math.abs(30 - min) % 15 == 0) {
+                                            timeAdd = endTime;
+                                        } else {
+                                            timePlus = 15 - (Math.abs(30 - min) % 15);
+                                            timeAdd = Time.valueOf(endTime.toLocalTime()
+                                                    .plusMinutes(timePlus));
+                                        }
+                                    } else {
+                                        timeAdd = Time.valueOf(timeAdd.toLocalTime()
+                                                .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                                    }
+                                    if (i == loop) {
+                                        bookTimeFinal = bookTimeFinal + timeAdd.toString();
+                                    } else {
+                                        bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
+                                    }
+                                }
+                            }
+                            timeResult = Arrays.asList(bookTimeFinal.split("-"));
+                        } else {
+                            if (calculateTimeDuration(startTime, Time.valueOf(Constant.TIME_START_DATE), totalTime) != -1) {
+                                loop = calculateTimeDuration(startTime, Time.valueOf(Constant.TIME_START_DATE), totalTime);
+                                for (int i = 0; i <= loop; i++) {
+                                    if (i == 0) {
+                                        timeAdd = Time.valueOf(Constant.TIME_START_DATE);
+                                    } else {
+                                        timeAdd = Time.valueOf(timeAdd.toLocalTime()
+                                                .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                                    }
+                                    bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
+                                }
+                            }
+                            if (calculateTimeDuration(Time.valueOf(Constant.TIME_START_RELAX),
+                                    endTime, totalTime) != -1) {
+                                loop = calculateTimeDuration(Time.valueOf(Constant.TIME_START_RELAX),
+                                        endTime, totalTime);
+                                for (int i = 0; i <= loop; i++) {
+                                    if (i == 0) {
+                                        int min = endTime.getMinutes();
+                                        if (Math.abs(30 - min) % 15 == 0) {
+                                            timeAdd = endTime;
+                                        } else {
+                                            timePlus = 15 - (Math.abs(30 - min) % 15);
+                                            timeAdd = Time.valueOf(endTime.toLocalTime()
+                                                    .plusMinutes(timePlus));
+                                        }
+                                    } else {
+                                        timeAdd = Time.valueOf(timeAdd.toLocalTime()
+                                                .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                                    }
+                                    bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
+                                }
+                            }
+                            loop = calculateTimeDuration(Time.valueOf(Constant.TIME_END_DATE),
+                                    Time.valueOf(Constant.TIME_END_RELAX), totalTime);
+                            for (int i = 0; i <= loop; i++) {
+                                if (i == 0) {
+                                    timeAdd = Time.valueOf(Constant.TIME_END_RELAX);
+                                } else {
+                                    timeAdd = Time.valueOf(timeAdd.toLocalTime()
+                                            .plusMinutes(Constant.TIME_BETWEEN_TWO_BOOKING));
+                                }
+                                if (i == loop) {
+                                    bookTimeFinal = bookTimeFinal + timeAdd.toString();
+                                } else {
+                                    bookTimeFinal = bookTimeFinal + timeAdd.toString() + "-";
+                                }
+                            }
+                            timeResult = Arrays.asList(bookTimeFinal.split("-"));
+                        }
                     }
                 } else {
                     List<BookingDetailStep> listBooking = entry.getValue();
