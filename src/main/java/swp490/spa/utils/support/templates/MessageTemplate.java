@@ -3,7 +3,7 @@ package swp490.spa.utils.support.templates;
 public class MessageTemplate {
     public static final String BOOKING_STATUS = "BOOKING";
     public static final String BOOKING_TITLE = "Đặt dịch vụ";
-    public static final String BOOKING_MESSAGE = "Bạn đã đặt dịch vụ thành công lúc %s";
+    public static final String BOOKING_MESSAGE = "Bạn nhận được một yêu cầu đặt lịch mới lúc %s";
 
 
     public static final String ASSIGN_TITLE = "Phân công";

@@ -122,7 +122,7 @@ public class StaffController {
                                      @RequestBody DateOffRequest dateOffRequest) {
         Date dateRegister = Date.valueOf(dateOffRequest.getDateOff());
         List<BookingDetailStep> bookingDetailSteps =
-                bookingDetailStepService.findByDateBookingAndConsultant(dateRegister,
+                bookingDetailStepService.findByDateBookingAndStaff(dateRegister,
                         staffId);
         if (bookingDetailSteps.size() == 0) {
             DateOff dateOff = new DateOff();
