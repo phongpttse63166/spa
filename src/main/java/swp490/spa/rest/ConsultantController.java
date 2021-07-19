@@ -569,16 +569,9 @@ public class ConsultantController {
                         }
                     }
                 }
-                bookingDetailSteps = bookingDetailStepService
-                        .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
-                                IsConsultation.FALSE, spaId);
-                List<BookingDetailStep> bookingDetailStepsChoose = new ArrayList<>();
-                for (BookingDetailStep bookingDetailStepCheck : bookingDetailSteps) {
-                    if (bookingDetailStepCheck.getStaff().equals(staff)) {
-                        bookingDetailStepsChoose.add(bookingDetailStepCheck);
-                    }
-                }
-                bookingDetailSteps = bookingDetailStepsChoose;
+                bookingDetailSteps =
+                        bookingDetailStepService.findByDateBookingAndStaff(Date.valueOf(dateBooking),
+                                staff.getId());
                 Map<Integer, List<BookingDetailStep>> map = new HashMap<>();
                 map.put(staff.getId(), bookingDetailSteps);
                 List<String> timeBookingList = null;
@@ -655,16 +648,16 @@ public class ConsultantController {
     }
 
     @PutMapping("/bookingDetailStep/addTimeNextStep")
-    public Response addTimeForNextStep(@RequestBody BookingDetailStep bookingDetailStepInput) {
+    public Response addTimeForNextStep(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
         BookingDetailStep bookingDetailStep =
-                bookingDetailStepService.findById(bookingDetailStepInput.getId());
+                bookingDetailStepService.findById(bookingDetailRequest.getBookingDetailId());
         int duration = bookingDetailStep.getTreatmentService().getSpaService().getDurationMin();
-        Time starTime = bookingDetailStepInput.getStartTime();
+        Time starTime = Time.valueOf(bookingDetailRequest.getTimeBooking());
         Time endTime = Time.valueOf(starTime.toLocalTime().plusMinutes(duration));
         bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
         bookingDetailStep.setStartTime(starTime);
         bookingDetailStep.setEndTime(endTime);
-        bookingDetailStep.setDateBooking(bookingDetailStepInput.getDateBooking());
+        bookingDetailStep.setDateBooking(Date.valueOf(bookingDetailRequest.getDateBooking()));
         if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep))) {
             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                     Constant.TIME_NEXT_STEP));
