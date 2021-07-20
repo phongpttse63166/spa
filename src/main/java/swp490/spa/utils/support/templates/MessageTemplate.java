@@ -3,7 +3,7 @@ package swp490.spa.utils.support.templates;
 public class MessageTemplate {
     public static final String BOOKING_STATUS = "BOOKING";
     public static final String BOOKING_TITLE = "Đặt dịch vụ";
-    public static final String BOOKING_MESSAGE = "Bạn nhận được một yêu cầu đặt lịch mới lúc %s";
+    public static final String BOOKING_MESSAGE = "Bạn nhận được yêu cầu đặt lịch mới lúc %s";
 
 
     public static final String ASSIGN_TITLE = "Phân công";
@@ -20,4 +20,8 @@ public class MessageTemplate {
     public static final String CHANGE_STAFF_TITLE = "Đổi nhân viên";
     public static final String CHANGE_STAFF_MESSAGE = "Yêu cầu đổi nhân viên đã gửi lúc %s";
     public static final String CHANGE_STAFF_FINISH_MESSAGE = "Yêu cầu đổi nhân viên đã hoàn thành lúc %s";
+
+    public static final String REGISTER_DATE_OFF_STATUS = "REGISTER_DATE_OFF";
+    public static final String REGISTER_DATE_OFF_TITLE = "Đăng kí ngày nghỉ";
+    public static final String REGISTER_DATE_OFF_MESSAGE = "Bạn nhận được yêu cầu xin nghỉ lúc %s";
 }
