@@ -56,6 +56,8 @@ public class StaffController {
     @Autowired
     private RatingService ratingService;
     @Autowired
+    private ManagerService managerService;
+    @Autowired
     private NotificationFireBaseService notificationFireBaseService;
     @Autowired
     private NotificationService notificationService;
@@ -68,7 +70,7 @@ public class StaffController {
                            ConsultationContentService consultationContentService,
                            BookingDetailService bookingDetailService, BookingService bookingService,
                            NotificationFireBaseService notificationFireBaseService,
-                           NotificationService notificationService) {
+                           NotificationService notificationService, ManagerService managerService) {
         this.staffService = staffService;
         this.userService = userService;
         this.dateOffService = dateOffService;
@@ -77,6 +79,7 @@ public class StaffController {
         this.bookingDetailService = bookingDetailService;
         this.bookingService = bookingService;
         this.ratingService = ratingService;
+        this.managerService = managerService;
         this.notificationFireBaseService = notificationFireBaseService;
         this.notificationService = notificationService;
         this.conversion = new Conversion();
@@ -123,7 +126,7 @@ public class StaffController {
 
     @PostMapping("/dateoff/create/{staffId}")
     public Response insertNewDateOff(@PathVariable Integer staffId,
-                                     @RequestBody DateOffRequest dateOffRequest) {
+                                     @RequestBody DateOffRequest dateOffRequest) throws FirebaseMessagingException {
         Date dateRegister = Date.valueOf(dateOffRequest.getDateOff());
         List<BookingDetailStep> bookingDetailSteps =
                 bookingDetailStepService.findByDateBookingAndStaff(dateRegister,
@@ -131,13 +134,28 @@ public class StaffController {
         if (bookingDetailSteps.size() == 0) {
             DateOff dateOff = new DateOff();
             Staff staff = staffService.findByStaffId(staffId);
+            List<Manager> managers =
+                    managerService.findManagerBySpaAndStatusAvailable(staff.getSpa().getId());
             dateOff.setStatusDateOff(StatusDateOff.WAITING);
             dateOff.setReasonCancel(dateOffRequest.getReasonDateOff());
             dateOff.setEmployee(staff.getUser());
             dateOff.setSpa(staff.getSpa());
             DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);
             if (Objects.nonNull(dateOffResult)) {
-                return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
+                if (Objects.nonNull(dateOffResult)) {
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                    Map<String, String> map = new HashMap<>();
+                    map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS, "dateOffId "
+                            + dateOffResult.getId());
+                    if (notificationFireBaseService.notify(MessageTemplate.REGISTER_DATE_OFF_TITLE,
+                            String.format(MessageTemplate.REGISTER_DATE_OFF_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                            map, managers.get(0).getUser().getId(), Role.MANAGER)) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
+                    } else {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
+                    }
+                }
             }
         } else {
             return ResponseHelper.error(String.format(LoggingTemplate.BOOKING_SERVICE_EXISTED));
