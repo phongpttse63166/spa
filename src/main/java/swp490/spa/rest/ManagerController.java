@@ -1430,8 +1430,9 @@ public class ManagerController {
         result.setTotalConsultant(allConsultants.size());
         result.setTotalStaff(allStaffs.size());
         List<DateOff> dateOffWaiting =
-                dateOffService.findBySpaAndFromToDateAndStatus(spaId, startDate,
-                        endDate, StatusDateOff.WAITING);
+                dateOffService.findBySpaAndStatusInRangeDate(spaId, StatusDateOff.WAITING, startDate,
+                        endDate, PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT,
+                                Sort.unsorted())).getContent();
         List<Date> dateList = new ArrayList<>();
         for (DateOff dateOff : dateOffWaiting) {
             if(dateList.size() == 0){
