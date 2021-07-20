@@ -332,8 +332,8 @@ public class ConsultantController {
                     notification.setTitle(MessageTemplate.FINISH_TITLE);
                     notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
                             LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
-                    notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
-                    notification.setType(Constant.CHANGE_STAFF_TYPE);
+                    notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                    notification.setType(Constant.STEP_FINISH_TYPE);
                     notificationService.insertNewNotification(notification);
                     return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                             Constant.BOOKING_DETAIL_TREATMENT));

@@ -2,6 +2,7 @@ package swp490.spa.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import swp490.spa.entities.DateOffByDate;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,5 +18,5 @@ public class SpaAllDateOffResponse implements Serializable {
     @JsonProperty("total_consultant")
     private Integer totalConsultant;
     @JsonProperty("date_offs")
-    private List<SpaDateOffResponse> spaDateOffResponses;
+    private List<DateOffByDate> dateOffByDateList;
 }
