@@ -2,7 +2,6 @@ package swp490.spa.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import swp490.spa.entities.DateOffByDate;
 
 import java.io.Serializable;
 import java.util.List;

@@ -1421,7 +1421,8 @@ public class ManagerController {
         SpaAllDateOffResponse result = new SpaAllDateOffResponse();
         List<DateOffByDate> dateOffByDates = new ArrayList<>();
         DateOffByDate dateOffByDate = new DateOffByDate();
-        List<DateOff> dateOffList = new ArrayList<>();
+        List<DateOff> staffDateOffList = new ArrayList<>();
+        List<DateOff> consultantDateOffList = new ArrayList<>();
         Date startDate = Date.valueOf(dateStart);
         Date endDate = Date.valueOf(dateEnd);
         List<Staff> allStaffs = staffService.findBySpaIdAndStatusAvailable(spaId);
@@ -1436,35 +1437,70 @@ public class ManagerController {
             oldDate = newDate;
             newDate = dateOff.getDateOff();
             if (newDate.compareTo(oldDate) == 0) {
-                dateOffList.add(dateOff);
+                for (Staff staff : allStaffs) {
+                    if(staff.getUser().equals(dateOff.getEmployee())){
+                        staffDateOffList.add(dateOff);
+                    }
+                }
+                for (Consultant consultant : allConsultants) {
+                    if(consultant.getUser().equals(dateOff.getEmployee())){
+                        consultantDateOffList.add(dateOff);
+                    }
+                }
                 if (dateOffs.get(dateOffs.size() - 1).equals(dateOff)) {
-                    dateOffByDate.setDateOffList(dateOffList);
+                    dateOffByDate.setStaffDateOffList(staffDateOffList);
+                    dateOffByDate.setConsultantDateOffList(consultantDateOffList);
                     dateOffByDates.add(dateOffByDate);
                 }
             } else {
                 if (!dateOffs.get(dateOffs.size() - 1).equals(dateOff)) {
                     if (dateOffByDates.size() == 0) {
                         if (!dateOffs.get(0).equals(dateOff)) {
-                            dateOffByDate.setDateOffList(dateOffList);
+                            dateOffByDate.setStaffDateOffList(staffDateOffList);
+                            dateOffByDate.setConsultantDateOffList(consultantDateOffList);
                             dateOffByDates.add(dateOffByDate);
                             dateOffByDate = new DateOffByDate();
-                            dateOffList = new ArrayList<>();
+                            staffDateOffList = new ArrayList<>();
+                            consultantDateOffList = new ArrayList<>();
                         }
                     } else {
-                        dateOffByDate.setDateOffList(dateOffList);
+                        dateOffByDate.setStaffDateOffList(staffDateOffList);
+                        dateOffByDate.setConsultantDateOffList(consultantDateOffList);
                         dateOffByDates.add(dateOffByDate);
                         dateOffByDate = new DateOffByDate();
-                        dateOffList = new ArrayList<>();
+                        staffDateOffList = new ArrayList<>();
+                        consultantDateOffList = new ArrayList<>();
                     }
                     dateOffByDate.setDateOff(newDate);
-                    dateOffList.add(dateOff);
+                    for (Staff staff : allStaffs) {
+                        if(staff.getUser().equals(dateOff.getEmployee())){
+                            staffDateOffList.add(dateOff);
+                        }
+                    }
+                    for (Consultant consultant : allConsultants) {
+                        if(consultant.getUser().equals(dateOff.getEmployee())){
+                            consultantDateOffList.add(dateOff);
+                        }
+                    }
                 } else {
-                    dateOffByDate.setDateOffList(dateOffList);
+                    dateOffByDate.setStaffDateOffList(staffDateOffList);
+                    dateOffByDate.setConsultantDateOffList(consultantDateOffList);
                     dateOffByDates.add(dateOffByDate);
                     dateOffByDate = new DateOffByDate();
-                    dateOffList = new ArrayList<>();
-                    dateOffList.add(dateOff);
-                    dateOffByDate.setDateOffList(dateOffList);
+                    staffDateOffList = new ArrayList<>();
+                    consultantDateOffList = new ArrayList<>();
+                    for (Staff staff : allStaffs) {
+                        if(staff.getUser().equals(dateOff.getEmployee())){
+                            staffDateOffList.add(dateOff);
+                        }
+                    }
+                    for (Consultant consultant : allConsultants) {
+                        if(consultant.getUser().equals(dateOff.getEmployee())){
+                            consultantDateOffList.add(dateOff);
+                        }
+                    }
+                    dateOffByDate.setStaffDateOffList(staffDateOffList);
+                    dateOffByDate.setConsultantDateOffList(consultantDateOffList);
                     dateOffByDate.setDateOff(newDate);
                     dateOffByDates.add(dateOffByDate);
                 }
