@@ -1,5 +1,6 @@
 package swp490.spa.dto.responses;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import swp490.spa.entities.BookingDetail;
@@ -23,5 +24,6 @@ public class ConsultationContentResponse {
     @JsonProperty("note")
     private String note;
     @JsonProperty("booking_detail_step")
+    @JsonIgnore
     private BookingDetailStep bookingDetailStep;
 }

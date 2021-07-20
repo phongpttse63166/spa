@@ -1,5 +1,6 @@
 package swp490.spa.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,7 @@ public class ConsultationContent implements Serializable {
     @Column(name = "note", length = 65355)
     private String note;
     @OneToOne
+    @JsonBackReference
     @JoinColumn(name = "booking_detail_step_id")
     private BookingDetailStep bookingDetailStep;
 }

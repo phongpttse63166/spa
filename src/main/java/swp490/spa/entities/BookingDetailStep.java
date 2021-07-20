@@ -48,10 +48,8 @@ public class BookingDetailStep implements Serializable {
     @JoinColumn(name = "booking_detail_id")
     private BookingDetail bookingDetail;
     @OneToOne
-    @JsonBackReference
     private Rating rating;
     @OneToOne
-    @JsonBackReference
     private ConsultationContent consultationContent;
 
     public Integer getId() {

@@ -1,5 +1,6 @@
 package swp490.spa.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,7 @@ public class Rating implements Serializable {
     @JoinColumn(name = "customer_id")
     private Customer customer;
     @OneToOne
+    @JsonBackReference
     @JoinColumn(name = "booking_detail_step_id")
     private BookingDetailStep bookingDetailStep;
 }
