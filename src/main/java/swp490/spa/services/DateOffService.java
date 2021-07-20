@@ -51,6 +51,12 @@ public class DateOffService {
                         endDate, status);
     }
 
+    public List<DateOff> findBySpaAndFromToDate(Integer spaId, Date startDate, Date endDate){
+        return this.dateOffRepository
+                .findBySpa_IdAndDateOffBetweenOrderByDateOffAscStatusDateOffAsc(spaId,
+                        startDate, endDate);
+    }
+
     public DateOff findByEmployeeAndDateOff(Integer employeeId, Date dateOff) {
         return this.dateOffRepository.findByEmployee_IdAndDateOff(employeeId,dateOff);
     }

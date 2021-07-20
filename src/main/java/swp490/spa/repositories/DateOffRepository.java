@@ -28,4 +28,8 @@ public interface DateOffRepository extends JpaRepository<DateOff, Integer> {
                                                                          StatusDateOff status);
 
     DateOff findByEmployee_IdAndDateOff(Integer employeeId, Date dateOff);
+
+    List<DateOff> findBySpa_IdAndDateOffBetweenOrderByDateOffAscStatusDateOffAsc(Integer spaId,
+                                                                                 Date startDate,
+                                                                                 Date endDate);
 }
