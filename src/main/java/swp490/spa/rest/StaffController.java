@@ -226,7 +226,8 @@ public class StaffController {
                                 Notification notification = new Notification();
                                 notification.setRole(Role.CUSTOMER);
                                 notification.setTitle(MessageTemplate.FINISH_TITLE);
-                                notification.setMessage(MessageTemplate.FINISH_MESSAGE);
+                                notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
+                                        LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                                 notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                                 notification.setType(Constant.STEP_FINISH_TYPE);
                                 notificationService.insertNewNotification(notification);

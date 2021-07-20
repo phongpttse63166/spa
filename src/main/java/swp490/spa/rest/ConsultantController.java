@@ -25,6 +25,7 @@ import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -58,7 +59,11 @@ public class ConsultantController {
     @Autowired
     private SpaServiceService spaServiceService;
     @Autowired
+    private RatingService ratingService;
+    @Autowired
     private NotificationFireBaseService notificationFireBaseService;
+    @Autowired
+    private NotificationService notificationService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -68,7 +73,8 @@ public class ConsultantController {
                                 BookingDetailStepService bookingDetailStepService,
                                 SpaTreatmentService spaTreatmentService, SpaServiceService spaServiceService,
                                 ConsultationContentService consultationContentService, ManagerService managerService,
-                                NotificationFireBaseService notificationFireBaseService) {
+                                NotificationFireBaseService notificationFireBaseService,
+                                RatingService ratingService, NotificationService notificationService) {
         this.consultantService = consultantService;
         this.userService = userService;
         this.dateOffService = dateOffService;
@@ -80,7 +86,9 @@ public class ConsultantController {
         this.spaServiceService = spaServiceService;
         this.spaTreatmentService = spaTreatmentService;
         this.consultationContentService = consultationContentService;
+        this.ratingService = ratingService;
         this.notificationFireBaseService = notificationFireBaseService;
+        this.notificationService = notificationService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions(bookingDetailStepService, bookingDetailService);
     }
@@ -182,13 +190,14 @@ public class ConsultantController {
     }
 
     @PutMapping("/bookingdetailstep/addtreatment")
-    public Response editBookingDetail(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
+    public Response editBookingDetail(@RequestBody BookingDetailEditRequest bookingDetailRequest) throws FirebaseMessagingException {
         Booking bookingBeforeEdit;
         BookingDetail bookingDetailEdit = null;
         List<BookingDetailStep> bookingDetailStepEditList = new ArrayList<>();
         List<ConsultationContent> consultationContentList = new ArrayList<>();
         List<ConsultationContent> consultationContentResultList = new ArrayList<>();
         boolean checkFinish = true;
+        Rating rating = null;
         Integer totalTime = 0;
         Double totalPrice = 0.0;
         //Get Booking to edit
@@ -204,8 +213,20 @@ public class ConsultantController {
                 }
                 if (bookingDetail.getBookingDetailSteps().size() == 1
                         && bookingDetailBeforeEdit.getId().equals(bookingDetail.getId())) {
-                    bookingDetail.getBookingDetailSteps().get(0).setStatusBooking(StatusBooking.FINISH);
-                    bookingDetailEdit = bookingDetail;
+                    rating = new Rating();
+                    rating.setCustomer(bookingDetail.getBooking().getCustomer());
+                    rating.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
+                    rating.setExpireTime(Date.valueOf(LocalDateTime.now().toLocalDate().plusDays(3)));
+                    rating.setStatusRating(StatusRating.WAITING);
+                    rating.setBookingDetailStep(bookingDetail.getBookingDetailSteps().get(0));
+                    Rating ratingResult = ratingService.insertNewRating(rating);
+                    if(Objects.nonNull(ratingResult)) {
+                        bookingDetail.getBookingDetailSteps().get(0).setStatusBooking(StatusBooking.FINISH);
+                        bookingDetail.getBookingDetailSteps().get(0).setRating(ratingResult);
+                        bookingDetailEdit = bookingDetail;
+                    } else {
+                        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+                    }
                 }
             }
             // Get SpaTreatment to get price And time from Treatment chosen
@@ -297,8 +318,29 @@ public class ConsultantController {
                                 Constant.BOOKING_DETAIL_STEP));
                     }
                 }
-                return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
-                        Constant.BOOKING_DETAIL_TREATMENT));
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                Customer customer = bookingResult.getCustomer();
+                Map<String, String> map = new HashMap<>();
+                map.put(MessageTemplate.FINISH_STATUS, "bookingDetailStepId "
+                        + bookingDetailBeforeEdit.getBookingDetailSteps().get(0).getId());
+                if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
+                        String.format(MessageTemplate.FINISH_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                        map, customer.getUser().getId(), Role.CUSTOMER)) {
+                    Notification notification = new Notification();
+                    notification.setRole(Role.CUSTOMER);
+                    notification.setTitle(MessageTemplate.FINISH_TITLE);
+                    notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
+                            LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                    notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
+                    notification.setType(Constant.CHANGE_STAFF_TYPE);
+                    notificationService.insertNewNotification(notification);
+                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
+                            Constant.BOOKING_DETAIL_TREATMENT));
+                } else {
+                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
+                            Constant.BOOKING_DETAIL_TREATMENT));
+                }
             }
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));

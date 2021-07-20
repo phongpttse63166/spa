@@ -1348,8 +1348,8 @@ public class ManagerController {
                 }
             } else {
                 if (!dateOffs.get(dateOffs.size() - 1).equals(dateOff)) {
-                    if(result.size() == 0){
-                        if(!dateOffs.get(0).equals(dateOff)){
+                    if (result.size() == 0) {
+                        if (!dateOffs.get(0).equals(dateOff)) {
                             spaDateOffResponse.setStaffs(staffs);
                             spaDateOffResponse.setConsultants(consultants);
                             result.add(spaDateOffResponse);
@@ -1416,8 +1416,8 @@ public class ManagerController {
 
     @GetMapping("/getDateOffOfSpa/{spaId}")
     public Response getDateOffOfSpa(@PathVariable Integer spaId,
-                                      @RequestParam String dateStart,
-                                      @RequestParam String dateEnd) {
+                                    @RequestParam String dateStart,
+                                        @RequestParam String dateEnd) {
         SpaAllDateOffResponse result = new SpaAllDateOffResponse();
         List<SpaDateOffResponse> spaDateOffResponses = new ArrayList<>();
         List<User> staffs = new ArrayList<>();
@@ -1429,7 +1429,7 @@ public class ManagerController {
         result.setTotalConsultant(allConsultants.size());
         result.setTotalStaff(allStaffs.size());
         List<DateOff> dateOffs =
-                dateOffService.findBySpaAndFromToDate(spaId,startDate,endDate);
+                dateOffService.findBySpaAndFromToDate(spaId, startDate, endDate);
         SpaDateOffResponse spaDateOffResponse = new SpaDateOffResponse();
         Date oldDate = Date.valueOf(Constant.DATE_DEFAULT);
         Date newDate = Date.valueOf(Constant.DATE_DEFAULT);
@@ -1454,8 +1454,8 @@ public class ManagerController {
                 }
             } else {
                 if (!dateOffs.get(dateOffs.size() - 1).equals(dateOff)) {
-                    if(spaDateOffResponses.size() == 0){
-                        if(!dateOffs.get(0).equals(dateOff)){
+                    if (spaDateOffResponses.size() == 0) {
+                        if (!dateOffs.get(0).equals(dateOff)) {
                             spaDateOffResponse.setStaffs(staffs);
                             spaDateOffResponse.setConsultants(consultants);
                             spaDateOffResponses.add(spaDateOffResponse);
@@ -1523,10 +1523,10 @@ public class ManagerController {
 
     @GetMapping("/dateOff/findByIdAndDateOff")
     public Response findByIdAndDateOff(@RequestParam Integer userId,
-                                       @RequestParam String dateOff){
+                                       @RequestParam String dateOff) {
         Date dateOffSearch = Date.valueOf(dateOff);
-        DateOff dateOffResult = dateOffService.findByEmployeeAndDateOff(userId,dateOffSearch);
-        if(Objects.nonNull(dateOffResult)){
+        DateOff dateOffResult = dateOffService.findByEmployeeAndDateOff(userId, dateOffSearch);
+        if (Objects.nonNull(dateOffResult)) {
             return ResponseHelper.ok(dateOffResult);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
