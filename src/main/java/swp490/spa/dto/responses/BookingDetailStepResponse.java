@@ -30,6 +30,10 @@ public class BookingDetailStepResponse {
     private String reason;
     @JsonProperty("is_consultation")
     private IsConsultation isConsultation;
+    @JsonProperty("consultation_content")
+    private ConsultationContent consultationContent;
+    @JsonProperty("rating")
+    private Rating rating;
     @JsonProperty("treatment_service")
     private TreatmentService treatmentService;
     @JsonProperty("staff")
