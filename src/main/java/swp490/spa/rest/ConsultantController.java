@@ -12,6 +12,7 @@ import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.BookingDetailEditRequest;
+import swp490.spa.dto.requests.BookingDetailStepRequest;
 import swp490.spa.dto.requests.DateOffRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
@@ -690,16 +691,16 @@ public class ConsultantController {
     }
 
     @PutMapping("/bookingDetailStep/addTimeNextStep")
-    public Response addTimeForNextStep(@RequestBody BookingDetailEditRequest bookingDetailRequest) {
+    public Response addTimeForNextStep(@RequestBody BookingDetailStepRequest bookingDetailStepRequest) {
         BookingDetailStep bookingDetailStep =
-                bookingDetailStepService.findById(bookingDetailRequest.getBookingDetailId());
+                bookingDetailStepService.findById(bookingDetailStepRequest.getBookingDetailStepId());
         int duration = bookingDetailStep.getTreatmentService().getSpaService().getDurationMin();
-        Time starTime = Time.valueOf(bookingDetailRequest.getTimeBooking());
+        Time starTime = Time.valueOf(bookingDetailStepRequest.getTimeBooking());
         Time endTime = Time.valueOf(starTime.toLocalTime().plusMinutes(duration));
         bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
         bookingDetailStep.setStartTime(starTime);
         bookingDetailStep.setEndTime(endTime);
-        bookingDetailStep.setDateBooking(Date.valueOf(bookingDetailRequest.getDateBooking()));
+        bookingDetailStep.setDateBooking(Date.valueOf(bookingDetailStepRequest.getDateBooking()));
         if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep))) {
             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                     Constant.TIME_NEXT_STEP));

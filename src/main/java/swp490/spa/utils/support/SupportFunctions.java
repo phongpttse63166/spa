@@ -647,4 +647,13 @@ public class SupportFunctions {
         }
         return false;
     }
+
+    public boolean checkDateExitedInList(Date dateOff, List<Date> dateList) {
+        for (Date dateCheck : dateList) {
+            if(dateCheck.compareTo(dateOff) == 0){
+                return true;
+            }
+        }
+        return false;
+    }
 }

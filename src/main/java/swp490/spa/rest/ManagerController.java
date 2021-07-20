@@ -1429,8 +1429,24 @@ public class ManagerController {
         List<Consultant> allConsultants = consultantService.findBySpaIdAndStatusAvailable(spaId);
         result.setTotalConsultant(allConsultants.size());
         result.setTotalStaff(allStaffs.size());
-        List<DateOff> dateOffs =
-                dateOffService.findBySpaAndFromToDate(spaId, startDate, endDate);
+        List<DateOff> dateOffWaiting =
+                dateOffService.findBySpaAndFromToDateAndStatus(spaId, startDate,
+                        endDate, StatusDateOff.WAITING);
+        List<Date> dateList = new ArrayList<>();
+        for (DateOff dateOff : dateOffWaiting) {
+            if(dateList.size() == 0){
+                dateList.add(dateOff.getDateOff());
+            } else {
+                if(!supportFunctions.checkDateExitedInList(dateOff.getDateOff(), dateList)){
+                    dateList.add(dateOff.getDateOff());
+                }
+            }
+        }
+        List<DateOff> dateOffs = new ArrayList<>();
+        for (Date dateOff : dateList) {
+            List<DateOff> dateOffsGet = dateOffService.findByDateOff(dateOff);
+            dateOffs.addAll(dateOffsGet);
+        }
         Date oldDate = Date.valueOf(Constant.DATE_DEFAULT);
         Date newDate = Date.valueOf(Constant.DATE_DEFAULT);
         for (DateOff dateOff : dateOffs) {
