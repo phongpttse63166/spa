@@ -41,7 +41,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                             Date dateBooking,
                                                                             Pageable pageable);
 
-    Page<BookingDetailStep> findByConsultant_IdAndAndDateBookingOrderByStartTimeAsc(Integer staffId,
+    Page<BookingDetailStep> findByConsultant_IdAndDateBookingOrderByStartTimeAsc(Integer staffId,
                                                                                     Date dateBooking,
                                                                                     Pageable pageable);
 

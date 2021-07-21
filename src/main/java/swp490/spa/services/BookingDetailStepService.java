@@ -63,7 +63,7 @@ public class BookingDetailStepService {
                                                                Date dateBooking,
                                                                Pageable pageable) {
         return this.bookingDetailStepRepository
-                .findByConsultant_IdAndAndDateBookingOrderByStartTimeAsc(consultantId, dateBooking, pageable);
+                .findByConsultant_IdAndDateBookingOrderByStartTimeAsc(consultantId, dateBooking, pageable);
     }
 
     public List<BookingDetailStep> findByStatusAndSpaId(StatusBooking statusBooking, Integer spaId) {
