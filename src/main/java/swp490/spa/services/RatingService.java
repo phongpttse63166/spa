@@ -13,4 +13,12 @@ public class RatingService {
     public Rating insertNewRating(Rating rating) {
         return this.ratingRepository.save(rating);
     }
+
+    public Rating findByRatingId(Integer ratingId) {
+        return this.ratingRepository.findById(ratingId).get();
+    }
+
+    public Rating editRating(Rating rating) {
+        return this.ratingRepository.save(rating);
+    }
 }

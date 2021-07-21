@@ -145,7 +145,7 @@ public class StaffController {
                 if (Objects.nonNull(dateOffResult)) {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                     Map<String, String> map = new HashMap<>();
-                    map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS, "dateOffId "
+                    map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS, "- dateOffId "
                             + dateOffResult.getId());
                     if (notificationFireBaseService.notify(MessageTemplate.REGISTER_DATE_OFF_TITLE,
                             String.format(MessageTemplate.REGISTER_DATE_OFF_MESSAGE,
@@ -218,7 +218,7 @@ public class StaffController {
                             BookingDetail bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetail);
                             if (Objects.nonNull(bookingDetailEdited)) {
-                                map.put(MessageTemplate.FINISH_STATUS, "bookingDetailId "
+                                map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailId "
                                         + bookingDetailEdited.getId().toString());
                                 if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                                         MessageTemplate.FINISH_ALL_MESSAGE, map,
@@ -239,7 +239,7 @@ public class StaffController {
                             }
                         } else {
                             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-                            map.put(MessageTemplate.FINISH_STATUS, "bookingDetailStepId "
+                            map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailStepId "
                                     + bookingDetailStepEdited.getId().toString());
                             if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                                     String.format(MessageTemplate.FINISH_MESSAGE,
@@ -307,7 +307,7 @@ public class StaffController {
                         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                         Customer customer = bookingDetailResult.getBooking().getCustomer();
                         Map<String, String> map = new HashMap<>();
-                        map.put(MessageTemplate.FINISH_STATUS, "bookingDetailId "
+                        map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailId "
                                 + bookingDetailResult.getId());
                         if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                                 String.format(MessageTemplate.FINISH_MESSAGE,

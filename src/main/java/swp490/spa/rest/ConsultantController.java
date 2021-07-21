@@ -114,7 +114,7 @@ public class ConsultantController {
             if (Objects.nonNull(dateOffResult)) {
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS, "dateOffId "
+                map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS, "- dateOffId "
                         + dateOffResult.getId());
                 if (notificationFireBaseService.notify(MessageTemplate.REGISTER_DATE_OFF_TITLE,
                         String.format(MessageTemplate.REGISTER_DATE_OFF_MESSAGE,
@@ -325,7 +325,7 @@ public class ConsultantController {
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Customer customer = bookingResult.getCustomer();
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.FINISH_STATUS, "bookingDetailStepId "
+                map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailStepId "
                         + bookingDetailBeforeEdit.getBookingDetailSteps().get(0).getId());
                 if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                         String.format(MessageTemplate.FINISH_MESSAGE,
@@ -658,7 +658,7 @@ public class ConsultantController {
                 List<Manager> managers =
                         managerService.findManagerBySpaAndStatusAvailable(bookingDetail.getBooking().getSpa().getId());
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.CHANGE_STAFF_STATUS, "bookingDetailId "
+                map.put(MessageTemplate.CHANGE_STAFF_STATUS, "- bookingDetailId "
                         + bookingDetail.getId().toString());
                 if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
                         String.format(MessageTemplate.CHANGE_STAFF_MESSAGE,

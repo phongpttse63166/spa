@@ -24,4 +24,8 @@ public class MessageTemplate {
     public static final String REGISTER_DATE_OFF_STATUS = "REGISTER_DATE_OFF";
     public static final String REGISTER_DATE_OFF_TITLE = "Đăng kí ngày nghỉ";
     public static final String REGISTER_DATE_OFF_MESSAGE = "Bạn nhận được yêu cầu xin nghỉ lúc %s";
+
+    public static final String RATING_STATUS = "RATING";
+    public static final String RATING_TITLE = "Đánh giá dịch vụ";
+    public static final String RATING_MESSAGE = "Bạn nhận được một đánh giá mới lúc %s";
 }

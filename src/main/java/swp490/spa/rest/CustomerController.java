@@ -12,6 +12,7 @@ import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.BookingRequest;
+import swp490.spa.dto.requests.RatingRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
@@ -64,6 +65,8 @@ public class CustomerController {
     @Autowired
     private NotificationFireBaseService notificationFireBaseService;
     @Autowired
+    private RatingService ratingService;
+    @Autowired
     private ManagerService managerService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
@@ -76,7 +79,7 @@ public class CustomerController {
                               SpaTreatmentService spaTreatmentService, ConsultantService consultantService,
                               BookingService bookingService, BookingDetailService bookingDetailService,
                               DateOffService dateOffService, NotificationFireBaseService notificationFireBaseService,
-                              ManagerService managerService) {
+                              ManagerService managerService, RatingService ratingService) {
         this.customerService = customerService;
         this.userLocationService = userLocationService;
         this.accountRegisterService = accountRegisterService;
@@ -93,6 +96,7 @@ public class CustomerController {
         this.dateOffService = dateOffService;
         this.notificationFireBaseService = notificationFireBaseService;
         this.managerService = managerService;
+        this.ratingService = ratingService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions(bookingDetailStepService, bookingDetailService);
     }
@@ -515,7 +519,7 @@ public class CustomerController {
                         List<Manager> managers =
                                 managerService.findManagerBySpaAndStatusAvailable(spa.getId());
                         Map<String, String> map = new HashMap<>();
-                        map.put(MessageTemplate.BOOKING_STATUS, "bookingId " + bookingInsert.getId().toString());
+                        map.put(MessageTemplate.BOOKING_STATUS, "- bookingId " + bookingInsert.getId().toString());
                         if (notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
                                 String.format(MessageTemplate.BOOKING_MESSAGE,
                                         LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -635,5 +639,39 @@ public class CustomerController {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.LIST_CONSULTANT_CHATTING));
+    }
+
+    @PutMapping("/rating/edit")
+    public Response ratingStep(@RequestBody RatingRequest ratingRequest) throws FirebaseMessagingException {
+        if(Objects.nonNull(ratingRequest.getRatingId())){
+            Rating ratingGet = ratingService.findByRatingId(ratingRequest.getRatingId());
+            if(Objects.nonNull(ratingRequest.getRate())){
+                ratingGet.setRate(ratingRequest.getRate());
+            }
+            if(Objects.nonNull(ratingRequest.getComment())){
+                ratingGet.setComment(ratingRequest.getComment());
+            }
+            ratingGet.setStatusRating(StatusRating.RATED);
+            Rating ratingResult = ratingService.editRating(ratingGet);
+            if(Objects.nonNull(ratingResult)){
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                Map<String, String> map = new HashMap<>();
+                map.put(MessageTemplate.RATING_STATUS, "- ratingId "
+                        + ratingRequest.getRatingId());
+                if (notificationFireBaseService.notify(MessageTemplate.RATING_TITLE,
+                        String.format(MessageTemplate.RATING_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                        map, ratingRequest.getStaffId(), Role.STAFF)) {
+                    return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.RATING));
+                } else {
+                    return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.RATING));
+                }
+            } else {
+                LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.RATING));
+            }
+        } else {
+            LOGGER.error(LoggingTemplate.ID_NOT_EXISTED);
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.RATING));
     }
 }

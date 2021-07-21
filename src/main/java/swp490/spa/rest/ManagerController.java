@@ -1284,7 +1284,7 @@ public class ManagerController {
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Customer customer = bookingDetail.getBooking().getCustomer();
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.CHANGE_STAFF_STATUS, "bookingDetailId "
+                map.put(MessageTemplate.CHANGE_STAFF_STATUS, "- bookingDetailId "
                         + bookingDetail.getId().toString());
                 if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
                         String.format(MessageTemplate.CHANGE_STAFF_FINISH_MESSAGE,
