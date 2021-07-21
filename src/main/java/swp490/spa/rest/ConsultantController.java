@@ -273,9 +273,11 @@ public class ConsultantController {
                                 Time.valueOf(Time.valueOf(bookingDetailRequest.getTimeBooking()).toLocalTime()
                                         .plusMinutes(treatmentService.getSpaService().getDurationMin()));
                         bookingDetailStep.setEndTime(endTime);
+                        bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                    } else {
+                        bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
                     }
                     bookingDetailStep.setBookingPrice(treatmentService.getSpaService().getPrice());
-                    bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
                     bookingDetailStep.setIsConsultation(IsConsultation.FALSE);
                     bookingDetailStep.setTreatmentService(treatmentService);
                     bookingDetailStep.setConsultant(consultant);
