@@ -227,20 +227,8 @@ public class ConsultantController {
                 }
                 if (bookingDetail.getBookingDetailSteps().size() == 1
                         && bookingDetailBeforeEdit.getId().equals(bookingDetail.getId())) {
-                    rating = new Rating();
-                    rating.setCustomer(bookingDetail.getBooking().getCustomer());
-                    rating.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
-                    rating.setExpireTime(Date.valueOf(LocalDateTime.now().toLocalDate().plusDays(3)));
-                    rating.setStatusRating(StatusRating.WAITING);
-                    rating.setBookingDetailStep(bookingDetail.getBookingDetailSteps().get(0));
-                    Rating ratingResult = ratingService.insertNewRating(rating);
-                    if(Objects.nonNull(ratingResult)) {
-                        bookingDetail.getBookingDetailSteps().get(0).setStatusBooking(StatusBooking.FINISH);
-                        bookingDetail.getBookingDetailSteps().get(0).setRating(ratingResult);
-                        bookingDetailEdit = bookingDetail;
-                    } else {
-                        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
-                    }
+                    bookingDetail.getBookingDetailSteps().get(0).setStatusBooking(StatusBooking.FINISH);
+                    bookingDetailEdit = bookingDetail;
                 }
             }
             // Get SpaTreatment to get price And time from Treatment chosen
@@ -718,7 +706,7 @@ public class ConsultantController {
                 if (imageLink != "") {
                     user.setImage(imageLink);
                     User userResult = userService.editUser(user);
-                    if(Objects.nonNull(userResult)){
+                    if (Objects.nonNull(userResult)) {
                         return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.IMAGE));
                     }
                 } else {
