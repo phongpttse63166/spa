@@ -31,27 +31,30 @@ import java.util.*;
 public class AdminController {
     Logger LOGGER = LogManager.getLogger(AdminController.class);
     @Autowired
-    private ManagerService managerService;
-    @Autowired
     private SpaServiceService spaServiceService;
     @Autowired
     private SpaPackageService spaPackageService;
     @Autowired
     private SpaTreatmentService spaTreatmentService;
     @Autowired
+    private AdminService adminService;
+    @Autowired
     private CategoryService categoryService;
     @Autowired
     private TreatmentServiceService treatmentServiceService;
     private Conversion conversion;
 
-    public AdminController(ManagerService managerService, SpaServiceService spaServiceService,
-                             SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
-                             TreatmentServiceService treatmentServiceService){
-        this.managerService = managerService;
+
+    public AdminController(SpaServiceService spaServiceService,
+                           SpaPackageService spaPackageService,
+                           SpaTreatmentService spaTreatmentService,
+                           TreatmentServiceService treatmentServiceService,
+                           AdminService adminService) {
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
         this.spaTreatmentService = spaTreatmentService;
         this.treatmentServiceService = treatmentServiceService;
+        this.adminService = adminService;
         this.conversion = new Conversion();
     }
 
@@ -76,8 +79,8 @@ public class AdminController {
         if (Objects.nonNull(spaServiceRequest.getFile())) {
             String imageLink = UploadImage.uploadImage(spaServiceRequest.getFile());
             if (imageLink != "") {
-                Manager manager = managerService.findManagerById(spaServiceRequest.getCreateBy());
-                if (Objects.isNull(manager)) {
+                Admin admin = adminService.findByUserId(spaServiceRequest.getCreateBy());
+                if (Objects.isNull(admin)) {
                     LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
                     return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
                 }
