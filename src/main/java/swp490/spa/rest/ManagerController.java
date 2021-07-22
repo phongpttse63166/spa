@@ -1539,4 +1539,47 @@ public class ManagerController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
     }
+
+    @PutMapping("/dateOff/approveDateOffRequest")
+    public Response approveDateOffRequest(@RequestBody DateOff dateOffRequest){
+        if(dateOffRequest.getId() == null){
+            DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getId());
+            if(Objects.nonNull(dateOffEdit)){
+                dateOffEdit.setStatusDateOff(StatusDateOff.APPROVE);
+                DateOff dateOffResult = dateOffService.editDateOff(dateOffEdit);
+                if(Objects.nonNull(dateOffResult)){
+                    return ResponseHelper.ok(LoggingTemplate.APPROVE_SUCCESS);
+                } else {
+                    LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.DATE_OFF));
+                }
+            } else {
+                LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.ID_NOT_EXISTED));
+        }
+        return ResponseHelper.error(LoggingTemplate.APPROVE_FAILED);
+    }
+
+    @PutMapping("/dateOff/cancelDateOffRequest")
+    public Response cancelDateOffRequest(@RequestBody DateOff dateOffRequest){
+        if(dateOffRequest.getId() == null && dateOffRequest.getReasonCancel() == null){
+            DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getId());
+            if(Objects.nonNull(dateOffEdit)){
+                dateOffEdit.setStatusDateOff(StatusDateOff.CANCEL);
+                dateOffEdit.setReasonCancel(dateOffRequest.getReasonCancel());
+                DateOff dateOffResult = dateOffService.editDateOff(dateOffEdit);
+                if(Objects.nonNull(dateOffResult)){
+                    return ResponseHelper.ok(LoggingTemplate.CANCEL_SUCCESS);
+                } else {
+                    LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.DATE_OFF));
+                }
+            } else {
+                LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.DATE_OFF));
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.DATA_MISSING));
+        }
+        return ResponseHelper.error(LoggingTemplate.CANCEL_FAILED);
+    }
 }

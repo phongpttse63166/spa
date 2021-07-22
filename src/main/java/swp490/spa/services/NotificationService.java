@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import swp490.spa.entities.Notification;
 import swp490.spa.repositories.NotificationRepository;
 
+import java.util.List;
+
 @Service
 public class NotificationService {
     @Autowired
@@ -12,5 +14,9 @@ public class NotificationService {
 
     public Notification insertNewNotification(Notification notification) {
         return this.notificationRepository.save(notification);
+    }
+
+    public List<Notification> findByCustomerId(Integer customerId) {
+        return this.notificationRepository.findByUser_Id(customerId);
     }
 }

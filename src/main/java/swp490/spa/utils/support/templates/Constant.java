@@ -46,6 +46,7 @@ public class Constant {
     public static final String ADMIN = "Admin";
     public static final String SPA = "Spa";
     public static final String RATING = "Rating";
+    public static final String NOTIFICATION = "Notification";
     public static final String EMPLOYEE = "Nhân viên";
     public static final String IMAGE = "Hình ảnh";
     public static final String SERVICES = "Danh sách Service";
@@ -69,5 +70,6 @@ public class Constant {
     public static final String CHANGE_STAFF_TYPE = "CHANGE_STAFF";
     public static final String SKIP_TYPE = "SKIP";
     public static final String CANCEL_TYPE = "CANCEL";
+
 
 }

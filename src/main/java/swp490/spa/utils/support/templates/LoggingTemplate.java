@@ -12,6 +12,7 @@ public class LoggingTemplate {
     public static final String SEND_OTP_FAILED = "Gửi mã OTP thất bại";
     public static final String FILE_NOT_EXISTED = "File không tồn tại";
     public static final String SAVE_IMAGE_FAILED = "Lưu hình thất bại";
+    public static final String DATA_MISSING = "Thiếu dữ liệu";
     public static final String CANNOT_BOOKING_AT_TIME = "Không thể booking tại thời gian đó vì không có nhân viên rảnh";
     public static final String NO_EMPLOYEE_FREE = "Không có nhân viên rảnh";
     public static final String BOOKING_OVERTIME = "Booking thất bại vì thời gian không phù hợp";
@@ -39,4 +40,9 @@ public class LoggingTemplate {
     public static final String EMPLOYEE_EXISTED = "Nhân viên đã có tài khoản";
     public static final String EMPLOYEE_HAS_OTHER_ROLE = "Tài khoản đã có role khác";
     public static final String ID_NOT_EXISTED = "ID không tồn tại";
+    public static final String APPROVE_FAILED = "Approve thất bại";
+    public static final String APPROVE_SUCCESS = "Approve thành công";
+    public static final String CANCEL_SUCCESS = "Cancel thành công";
+    public static final String CANCEL_FAILED = "Approve thành công";
+
 }

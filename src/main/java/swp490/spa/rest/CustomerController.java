@@ -65,6 +65,8 @@ public class CustomerController {
     @Autowired
     private NotificationFireBaseService notificationFireBaseService;
     @Autowired
+    private NotificationService notificationService;
+    @Autowired
     private RatingService ratingService;
     @Autowired
     private ManagerService managerService;
@@ -79,7 +81,8 @@ public class CustomerController {
                               SpaTreatmentService spaTreatmentService, ConsultantService consultantService,
                               BookingService bookingService, BookingDetailService bookingDetailService,
                               DateOffService dateOffService, NotificationFireBaseService notificationFireBaseService,
-                              ManagerService managerService, RatingService ratingService) {
+                              ManagerService managerService, RatingService ratingService,
+                              NotificationService notificationService) {
         this.customerService = customerService;
         this.userLocationService = userLocationService;
         this.accountRegisterService = accountRegisterService;
@@ -95,6 +98,7 @@ public class CustomerController {
         this.bookingDetailService = bookingDetailService;
         this.dateOffService = dateOffService;
         this.notificationFireBaseService = notificationFireBaseService;
+        this.notificationService = notificationService;
         this.managerService = managerService;
         this.ratingService = ratingService;
         this.conversion = new Conversion();
@@ -673,5 +677,17 @@ public class CustomerController {
             LOGGER.error(LoggingTemplate.ID_NOT_EXISTED);
         }
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.RATING));
+    }
+
+    @GetMapping("/getAllNotification/{customerId}")
+    public Response getAllNotification(@PathVariable Integer customerId){
+        List<Notification> notifications =
+                notificationService.findByCustomerId(customerId);
+        if(Objects.nonNull(notifications)){
+            return ResponseHelper.ok(notifications);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
     }
 }
