@@ -27,6 +27,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/admin")
+@CrossOrigin
 public class AdminController {
     Logger LOGGER = LogManager.getLogger(AdminController.class);
     @Autowired
