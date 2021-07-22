@@ -1435,10 +1435,10 @@ public class ManagerController {
                                 Sort.unsorted())).getContent();
         List<Date> dateList = new ArrayList<>();
         for (DateOff dateOff : dateOffWaiting) {
-            if(dateList.size() == 0){
+            if (dateList.size() == 0) {
                 dateList.add(dateOff.getDateOff());
             } else {
-                if(!supportFunctions.checkDateExitedInList(dateOff.getDateOff(), dateList)){
+                if (!supportFunctions.checkDateExitedInList(dateOff.getDateOff(), dateList)) {
                     dateList.add(dateOff.getDateOff());
                 }
             }
@@ -1455,12 +1455,12 @@ public class ManagerController {
             newDate = dateOff.getDateOff();
             if (newDate.compareTo(oldDate) == 0) {
                 for (Staff staff : allStaffs) {
-                    if(staff.getUser().equals(dateOff.getEmployee())){
+                    if (staff.getUser().equals(dateOff.getEmployee())) {
                         staffDateOffList.add(dateOff);
                     }
                 }
                 for (Consultant consultant : allConsultants) {
-                    if(consultant.getUser().equals(dateOff.getEmployee())){
+                    if (consultant.getUser().equals(dateOff.getEmployee())) {
                         consultantDateOffList.add(dateOff);
                     }
                 }
@@ -1490,12 +1490,12 @@ public class ManagerController {
                     }
                     dateOffByDate.setDateOff(newDate);
                     for (Staff staff : allStaffs) {
-                        if(staff.getUser().equals(dateOff.getEmployee())){
+                        if (staff.getUser().equals(dateOff.getEmployee())) {
                             staffDateOffList.add(dateOff);
                         }
                     }
                     for (Consultant consultant : allConsultants) {
-                        if(consultant.getUser().equals(dateOff.getEmployee())){
+                        if (consultant.getUser().equals(dateOff.getEmployee())) {
                             consultantDateOffList.add(dateOff);
                         }
                     }
@@ -1507,12 +1507,12 @@ public class ManagerController {
                     staffDateOffList = new ArrayList<>();
                     consultantDateOffList = new ArrayList<>();
                     for (Staff staff : allStaffs) {
-                        if(staff.getUser().equals(dateOff.getEmployee())){
+                        if (staff.getUser().equals(dateOff.getEmployee())) {
                             staffDateOffList.add(dateOff);
                         }
                     }
                     for (Consultant consultant : allConsultants) {
-                        if(consultant.getUser().equals(dateOff.getEmployee())){
+                        if (consultant.getUser().equals(dateOff.getEmployee())) {
                             consultantDateOffList.add(dateOff);
                         }
                     }
@@ -1541,13 +1541,15 @@ public class ManagerController {
     }
 
     @PutMapping("/dateOff/approveDateOffRequest")
-    public Response approveDateOffRequest(@RequestBody DateOff dateOffRequest){
-        if(dateOffRequest.getId() != null){
-            DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getId());
-            if(Objects.nonNull(dateOffEdit)){
+    public Response approveDateOffRequest(@RequestBody DateOffCheckRequest dateOffRequest) {
+        if (dateOffRequest.getDateOffId() != null) {
+            DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getDateOffId());
+            if (Objects.nonNull(dateOffEdit)) {
+                Manager manager = managerService.findManagerById(dateOffRequest.getManagerId());
                 dateOffEdit.setStatusDateOff(StatusDateOff.APPROVE);
+                dateOffEdit.setManager(manager);
                 DateOff dateOffResult = dateOffService.editDateOff(dateOffEdit);
-                if(Objects.nonNull(dateOffResult)){
+                if (Objects.nonNull(dateOffResult)) {
                     return ResponseHelper.ok(LoggingTemplate.APPROVE_SUCCESS);
                 } else {
                     LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.DATE_OFF));
@@ -1562,14 +1564,17 @@ public class ManagerController {
     }
 
     @PutMapping("/dateOff/cancelDateOffRequest")
-    public Response cancelDateOffRequest(@RequestBody DateOff dateOffRequest){
-        if(dateOffRequest.getId() != null && dateOffRequest.getReasonCancel() != null){
-            DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getId());
-            if(Objects.nonNull(dateOffEdit)){
+    public Response cancelDateOffRequest(@RequestBody DateOffCheckRequest dateOffRequest) {
+        if (dateOffRequest.getDateOffId() != null && dateOffRequest.getReasonCancel() != null
+                && dateOffRequest.getManagerId() != null) {
+            DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getDateOffId());
+            if (Objects.nonNull(dateOffEdit)) {
+                Manager manager = managerService.findManagerById(dateOffRequest.getManagerId());
                 dateOffEdit.setStatusDateOff(StatusDateOff.CANCEL);
                 dateOffEdit.setReasonCancel(dateOffRequest.getReasonCancel());
+                dateOffEdit.setManager(manager);
                 DateOff dateOffResult = dateOffService.editDateOff(dateOffEdit);
-                if(Objects.nonNull(dateOffResult)){
+                if (Objects.nonNull(dateOffResult)) {
                     return ResponseHelper.ok(LoggingTemplate.CANCEL_SUCCESS);
                 } else {
                     LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.DATE_OFF));
