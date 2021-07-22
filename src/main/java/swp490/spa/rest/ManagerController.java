@@ -1542,7 +1542,7 @@ public class ManagerController {
 
     @PutMapping("/dateOff/approveDateOffRequest")
     public Response approveDateOffRequest(@RequestBody DateOff dateOffRequest){
-        if(dateOffRequest.getId() == null){
+        if(dateOffRequest.getId() != null){
             DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getId());
             if(Objects.nonNull(dateOffEdit)){
                 dateOffEdit.setStatusDateOff(StatusDateOff.APPROVE);
@@ -1563,7 +1563,7 @@ public class ManagerController {
 
     @PutMapping("/dateOff/cancelDateOffRequest")
     public Response cancelDateOffRequest(@RequestBody DateOff dateOffRequest){
-        if(dateOffRequest.getId() == null && dateOffRequest.getReasonCancel() == null){
+        if(dateOffRequest.getId() != null && dateOffRequest.getReasonCancel() != null){
             DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getId());
             if(Objects.nonNull(dateOffEdit)){
                 dateOffEdit.setStatusDateOff(StatusDateOff.CANCEL);
