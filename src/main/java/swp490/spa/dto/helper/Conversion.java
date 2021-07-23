@@ -58,7 +58,7 @@ public class Conversion {
                         spa.getDistrict(),
                         spa.getCity(),
                         spa.getLatitude(),
-                        spa.getLongtitude(),
+                        spa.getLongitude(),
                         spa.getCreateBy(),
                         spa.getCreateTime(),
                         spa.getStatus()))
