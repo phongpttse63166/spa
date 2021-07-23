@@ -564,7 +564,7 @@ public class AdminController {
         Page<Spa> spas = spaService.findAllWithSearch(search, pageable);
         if (!spas.hasContent() && !spas.isFirst()) {
             spas = spaService.findAllWithSearch(search,
-                    PageRequest.of(spas.getTotalPages(), spas.getSize(), spas.getSort()));
+                    PageRequest.of(spas.getTotalPages()-1, spas.getSize(), spas.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaResponse(spas));
     }
