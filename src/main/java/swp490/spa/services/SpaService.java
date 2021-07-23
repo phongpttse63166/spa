@@ -24,4 +24,8 @@ public class SpaService {
     public Spa findById(Integer spaId) {
         return this.spaRepository.findBySpaId(spaId);
     }
+
+    public Page<Spa> findAllWithSearch(String search, Pageable pageable) {
+        return this.spaRepository.findWithSearch(search,pageable);
+    }
 }

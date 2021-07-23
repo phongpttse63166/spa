@@ -18,8 +18,8 @@ public class UserLocationResponse {
     private User user;
     @JsonProperty("latitude")
     private String latitude;
-    @JsonProperty("longtitude")
-    private String longtitude;
+    @JsonProperty("longitude")
+    private String longitude;
     @JsonProperty("modifier_time")
     private Date modifier_time;
 }

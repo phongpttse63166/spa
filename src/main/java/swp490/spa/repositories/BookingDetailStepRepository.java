@@ -94,4 +94,6 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
             "AND b.bookingDetail.type = 1 " +
             "ORDER BY b.bookingDetail.id ASC")
     List<BookingDetailStep> findBySpaAndStaffIsNull(Integer spaId);
+
+    List<BookingDetailStep> findByStaff_IdOrderByRatingDesc(Integer staffId);
 }

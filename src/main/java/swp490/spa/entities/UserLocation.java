@@ -25,8 +25,8 @@ public class UserLocation implements Serializable {
     private User user;
     @Column(name = "latitude")
     private String latitude;
-    @Column(name = "longtitude")
-    private String longtitude;
+    @Column(name = "longitude")
+    private String longitude;
     @Column(name = "modifier_time")
     private Date modifier_time;
 }

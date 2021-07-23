@@ -1587,4 +1587,34 @@ public class ManagerController {
         }
         return ResponseHelper.error(LoggingTemplate.CANCEL_FAILED);
     }
+
+    @GetMapping("/ratings/findAllAndGroupByEmployee")
+    public Response findAllAndGroupByEmployee(@RequestParam Integer spaId){
+        List<TotalRatingResponse> response = new ArrayList<>();
+        List<Staff> allStaffList = staffService.findBySpaIdAndStatusAvailable(spaId);
+        if(Objects.nonNull(allStaffList)){
+            for (Staff staff : allStaffList) {
+                TotalRatingResponse data = new TotalRatingResponse();
+                data.setStaff(staff.getUser().getFullname());
+                List<Rating> ratings = new ArrayList<>();
+                List<BookingDetailStep> bookingDetailSteps =
+                        bookingDetailStepService.findByStaff(staff.getUser().getId());
+                if(Objects.nonNull(bookingDetailSteps)){
+                    for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                        if(bookingDetailStep.getRating()!=null){
+                            ratings.add(bookingDetailStep.getRating());
+                        }
+                    }
+                    data.setRatingList(ratings);
+                    response.add(data);
+                } else {
+                    LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                }
+            }
+            return ResponseHelper.ok(response);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.RATING));
+    }
 }

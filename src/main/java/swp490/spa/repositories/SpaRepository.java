@@ -14,4 +14,7 @@ public interface SpaRepository extends JpaRepository<Spa, Integer> {
 
     @Query("FROM Spa s WHERE s.id = ?1")
     Spa findBySpaId(Integer spaId);
+
+    @Query("FROM Spa s WHERE s.name LIKE %?1% ORDER BY s.id")
+    Page<Spa> findWithSearch(String search, Pageable pageable);
 }

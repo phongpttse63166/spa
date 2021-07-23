@@ -26,8 +26,8 @@ public class SpaResponse {
     private String city;
     @JsonProperty("latitude")
     private String latitude;
-    @JsonProperty("longtitude")
-    private String longtitude;
+    @JsonProperty("longitude")
+    private String longitude;
     @JsonProperty("create_by")
     private String createBy;
     @JsonProperty("create_time")

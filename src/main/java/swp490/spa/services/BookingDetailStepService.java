@@ -129,4 +129,8 @@ public class BookingDetailStepService {
     public BookingDetailStep findById(Integer bookingDetailStepId) {
         return this.bookingDetailStepRepository.findById(bookingDetailStepId).get();
     }
+
+    public List<BookingDetailStep> findByStaff(Integer staffId) {
+        return this.bookingDetailStepRepository.findByStaff_IdOrderByRatingDesc(staffId);
+    }
 }

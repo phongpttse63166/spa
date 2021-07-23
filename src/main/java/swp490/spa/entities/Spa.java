@@ -31,8 +31,8 @@ public class Spa implements Serializable {
     private String city;
     @Column(name = "latitude")
     private String latitude;
-    @Column(name = "longtitude")
-    private String longtitude;
+    @Column(name = "longitude")
+    private String longitude;
     @Column(name = "create_by")
     private String createBy;
     @Column(name = "create_time")

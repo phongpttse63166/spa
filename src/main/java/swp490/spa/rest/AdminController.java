@@ -8,15 +8,13 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
-import swp490.spa.dto.requests.CategoryRequest;
-import swp490.spa.dto.requests.SpaPackageRequest;
-import swp490.spa.dto.requests.SpaServiceRequest;
-import swp490.spa.dto.requests.SpaTreatmentRequest;
+import swp490.spa.dto.requests.*;
 import swp490.spa.dto.responses.CategorySpaPackageResponse;
 import swp490.spa.dto.responses.SpaPackageTreatmentResponse;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
+import swp490.spa.services.SpaService;
 import swp490.spa.utils.support.image.UploadImage;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
@@ -41,6 +39,8 @@ public class AdminController {
     @Autowired
     private CategoryService categoryService;
     @Autowired
+    private SpaService spaService;
+    @Autowired
     private TreatmentServiceService treatmentServiceService;
     private Conversion conversion;
 
@@ -49,12 +49,13 @@ public class AdminController {
                            SpaPackageService spaPackageService,
                            SpaTreatmentService spaTreatmentService,
                            TreatmentServiceService treatmentServiceService,
-                           AdminService adminService) {
+                           AdminService adminService, SpaService spaService) {
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
         this.spaTreatmentService = spaTreatmentService;
         this.treatmentServiceService = treatmentServiceService;
         this.adminService = adminService;
+        this.spaService = spaService;
         this.conversion = new Conversion();
     }
 
@@ -491,5 +492,80 @@ public class AdminController {
         }
         LOGGER.info(String.format(LoggingTemplate.EDIT_FAILED, Constant.SPA_TREATMENT));
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.SPA_TREATMENT));
+    }
+
+    @PostMapping(value = "/spa/insert",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response insertNewSpa(SpaRequest spaRequest) {
+        boolean checkNull = false;
+        Spa spaResult;
+        if (spaRequest.getAdminId() != null) {
+            Admin admin = adminService.findByUserId(spaRequest.getAdminId());
+            if (admin == null) {
+                return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+            } else {
+                Spa spa = new Spa();
+                if (Objects.nonNull(spaRequest.getFile())) {
+                    String imageLink = UploadImage.uploadImage(spaRequest.getFile());
+                    if (imageLink != "") {
+                        spa.setImage(imageLink);
+                    } else {
+                        LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                        return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    }
+                    if(spaRequest.getName() != null){
+                        spa.setName(spaRequest.getName());
+                    } else {
+                        return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+                    }
+                    if(spaRequest.getStreet() != null){
+                        spa.setStreet(spaRequest.getStreet());
+                    } else {
+                        return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+                    }
+                    if(spaRequest.getDistrict() != null){
+                        spa.setDistrict(spaRequest.getDistrict());
+                    } else {
+                        return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+                    }
+                    if(spaRequest.getCity() != null){
+                        spa.setCity(spaRequest.getCity());
+                    } else {
+                        return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+                    }
+                    if(spaRequest.getLongitude() != null){
+                        spa.setLongitude(spaRequest.getLongitude());
+                    } else {
+                        return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+                    }
+                    if(spaRequest.getLatitude() != null){
+                        spa.setLatitude(spaRequest.getLatitude());
+                    } else {
+                        return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+                    }
+                    spa.setStatus(Status.AVAILABLE);
+                    spa.setCreateBy(admin.getId().toString());
+                    spa.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
+                    spaResult = spaService.insertNewSpa(spa);
+                    if(spaResult!=null){
+                        return ResponseHelper.ok(spaResult);
+                    }
+                }
+            }
+        } else {
+            return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.SPA));
+    }
+
+    @GetMapping("/spa/findAllWithSearch")
+    public Response findAllSpa(@RequestParam String search, Pageable pageable){
+        Page<Spa> spas = spaService.findAllWithSearch(search, pageable);
+        if (!spas.hasContent() && !spas.isFirst()) {
+            spas = spaService.findAllWithSearch(search,
+                    PageRequest.of(spas.getTotalPages() - 1, spas.getSize(), spas.getSort()));
+        }
+        return ResponseHelper.ok(conversion.convertToPageSpaResponse(spas));
     }
 }
