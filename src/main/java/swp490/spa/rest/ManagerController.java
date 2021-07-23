@@ -1014,17 +1014,27 @@ public class ManagerController {
                                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                                 .getContent().size();
                                 if (Objects.nonNull(countBookingDetail)) {
+                                    Booking booking = bookingDetailEdited.getBooking();
                                     if (countBookingDetail == 1) {
-                                        Booking booking = bookingDetailEdited.getBooking();
                                         booking.setStatusBooking(StatusBooking.BOOKING);
                                         bookingEdited = bookingService.editBooking(booking);
-                                        if (Objects.nonNull(bookingEdited)) {
-                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
-                                        } else {
-                                            check = false;
-                                        }
                                     } else {
+                                        boolean checkBookingAll = true;
+                                        booking = bookingDetailEdited.getBooking();
+                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
+                                            if(!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)){
+                                                checkBookingAll = false;
+                                            }
+                                        }
+                                        if(checkBookingAll){
+                                            booking.setStatusBooking(StatusBooking.BOOKING);
+                                            bookingEdited = bookingService.editBooking(booking);
+                                        }
+                                    }
+                                    if (Objects.nonNull(bookingEdited)) {
                                         return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
+                                    } else {
+                                        check = false;
                                     }
                                 }
                             } else {
@@ -1109,17 +1119,27 @@ public class ManagerController {
                                                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                                 .getContent().size();
                                 if (Objects.nonNull(countBookingDetail)) {
+                                    Booking booking = bookingDetailEdited.getBooking();
                                     if (countBookingDetail == 1) {
-                                        Booking booking = bookingDetailEdited.getBooking();
                                         booking.setStatusBooking(StatusBooking.BOOKING);
                                         bookingEdited = bookingService.editBooking(booking);
-                                        if (Objects.nonNull(bookingEdited)) {
-                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
-                                        } else {
-                                            check = false;
-                                        }
                                     } else {
-                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
+                                        boolean checkBookingAll = true;
+                                        booking = bookingDetailEdited.getBooking();
+                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
+                                            if(!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)){
+                                                checkBookingAll = false;
+                                            }
+                                        }
+                                        if(checkBookingAll){
+                                            booking.setStatusBooking(StatusBooking.BOOKING);
+                                            bookingEdited = bookingService.editBooking(booking);
+                                        }
+                                    }
+                                    if (Objects.nonNull(bookingEdited)) {
+                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
+                                    } else {
+                                        check = false;
                                     }
                                 }
                             } else {
