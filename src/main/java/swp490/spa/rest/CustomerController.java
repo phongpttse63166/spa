@@ -25,6 +25,7 @@ import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -221,6 +222,17 @@ public class CustomerController {
                 timeBookingList =
                         supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
                                 dateBooking);
+                if(LocalDateTime.now().toLocalDate().equals(LocalDate.parse(dateBooking))){
+                    List<String> listTimeGet = new ArrayList<>();
+                    Time currentTime = Time.valueOf(LocalTime.now());
+                    for (String time: timeBookingList) {
+                        Time checkTime = Time.valueOf(time);
+                        if(checkTime.compareTo(currentTime)>0){
+                            listTimeGet.add(time);
+                        }
+                    }
+                    timeBookingList = listTimeGet;
+                }
                 Page<String> page = new PageImpl<>(timeBookingList,
                         PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
                         timeBookingList.size());
