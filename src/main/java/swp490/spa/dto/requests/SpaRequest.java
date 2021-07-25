@@ -9,8 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SpaRequest {
+    private Integer spaId;
     private String name;
     private String street;
+    private String phone;
     private String district;
     private String longitude;
     private String latitude;

@@ -28,4 +28,8 @@ public class SpaService {
     public Page<Spa> findAllWithSearch(String search, Pageable pageable) {
         return this.spaRepository.findWithSearch(search,pageable);
     }
+
+    public Spa editSpa(Spa spaEdit) {
+        return this.spaRepository.save(spaEdit);
+    }
 }

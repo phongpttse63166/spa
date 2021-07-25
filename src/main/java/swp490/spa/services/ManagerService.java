@@ -25,4 +25,8 @@ public class ManagerService {
     public List<Manager> findManagerBySpaAndStatusAvailable(Integer spaId) {
         return this.managerRepository.findBySpa_IdAndStatusOrderByIdAsc(spaId, Status.AVAILABLE);
     }
+
+    public Manager insertNewManager(Manager manager) {
+        return this.managerRepository.save(manager);
+    }
 }

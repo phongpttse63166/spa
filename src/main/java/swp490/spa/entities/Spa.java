@@ -29,6 +29,8 @@ public class Spa implements Serializable {
     private String district;
     @Column(name = "city")
     private String city;
+    @Column(name = "phone")
+    private String phone;
     @Column(name = "latitude")
     private String latitude;
     @Column(name = "longitude")
@@ -39,5 +41,4 @@ public class Spa implements Serializable {
     private Date createTime;
     @Column(name = "status")
     private Status status;
-
 }

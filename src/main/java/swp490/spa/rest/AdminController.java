@@ -1,5 +1,6 @@
 package swp490.spa.rest;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,14 @@ public class AdminController {
     @Autowired
     private SpaService spaService;
     @Autowired
+    private UserService userService;
+    @Autowired
+    private ManagerService managerService;
+    @Autowired
+    private StaffService staffService;
+    @Autowired
+    private ConsultantService consultantService;
+    @Autowired
     private TreatmentServiceService treatmentServiceService;
     private Conversion conversion;
 
@@ -49,13 +58,19 @@ public class AdminController {
                            SpaPackageService spaPackageService,
                            SpaTreatmentService spaTreatmentService,
                            TreatmentServiceService treatmentServiceService,
-                           AdminService adminService, SpaService spaService) {
+                           AdminService adminService, SpaService spaService,
+                           UserService userService, ManagerService managerService,
+                           StaffService staffService, ConsultantService consultantService) {
         this.spaServiceService = spaServiceService;
         this.spaPackageService = spaPackageService;
         this.spaTreatmentService = spaTreatmentService;
         this.treatmentServiceService = treatmentServiceService;
         this.adminService = adminService;
         this.spaService = spaService;
+        this.userService = userService;
+        this.managerService = managerService;
+        this.staffService = staffService;
+        this.consultantService = consultantService;
         this.conversion = new Conversion();
     }
 
@@ -498,7 +513,6 @@ public class AdminController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response insertNewSpa(SpaRequest spaRequest) {
-        boolean checkNull = false;
         Spa spaResult;
         if (spaRequest.getAdminId() != null) {
             Admin admin = adminService.findByUserId(spaRequest.getAdminId());
@@ -514,32 +528,37 @@ public class AdminController {
                         LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
                         return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
                     }
-                    if(spaRequest.getName() != null){
+                    if (spaRequest.getName() != null) {
                         spa.setName(spaRequest.getName());
                     } else {
                         return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
                     }
-                    if(spaRequest.getStreet() != null){
+                    if (spaRequest.getPhone() != null) {
+                        spa.setPhone(spaRequest.getPhone());
+                    } else {
+                        return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+                    }
+                    if (spaRequest.getStreet() != null) {
                         spa.setStreet(spaRequest.getStreet());
                     } else {
                         return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
                     }
-                    if(spaRequest.getDistrict() != null){
+                    if (spaRequest.getDistrict() != null) {
                         spa.setDistrict(spaRequest.getDistrict());
                     } else {
                         return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
                     }
-                    if(spaRequest.getCity() != null){
+                    if (spaRequest.getCity() != null) {
                         spa.setCity(spaRequest.getCity());
                     } else {
                         return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
                     }
-                    if(spaRequest.getLongitude() != null){
+                    if (spaRequest.getLongitude() != null) {
                         spa.setLongitude(spaRequest.getLongitude());
                     } else {
                         return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
                     }
-                    if(spaRequest.getLatitude() != null){
+                    if (spaRequest.getLatitude() != null) {
                         spa.setLatitude(spaRequest.getLatitude());
                     } else {
                         return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
@@ -548,7 +567,7 @@ public class AdminController {
                     spa.setCreateBy(admin.getId().toString());
                     spa.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
                     spaResult = spaService.insertNewSpa(spa);
-                    if(spaResult!=null){
+                    if (spaResult != null) {
                         return ResponseHelper.ok(spaResult);
                     }
                 }
@@ -560,12 +579,122 @@ public class AdminController {
     }
 
     @GetMapping("/spa/findAllWithSearch")
-    public Response findAllSpa(@RequestParam String search, Pageable pageable){
+    public Response findAllSpa(@RequestParam String search, Pageable pageable) {
         Page<Spa> spas = spaService.findAllWithSearch(search, pageable);
         if (!spas.hasContent() && !spas.isFirst()) {
             spas = spaService.findAllWithSearch(search,
-                    PageRequest.of(spas.getTotalPages()-1, spas.getSize(), spas.getSort()));
+                    PageRequest.of(spas.getTotalPages() - 1, spas.getSize(), spas.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaResponse(spas));
+    }
+
+    @PutMapping(value = "/spa/edit",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editSpa(SpaRequest spaRequest) {
+        if (spaRequest.getSpaId() != null) {
+            Spa spaEdit = spaService.findById(spaRequest.getSpaId());
+            if (Objects.nonNull(spaEdit)) {
+                if (Objects.nonNull(spaRequest.getFile())) {
+                    String imageLink = UploadImage.uploadImage(spaRequest.getFile());
+                    if (imageLink != "") {
+                        spaEdit.setImage(imageLink);
+                    } else {
+                        LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                        return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    }
+                    if (spaRequest.getName() != null) {
+                        spaEdit.setName(spaRequest.getName());
+                    }
+                    if (spaRequest.getPhone() != null) {
+                        spaEdit.setPhone(spaRequest.getPhone());
+                    }
+                    if (spaRequest.getStreet() != null) {
+                        spaEdit.setStreet(spaRequest.getStreet());
+                    }
+                    if (spaRequest.getDistrict() != null) {
+                        spaEdit.setDistrict(spaRequest.getDistrict());
+                    }
+                    if (spaRequest.getCity() != null) {
+                        spaEdit.setCity(spaRequest.getCity());
+                    }
+                    Spa spaResult = spaService.editSpa(spaEdit);
+                    if (Objects.nonNull(spaResult)) {
+                        return ResponseHelper.ok(spaResult);
+                    }
+                }
+            }
+        } else {
+            LOGGER.error(LoggingTemplate.DATA_MISSING);
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.SPA));
+    }
+
+    @PostMapping(value = "/manager/insert",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response addManagerIntoSpa(ManagerRequest managerRequest) {
+        User user = userService.findByPhone(managerRequest.getPhone());
+        Spa spa = spaService.findById(managerRequest.getSpaId());
+        String password = "";
+        if (Objects.isNull(user)) {
+            if (Objects.nonNull(managerRequest.getFile())) {
+                String imageLink = UploadImage.uploadImage(managerRequest.getFile());
+                user = new User();
+                if (imageLink != "") {
+                    password = RandomStringUtils.random(Constant.PASSWORD_LENGTH, true, true);
+                    user.setFullname(managerRequest.getFullname());
+                    user.setPhone(managerRequest.getPhone());
+                    user.setGender(managerRequest.getGender());
+                    user.setBirthdate(managerRequest.getBirthdate());
+                    user.setAddress(managerRequest.getAddress());
+                    user.setEmail(managerRequest.getEmail());
+                    user.setActive(true);
+                    user.setImage(imageLink);
+                    user.setPassword(password);
+                    User userResult = userService.insertNewUser(user);
+                    if (Objects.nonNull(userResult)) {
+                        Manager manager = new Manager();
+                        manager.setUser(user);
+                        manager.setSpa(spa);
+                        manager.setStatus(Status.AVAILABLE);
+                        Manager managerResult = managerService.insertNewManager(manager);
+                        if (Objects.nonNull(managerResult)) {
+                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
+                                    Constant.MANAGER));
+                        }
+                    }
+                } else {
+                    LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
+                    return ResponseHelper.error(LoggingTemplate.FILE_NOT_EXISTED);
+                }
+            } else {
+                LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
+                return ResponseHelper.error(LoggingTemplate.FILE_NOT_EXISTED);
+            }
+        } else {
+            Staff staffSearch = staffService.findByStaffId(user.getId());
+            if (staffSearch == null) {
+                Consultant consultantSearch = consultantService.findByConsultantId(user.getId());
+                if (consultantSearch != null) {
+                    consultantSearch.setStatus(Status.DISABLE);
+                    consultantService.editConsultant(consultantSearch);
+                }
+            } else {
+                staffSearch.setStatus(Status.DISABLE);
+                staffService.editStaff(staffSearch);
+
+            }
+            Manager manager = new Manager();
+            manager.setUser(user);
+            manager.setSpa(spa);
+            manager.setStatus(Status.AVAILABLE);
+            Manager managerResult = managerService.insertNewManager(manager);
+            if (Objects.nonNull(managerResult)) {
+                return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
+                        Constant.MANAGER));
+            }
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.MANAGER));
     }
 }

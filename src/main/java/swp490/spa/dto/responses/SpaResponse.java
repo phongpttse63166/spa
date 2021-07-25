@@ -24,6 +24,8 @@ public class SpaResponse {
     private String district;
     @JsonProperty("city")
     private String city;
+    @JsonProperty("phone")
+    private String phone;
     @JsonProperty("latitude")
     private String latitude;
     @JsonProperty("longitude")
