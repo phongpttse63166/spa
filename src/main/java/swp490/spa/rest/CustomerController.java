@@ -226,7 +226,7 @@ public class CustomerController {
                 Date dateCheck = Date.valueOf(LocalDate.parse(dateBooking));
                 if(currentDate.compareTo(dateCheck) == 0){
                     List<String> listTimeGet = new ArrayList<>();
-                    Time currentTime = Time.valueOf(LocalTime.now());
+                    Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
                     for (String time: timeBookingList) {
                         Time checkTime = Time.valueOf(time);
                         if(checkTime.compareTo(currentTime)>0){
