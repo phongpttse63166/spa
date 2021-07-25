@@ -562,11 +562,11 @@ public class ConsultantController {
                 timeBookingList =
                         supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
                                 dateBooking);
-                Date currentDate = Date.valueOf(LocalDate.now());
+                Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
                 Date dateCheck = Date.valueOf(LocalDate.parse(dateBooking));
                 if(currentDate.compareTo(dateCheck) == 0){
                     List<String> listTimeGet = new ArrayList<>();
-                    Time currentTime = Time.valueOf(LocalTime.now());
+                    Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
                     for (String time: timeBookingList) {
                         Time checkTime = Time.valueOf(time);
                         if(checkTime.compareTo(currentTime)>0){
@@ -641,11 +641,11 @@ public class ConsultantController {
                     timeBookingList =
                             supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
                                     dateBooking);
-                    Date currentDate = Date.valueOf(LocalDate.now());
+                    Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
                     Date dateCheck = Date.valueOf(LocalDate.parse(dateBooking));
                     if(currentDate.compareTo(dateCheck) == 0){
                         List<String> listTimeGet = new ArrayList<>();
-                        Time currentTime = Time.valueOf(LocalTime.now());
+                        Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
                         for (String time: timeBookingList) {
                             Time checkTime = Time.valueOf(time);
                             if(checkTime.compareTo(currentTime)>0){
