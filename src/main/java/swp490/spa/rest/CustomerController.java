@@ -222,7 +222,9 @@ public class CustomerController {
                 timeBookingList =
                         supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
                                 dateBooking);
-                if(LocalDateTime.now().toLocalDate().equals(LocalDate.parse(dateBooking))){
+                Date currentDate = Date.valueOf(LocalDate.now());
+                Date dateCheck = Date.valueOf(LocalDate.parse(dateBooking));
+                if(currentDate.compareTo(dateCheck) == 0){
                     List<String> listTimeGet = new ArrayList<>();
                     Time currentTime = Time.valueOf(LocalTime.now());
                     for (String time: timeBookingList) {
