@@ -585,7 +585,7 @@ public class AdminController {
             spas = spaService.findAllWithSearch(search,
                     PageRequest.of(spas.getTotalPages() - 1, spas.getSize(), spas.getSort()));
         }
-        return ResponseHelper.ok(conversion.convertToPageSpaResponse(spas));
+        return ResponseHelper.ok(spas);
     }
 
     @PutMapping(value = "/spa/edit",
