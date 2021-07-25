@@ -630,7 +630,7 @@ public class AdminController {
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.SPA));
     }
 
-    @PostMapping(value = "/manager/insert",
+    @PostMapping(value = "/insertManager",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response addManagerIntoSpa(ManagerRequest managerRequest) {
