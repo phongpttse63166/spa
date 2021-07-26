@@ -19,4 +19,5 @@ public class ManagerRequest implements Serializable {
     private MultipartFile file;
     private String address;
     private Integer spaId;
+    private Integer managerId;
 }

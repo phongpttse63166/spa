@@ -705,13 +705,62 @@ public class AdminController {
     }
 
     @GetMapping("/getAllManager/{spaId}")
-    public Response getAllManagerBySpa(@PathVariable Integer spaId){
+    public Response getAllManagerBySpa(@PathVariable Integer spaId) {
         List<Manager> managers = managerService.findBySpa(spaId);
-        if(Objects.nonNull(managers)){
+        if (Objects.nonNull(managers)) {
             return ResponseHelper.ok(managers);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
+    }
+
+    @PutMapping(value = "/editManager",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editManager(ManagerRequest managerRequest) {
+        User userEdit = userService.findByUserId(managerRequest.getManagerId());
+        if(managerRequest.getSpaId()!=null) {
+            Spa spa = spaService.findById(managerRequest.getSpaId());
+            if (spa != null) {
+                Manager manager = managerService.findManagerById(managerRequest.getManagerId());
+                manager.setSpa(spa);
+                Manager managerResult = managerService.editManager(manager);
+                if (Objects.nonNull(userEdit) && Objects.nonNull(managerResult)) {
+                    if (Objects.nonNull(managerRequest.getFile())) {
+                        String imageLink = UploadImage.uploadImage(managerRequest.getFile());
+                        if (imageLink != "") {
+                            userEdit.setImage(imageLink);
+                        } else {
+                            LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
+                            return ResponseHelper.error(LoggingTemplate.FILE_NOT_EXISTED);
+                        }
+                    }
+                    if (managerRequest.getAddress() != null) {
+                        userEdit.setAddress(managerRequest.getAddress());
+                    }
+                    if (managerRequest.getBirthdate() != null) {
+                        userEdit.setBirthdate(managerRequest.getBirthdate());
+                    }
+                    if (managerRequest.getEmail() != null) {
+                        userEdit.setEmail(managerRequest.getEmail());
+                    }
+                    if (managerRequest.getFullname() != null) {
+                        userEdit.setFullname(managerRequest.getFullname());
+                    }
+                    if (managerRequest.getGender() != null) {
+                        userEdit.setGender(managerRequest.getGender());
+                    }
+                    User userResult = userService.editUser(userEdit);
+                    if (userResult != null) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS,
+                                Constant.MANAGER));
+                    }
+                } else {
+                    LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
+                }
+            }
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.MANAGER));
     }
 }
