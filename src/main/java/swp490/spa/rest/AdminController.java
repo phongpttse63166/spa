@@ -720,46 +720,59 @@ public class AdminController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response editManager(ManagerRequest managerRequest) {
         User userEdit = userService.findByUserId(managerRequest.getManagerId());
-        if(managerRequest.getSpaId()!=null) {
-            Spa spa = spaService.findById(managerRequest.getSpaId());
-            if (spa != null) {
-                Manager manager = managerService.findManagerById(managerRequest.getManagerId());
-                manager.setSpa(spa);
-                Manager managerResult = managerService.editManager(manager);
-                if (Objects.nonNull(userEdit) && Objects.nonNull(managerResult)) {
-                    if (Objects.nonNull(managerRequest.getFile())) {
-                        String imageLink = UploadImage.uploadImage(managerRequest.getFile());
-                        if (imageLink != "") {
-                            userEdit.setImage(imageLink);
-                        } else {
-                            LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
-                            return ResponseHelper.error(LoggingTemplate.FILE_NOT_EXISTED);
-                        }
-                    }
-                    if (managerRequest.getAddress() != null) {
-                        userEdit.setAddress(managerRequest.getAddress());
-                    }
-                    if (managerRequest.getBirthdate() != null) {
-                        userEdit.setBirthdate(managerRequest.getBirthdate());
-                    }
-                    if (managerRequest.getEmail() != null) {
-                        userEdit.setEmail(managerRequest.getEmail());
-                    }
-                    if (managerRequest.getFullname() != null) {
-                        userEdit.setFullname(managerRequest.getFullname());
-                    }
-                    if (managerRequest.getGender() != null) {
-                        userEdit.setGender(managerRequest.getGender());
-                    }
-                    User userResult = userService.editUser(userEdit);
-                    if (userResult != null) {
-                        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS,
-                                Constant.MANAGER));
-                    }
+        if (Objects.nonNull(userEdit)) {
+            User oldUser = userEdit;
+            if (Objects.nonNull(managerRequest.getFile())) {
+                String imageLink = UploadImage.uploadImage(managerRequest.getFile());
+                if (imageLink != "") {
+                    userEdit.setImage(imageLink);
                 } else {
-                    LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
+                    LOGGER.info(LoggingTemplate.FILE_NOT_EXISTED);
+                    return ResponseHelper.error(LoggingTemplate.FILE_NOT_EXISTED);
                 }
             }
+            if (managerRequest.getAddress() != null) {
+                userEdit.setAddress(managerRequest.getAddress());
+            }
+            if (managerRequest.getBirthdate() != null) {
+                userEdit.setBirthdate(managerRequest.getBirthdate());
+            }
+            if (managerRequest.getEmail() != null) {
+                userEdit.setEmail(managerRequest.getEmail());
+            }
+            if (managerRequest.getFullname() != null) {
+                userEdit.setFullname(managerRequest.getFullname());
+            }
+            if (managerRequest.getGender() != null) {
+                userEdit.setGender(managerRequest.getGender());
+            }
+            User userResult = userService.editUser(userEdit);
+            if (userResult != null) {
+                boolean checkFinish = true;
+                if(managerRequest.getSpaId()!=null) {
+                    Spa spa = spaService.findById(managerRequest.getSpaId());
+                    if (spa != null) {
+                        Manager manager = managerService.findManagerById(managerRequest.getManagerId());
+                        manager.setSpa(spa);
+                        Manager managerResult = managerService.editManager(manager);
+                        if(managerResult==null){
+                            userService.editUser(oldUser);
+                            checkFinish = false;
+                        }
+                    } else {
+                        checkFinish = false;
+                    }
+                }
+                if(checkFinish) {
+                    return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS,
+                            Constant.MANAGER));
+                } else {
+                    return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED,
+                            Constant.MANAGER));
+                }
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.MANAGER));
     }
