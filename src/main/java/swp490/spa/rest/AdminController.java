@@ -603,25 +603,31 @@ public class AdminController {
                         LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
                         return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
                     }
-                    if (spaRequest.getName() != null) {
-                        spaEdit.setName(spaRequest.getName());
-                    }
-                    if (spaRequest.getPhone() != null) {
-                        spaEdit.setPhone(spaRequest.getPhone());
-                    }
-                    if (spaRequest.getStreet() != null) {
-                        spaEdit.setStreet(spaRequest.getStreet());
-                    }
-                    if (spaRequest.getDistrict() != null) {
-                        spaEdit.setDistrict(spaRequest.getDistrict());
-                    }
-                    if (spaRequest.getCity() != null) {
-                        spaEdit.setCity(spaRequest.getCity());
-                    }
-                    Spa spaResult = spaService.editSpa(spaEdit);
-                    if (Objects.nonNull(spaResult)) {
-                        return ResponseHelper.ok(spaResult);
-                    }
+                }
+                if (spaRequest.getName() != null) {
+                    spaEdit.setName(spaRequest.getName());
+                }
+                if (spaRequest.getPhone() != null) {
+                    spaEdit.setPhone(spaRequest.getPhone());
+                }
+                if (spaRequest.getStreet() != null) {
+                    spaEdit.setStreet(spaRequest.getStreet());
+                }
+                if (spaRequest.getDistrict() != null) {
+                    spaEdit.setDistrict(spaRequest.getDistrict());
+                }
+                if (spaRequest.getCity() != null) {
+                    spaEdit.setCity(spaRequest.getCity());
+                }
+                if (spaRequest.getLatitude() != null) {
+                    spaEdit.setLatitude(spaRequest.getLatitude());
+                }
+                if (spaRequest.getLongitude() != null) {
+                    spaEdit.setLongitude(spaRequest.getLongitude());
+                }
+                Spa spaResult = spaService.editSpa(spaEdit);
+                if (Objects.nonNull(spaResult)) {
+                    return ResponseHelper.ok(spaResult);
                 }
             }
         } else {
