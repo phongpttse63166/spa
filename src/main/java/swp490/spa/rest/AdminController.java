@@ -703,4 +703,15 @@ public class AdminController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.MANAGER));
     }
+
+    @GetMapping("/getAllManager/{spaId}")
+    public Response getAllManagerBySpa(@PathVariable Integer spaId){
+        List<Manager> managers = managerService.findBySpa(spaId);
+        if(Objects.nonNull(managers)){
+            return ResponseHelper.ok(managers);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
+    }
 }

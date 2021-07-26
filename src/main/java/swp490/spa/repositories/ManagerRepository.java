@@ -14,4 +14,6 @@ public interface ManagerRepository extends JpaRepository<Manager, Integer> {
     Manager findByUserId(Integer userId);
 
     List<Manager> findBySpa_IdAndStatusOrderByIdAsc(Integer spaId, Status status);
+
+    List<Manager> findBySpa_IdOrderByIdAsc(Integer spaId);
 }
