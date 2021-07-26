@@ -366,4 +366,17 @@ public class StaffController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.IMAGE));
     }
+
+    @GetMapping("/bookingDetailStep/findByBookingDetail/{bookingDetailId}")
+    public Response findBookingDetailStepByBookingDetail(@PathVariable Integer bookingDetailId) {
+        Page<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findByBookingDetail(bookingDetailId,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()));
+        if (Objects.nonNull(bookingDetailSteps)) {
+            return ResponseHelper.ok(bookingDetailSteps);
+        }
+        LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED,
+                Constant.BOOKING_DETAIL_STEP));
+    }
 }
