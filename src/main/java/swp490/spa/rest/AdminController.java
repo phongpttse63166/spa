@@ -776,4 +776,14 @@ public class AdminController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.MANAGER));
     }
+
+    @GetMapping("/findById/{id}")
+    public Response getProfile(@PathVariable Integer id) {
+        Admin admin = adminService.findByUserId(id);
+        if (Objects.nonNull(admin)) {
+            return ResponseHelper.ok(admin.getUser());
+        }
+        LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.ADMIN));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.ADMIN));
+    }
 }
