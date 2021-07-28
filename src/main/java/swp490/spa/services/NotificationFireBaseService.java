@@ -88,9 +88,11 @@ public class NotificationFireBaseService {
             } catch (FirebaseMessagingException ex) {
                 try {
                     Thread.sleep(WAIT_NOTIFICATION_RETRY);
+                    return false;
                 } catch (InterruptedException exception) {
                     LOGGER.error("Error when retrying sending notification");
                     ex.printStackTrace();
+                    return false;
                 }
             }
         }
