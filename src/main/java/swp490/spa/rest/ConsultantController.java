@@ -27,7 +27,6 @@ import swp490.spa.utils.support.templates.MessageTemplate;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -329,13 +328,13 @@ public class ConsultantController {
                 map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailStepId "
                         + bookingDetailBeforeEdit.getBookingDetailSteps().get(0).getId());
                 if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
-                        String.format(MessageTemplate.FINISH_MESSAGE,
+                        String.format(MessageTemplate.FINISH_CONSULTATION_MESSAGE,
                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
                         map, customer.getUser().getId(), Role.CUSTOMER)) {
                     Notification notification = new Notification();
                     notification.setRole(Role.CUSTOMER);
                     notification.setTitle(MessageTemplate.FINISH_TITLE);
-                    notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
+                    notification.setMessage(String.format(MessageTemplate.FINISH_CONSULTATION_MESSAGE,
                             LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                     notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                     notification.setType(Constant.STEP_FINISH_TYPE);
@@ -347,7 +346,7 @@ public class ConsultantController {
                     Notification notification = new Notification();
                     notification.setRole(Role.CUSTOMER);
                     notification.setTitle(MessageTemplate.FINISH_TITLE);
-                    notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
+                    notification.setMessage(String.format(MessageTemplate.FINISH_CONSULTATION_MESSAGE,
                             LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                     notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                     notification.setType(Constant.STEP_FINISH_TYPE);

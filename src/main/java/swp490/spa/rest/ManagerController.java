@@ -1288,12 +1288,15 @@ public class ManagerController {
                     bookingDetailService.findByBookingDetailId(bookingDetailId);
             if (Objects.nonNull(bookingDetail)) {
                 List<BookingDetailStep> bookingDetailSteps = bookingDetail.getBookingDetailSteps();
+                Staff oldStaff = null;
                 for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                     if (!bookingDetailStep.getIsConsultation().equals(IsConsultation.TRUE)) {
                         if (!bookingDetailStep.getStatusBooking().equals(StatusBooking.FINISH)) {
                             bookingDetailStep.setStaff(staff);
                             bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
                             bookingDetailStep.setReason(null);
+                        } else if(bookingDetailStep.getStatusBooking().equals(StatusBooking.FINISH)){
+                            oldStaff = staffService.findByStaffId(bookingDetailStep.getStaff().getId());
                         }
                     }
                     bookingDetailStepEdit.add(bookingDetailStep);
@@ -1306,14 +1309,65 @@ public class ManagerController {
                 Map<String, String> map = new HashMap<>();
                 map.put(MessageTemplate.CHANGE_STAFF_STATUS, "- bookingDetailId "
                         + bookingDetail.getId().toString());
+                map.put(MessageTemplate.ASSIGN_STATUS, "- bookingDetailId "
+                        + bookingDetail.getId().toString());
                 if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
-                        String.format(MessageTemplate.CHANGE_STAFF_FINISH_MESSAGE,
+                        String.format(MessageTemplate.CHANGE_STAFF_CUSTOMER_FINISH_MESSAGE,
                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
                         map, customer.getUser().getId(), Role.CUSTOMER)) {
                     Notification notification = new Notification();
                     notification.setRole(Role.CUSTOMER);
                     notification.setTitle(MessageTemplate.CHANGE_STAFF_TITLE);
-                    notification.setMessage(MessageTemplate.CHANGE_STAFF_FINISH_MESSAGE);
+                    notification.setMessage(String.format(MessageTemplate.CHANGE_STAFF_CUSTOMER_FINISH_MESSAGE,
+                            LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                    notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
+                    notification.setType(Constant.CHANGE_STAFF_TYPE);
+                    notification.setUser(customer.getUser());
+                    notificationService.insertNewNotification(notification);
+                } else {
+                    Notification notification = new Notification();
+                    notification.setRole(Role.CUSTOMER);
+                    notification.setTitle(MessageTemplate.CHANGE_STAFF_TITLE);
+                    notification.setMessage(String.format(MessageTemplate.CHANGE_STAFF_CUSTOMER_FINISH_MESSAGE,
+                            LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                    notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
+                    notification.setType(Constant.CHANGE_STAFF_TYPE);
+                    notification.setUser(customer.getUser());
+                    notificationService.insertNewNotification(notification);
+                }
+                if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_TITLE,
+                        String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                customer.getUser().getFullname()),
+                        map, staff.getUser().getId(), Role.STAFF)) {
+                    Notification notification = new Notification();
+                    notification.setRole(Role.STAFF);
+                    notification.setTitle(MessageTemplate.ASSIGN_TITLE);
+                    notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
+                            customer.getUser().getFullname()));
+                    notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
+                    notification.setType(Constant.ASSIGN_TYPE);
+                    notification.setUser(customer.getUser());
+                    notificationService.insertNewNotification(notification);
+                } else {
+                    Notification notification = new Notification();
+                    notification.setRole(Role.STAFF);
+                    notification.setTitle(MessageTemplate.ASSIGN_TITLE);
+                    notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
+                            customer.getUser().getFullname()));
+                    notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
+                    notification.setType(Constant.ASSIGN_TYPE);
+                    notification.setUser(customer.getUser());
+                    notificationService.insertNewNotification(notification);
+                }
+                if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
+                        String.format(MessageTemplate.CHANGE_STAFF_OLD_STAFF_FINISH_MESSAGE,
+                                customer.getUser().getFullname()),
+                        map, oldStaff.getUser().getId(), Role.STAFF)) {
+                    Notification notification = new Notification();
+                    notification.setRole(Role.STAFF);
+                    notification.setTitle(MessageTemplate.CHANGE_STAFF_TITLE);
+                    notification.setMessage(String.format(MessageTemplate.CHANGE_STAFF_OLD_STAFF_FINISH_MESSAGE,
+                            customer.getUser().getFullname()));
                     notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
                     notification.setType(Constant.CHANGE_STAFF_TYPE);
                     notification.setUser(customer.getUser());
@@ -1321,9 +1375,10 @@ public class ManagerController {
                     return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
                 } else {
                     Notification notification = new Notification();
-                    notification.setRole(Role.CUSTOMER);
+                    notification.setRole(Role.STAFF);
                     notification.setTitle(MessageTemplate.CHANGE_STAFF_TITLE);
-                    notification.setMessage(MessageTemplate.CHANGE_STAFF_FINISH_MESSAGE);
+                    notification.setMessage(String.format(MessageTemplate.CHANGE_STAFF_OLD_STAFF_FINISH_MESSAGE,
+                            customer.getUser().getFullname()));
                     notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
                     notification.setType(Constant.CHANGE_STAFF_TYPE);
                     notification.setUser(customer.getUser());
