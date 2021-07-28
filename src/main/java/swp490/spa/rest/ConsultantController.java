@@ -324,9 +324,20 @@ public class ConsultantController {
                 }
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Customer customer = bookingResult.getCustomer();
+                List<Manager> managers = managerService.findBySpa(bookingBeforeEdit.getSpa().getId());
                 Map<String, String> map = new HashMap<>();
                 map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailStepId "
                         + bookingDetailBeforeEdit.getBookingDetailSteps().get(0).getId());
+                map.put(MessageTemplate.ASSIGN_REQUEST_STATUS, "- bookingDetailId "
+                        + bookingDetailBeforeEdit.getId());
+                if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_REQUEST_TITLE,
+                        String.format(MessageTemplate.ASSIGN_REQUEST_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                        map, managers.get(0).getUser().getId() , Role.MANAGER)) {
+                    LOGGER.info("Send notification {}: OK");
+                } else {
+                    LOGGER.info("Send notification {}: FAILED");
+                }
                 if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                         String.format(MessageTemplate.FINISH_CONSULTATION_MESSAGE,
                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
