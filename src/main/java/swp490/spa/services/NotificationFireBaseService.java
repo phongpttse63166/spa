@@ -84,16 +84,8 @@ public class NotificationFireBaseService {
             try {
                 String response = FirebaseMessaging.getInstance().send(notification);
                 LOGGER.info("Notification sent {}", response);
-                return true;
             } catch (FirebaseMessagingException ex) {
-                try {
-                    Thread.sleep(WAIT_NOTIFICATION_RETRY);
-                    return false;
-                } catch (InterruptedException exception) {
-                    LOGGER.error("Error when retrying sending notification");
-                    ex.printStackTrace();
-                    return false;
-                }
+                return false;
             }
         }
         return false;
