@@ -26,7 +26,7 @@ public class NotificationFireBaseService {
     @Autowired
     private AdminService adminService;
     private static final int MAX_NOTIFICATION_RETRY = 3;
-    private static final long WAIT_NOTIFICATION_RETRY = 10 * 60 * 1000;
+    private static final long WAIT_NOTIFICATION_RETRY = 10 * 1000;
 
     public boolean notify(String title, String message,
                        Map<String, String> data,

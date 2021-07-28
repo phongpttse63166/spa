@@ -1319,6 +1319,13 @@ public class ManagerController {
                     notificationService.insertNewNotification(notification);
                     return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
                 } else {
+                    Notification notification = new Notification();
+                    notification.setRole(Role.CUSTOMER);
+                    notification.setTitle(MessageTemplate.CHANGE_STAFF_TITLE);
+                    notification.setMessage(MessageTemplate.CHANGE_STAFF_FINISH_MESSAGE);
+                    notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
+                    notification.setType(Constant.CHANGE_STAFF_TYPE);
+                    notificationService.insertNewNotification(notification);
                     return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
                 }
             } else {

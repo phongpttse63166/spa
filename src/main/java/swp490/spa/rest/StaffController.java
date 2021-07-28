@@ -232,6 +232,13 @@ public class StaffController {
                                     notificationService.insertNewNotification(notification);
                                     return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
                                 } else {
+                                    Notification notification = new Notification();
+                                    notification.setRole(Role.CUSTOMER);
+                                    notification.setTitle(MessageTemplate.FINISH_TITLE);
+                                    notification.setMessage(MessageTemplate.FINISH_ALL_MESSAGE);
+                                    notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                                    notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                                    notificationService.insertNewNotification(notification);
                                     return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
                                 }
                             } else {
@@ -255,6 +262,14 @@ public class StaffController {
                                 notificationService.insertNewNotification(notification);
                                 return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
                             } else {
+                                Notification notification = new Notification();
+                                notification.setRole(Role.CUSTOMER);
+                                notification.setTitle(MessageTemplate.FINISH_TITLE);
+                                notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
+                                        LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                                notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                                notification.setType(Constant.STEP_FINISH_TYPE);
+                                notificationService.insertNewNotification(notification);
                                 return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
                             }
                         }
@@ -324,6 +339,14 @@ public class StaffController {
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                                     Constant.BOOKING_DETAIL_TREATMENT));
                         } else {
+                            Notification notification = new Notification();
+                            notification.setRole(Role.CUSTOMER);
+                            notification.setTitle(MessageTemplate.FINISH_ALL_MESSAGE);
+                            notification.setMessage(String.format(MessageTemplate.FINISH_ALL_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                            notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                            notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                            notificationService.insertNewNotification(notification);
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                                     Constant.BOOKING_DETAIL_TREATMENT));
                         }
