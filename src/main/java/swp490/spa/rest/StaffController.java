@@ -229,6 +229,7 @@ public class StaffController {
                                     notification.setMessage(MessageTemplate.FINISH_ALL_MESSAGE);
                                     notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                                     notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                                    notification.setUser(customer.getUser());
                                     notificationService.insertNewNotification(notification);
                                     return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
                                 } else {
@@ -238,6 +239,7 @@ public class StaffController {
                                     notification.setMessage(MessageTemplate.FINISH_ALL_MESSAGE);
                                     notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                                     notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                                    notification.setUser(customer.getUser());
                                     notificationService.insertNewNotification(notification);
                                     return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
                                 }
@@ -259,6 +261,7 @@ public class StaffController {
                                         LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                                 notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                                 notification.setType(Constant.STEP_FINISH_TYPE);
+                                notification.setUser(customer.getUser());
                                 notificationService.insertNewNotification(notification);
                                 return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
                             } else {
@@ -269,6 +272,7 @@ public class StaffController {
                                         LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                                 notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                                 notification.setType(Constant.STEP_FINISH_TYPE);
+                                notification.setUser(customer.getUser());
                                 notificationService.insertNewNotification(notification);
                                 return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
                             }
@@ -335,6 +339,7 @@ public class StaffController {
                                     LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                             notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                             notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                            notification.setUser(customer.getUser());
                             notificationService.insertNewNotification(notification);
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                                     Constant.BOOKING_DETAIL_TREATMENT));
@@ -346,6 +351,7 @@ public class StaffController {
                                     LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                             notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                             notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                            notification.setUser(customer.getUser());
                             notificationService.insertNewNotification(notification);
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                                     Constant.BOOKING_DETAIL_TREATMENT));

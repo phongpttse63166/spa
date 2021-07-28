@@ -339,6 +339,7 @@ public class ConsultantController {
                             LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                     notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                     notification.setType(Constant.STEP_FINISH_TYPE);
+                    notification.setUser(customer.getUser());
                     notificationService.insertNewNotification(notification);
                     return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                             Constant.BOOKING_DETAIL_TREATMENT));
@@ -350,6 +351,7 @@ public class ConsultantController {
                             LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                     notification.setData(map.get(MessageTemplate.FINISH_STATUS));
                     notification.setType(Constant.STEP_FINISH_TYPE);
+                    notification.setUser(customer.getUser());
                     notificationService.insertNewNotification(notification);
                     return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
                             Constant.BOOKING_DETAIL_TREATMENT));
