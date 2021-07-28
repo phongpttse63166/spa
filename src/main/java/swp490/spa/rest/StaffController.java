@@ -408,4 +408,16 @@ public class StaffController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED,
                 Constant.BOOKING_DETAIL_STEP));
     }
+
+    @GetMapping("/getAllNotification/{staffId}")
+    public Response getAllNotification(@PathVariable Integer staffId){
+        List<Notification> notifications =
+                notificationService.findByIdAndRole(staffId, Role.STAFF);
+        if(Objects.nonNull(notifications)){
+            return ResponseHelper.ok(notifications);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
+    }
 }

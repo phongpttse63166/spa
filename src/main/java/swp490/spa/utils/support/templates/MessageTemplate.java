@@ -21,8 +21,6 @@ public class MessageTemplate {
     public static final String CHANGE_STAFF_TITLE = "Đổi nhân viên";
     public static final String CHANGE_STAFF_MESSAGE = "Yêu cầu đổi nhân viên đã gửi lúc %s";
     public static final String CHANGE_STAFF_CUSTOMER_FINISH_MESSAGE = "Yêu cầu đổi nhân viên đã hoàn thành lúc %s";
-    public static final String CHANGE_STAFF_NEW_STAFF_FINISH_MESSAGE = "Bạn đã được thêm vào liệu trình " +
-            "của khách hàng %s";
     public static final String CHANGE_STAFF_OLD_STAFF_FINISH_MESSAGE = "Bạn không còn tham gia vào liệu trình " +
             "của khách hàng %s";
 

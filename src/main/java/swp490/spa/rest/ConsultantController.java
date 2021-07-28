@@ -768,4 +768,16 @@ public class ConsultantController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.IMAGE));
     }
+
+    @GetMapping("/getAllNotification/{consultantId}")
+    public Response getAllNotification(@PathVariable Integer consultantId){
+        List<Notification> notifications =
+                notificationService.findByIdAndRole(consultantId, Role.CONSULTANT);
+        if(Objects.nonNull(notifications)){
+            return ResponseHelper.ok(notifications);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
+    }
 }

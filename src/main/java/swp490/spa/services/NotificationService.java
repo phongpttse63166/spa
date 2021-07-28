@@ -3,6 +3,7 @@ package swp490.spa.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.Notification;
+import swp490.spa.entities.Role;
 import swp490.spa.repositories.NotificationRepository;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class NotificationService {
         return this.notificationRepository.save(notification);
     }
 
-    public List<Notification> findByCustomerId(Integer customerId) {
-        return this.notificationRepository.findByUser_Id(customerId);
+    public List<Notification> findByIdAndRole(Integer customerId, Role role) {
+        return this.notificationRepository.findByUser_IdAndRole(customerId, role);
     }
 }

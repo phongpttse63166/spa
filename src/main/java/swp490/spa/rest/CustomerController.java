@@ -696,7 +696,7 @@ public class CustomerController {
     @GetMapping("/getAllNotification/{customerId}")
     public Response getAllNotification(@PathVariable Integer customerId){
         List<Notification> notifications =
-                notificationService.findByCustomerId(customerId);
+                notificationService.findByIdAndRole(customerId, Role.CUSTOMER);
         if(Objects.nonNull(notifications)){
             return ResponseHelper.ok(notifications);
         } else {
