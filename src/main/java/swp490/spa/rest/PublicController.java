@@ -1,9 +1,11 @@
 package swp490.spa.rest;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import swp490.spa.dto.requests.AuthRequest;
 import swp490.spa.dto.responses.LoginResponse;
@@ -15,14 +17,18 @@ import swp490.spa.services.*;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
 import swp490.spa.services.SpaService;
+import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.otp.GenerationOTP;
 import swp490.spa.utils.support.templates.LoggingTemplate;
+import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,7 +60,14 @@ public class PublicController {
     private SpaPackageService spaPackageService;
     @Autowired
     private AccountRegisterService accountRegisterService;
+    @Autowired
+    private BookingDetailStepService bookingDetailStepService;
+    @Autowired
+    private NotificationFireBaseService notificationFireBaseService;
+    @Autowired
+    private NotificationService notificationService;
     private Conversion conversion;
+    private SupportFunctions supportFunctions;
     @Autowired
     JWTUtils jwtUtils;
 
@@ -63,7 +76,11 @@ public class PublicController {
                             CustomerService customerService, StaffService staffService,
                             AdminService adminService, ConsultantService consultantService,
                             ManagerService managerService, SpaTreatmentService spaTreatmentService,
-                            SpaPackageService spaPackageService, AccountRegisterService accountRegisterService) {
+                            SpaPackageService spaPackageService,
+                            AccountRegisterService accountRegisterService,
+                            BookingDetailStepService bookingDetailStepService,
+                            NotificationFireBaseService notificationFireBaseService,
+                            NotificationService notificationService) {
         this.userService = userService;
         this.categoryService = categoryService;
         this.spaService = spaService;
@@ -74,7 +91,11 @@ public class PublicController {
         this.spaTreatmentService = spaTreatmentService;
         this.spaPackageService = spaPackageService;
         this.accountRegisterService = accountRegisterService;
+        this.bookingDetailStepService = bookingDetailStepService;
+        this.notificationFireBaseService = notificationFireBaseService;
+        this.notificationService = notificationService;
         this.conversion = new Conversion();
+        this.supportFunctions = new SupportFunctions();
     }
 
     @GetMapping("/category/findall")
@@ -370,5 +391,62 @@ public class PublicController {
                                     spaPackages.getSize(), spaPackages.getSort()));
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
+    }
+
+    @Scheduled(cron = "0 0 7 * * *", zone = Constant.ZONE_ID)
+    public void triggerRemind() throws FirebaseMessagingException {
+        Date dateBooking = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findAllByDateAndIsConsultation(IsConsultation.FALSE,
+                        StatusBooking.BOOKING, dateBooking);
+        if(Objects.nonNull(bookingDetailSteps)){
+            List<BookingDetail> bookingDetails = new ArrayList<>();
+            for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+                if(bookingDetails.size() == 0){
+                    bookingDetails.add(bookingDetail);
+                } else {
+                    if(!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)){
+                        bookingDetails.add(bookingDetail);
+                    }
+                }
+            }
+            List<User> customers = new ArrayList<>();
+            for (BookingDetail bookingDetail : bookingDetails) {
+                User customer = bookingDetail.getBooking().getCustomer().getUser();
+                if(customers.size() == 0){
+                    customers.add(customer);
+                } else {
+                    if(!supportFunctions.checkUserExistedInList(customer, customers)){
+                        customers.add(customer);
+                    }
+                }
+            }
+            Map<String, String> map = new HashMap<>();
+            map.put(MessageTemplate.REMIND_STATUS,
+                    MessageTemplate.REMIND_STATUS + "- date: " + dateBooking);
+            for (User customer : customers) {
+                if(notificationFireBaseService.notify(MessageTemplate.REMIND_TITLE,
+                        MessageTemplate.REMIND_MESSAGE,map,customer.getId(),Role.CUSTOMER)){
+                    Notification notification = new Notification();
+                    notification.setRole(Role.CUSTOMER);
+                    notification.setTitle(MessageTemplate.REMIND_TITLE);
+                    notification.setMessage(MessageTemplate.REMIND_MESSAGE);
+                    notification.setData(map.get(MessageTemplate.REMIND_STATUS));
+                    notification.setType(Constant.REMIND_TYPE);
+                    notification.setUser(customer);
+                    notificationService.insertNewNotification(notification);
+                } else {
+                    Notification notification = new Notification();
+                    notification.setRole(Role.CUSTOMER);
+                    notification.setTitle(MessageTemplate.REMIND_TITLE);
+                    notification.setMessage(MessageTemplate.REMIND_MESSAGE);
+                    notification.setData(map.get(MessageTemplate.REMIND_STATUS));
+                    notification.setType(Constant.REMIND_TYPE);
+                    notification.setUser(customer);
+                    notificationService.insertNewNotification(notification);
+                }
+            }
+        }
     }
 }

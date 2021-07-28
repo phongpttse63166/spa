@@ -35,4 +35,8 @@ public class MessageTemplate {
     public static final String ASSIGN_REQUEST_STATUS = "ASSIGN_REQUEST";
     public static final String ASSIGN_REQUEST_TITLE = "Yêu cầu phân công";
     public static final String ASSIGN_REQUEST_MESSAGE = "Bạn nhận được một yêu cầu phân công mới lúc %s";
+
+    public static final String REMIND_STATUS = "REMIND";
+    public static final String REMIND_TITLE = "Thông báo nhắc nhở";
+    public static final String REMIND_MESSAGE = "Hôm nay bạn có lịch hẹn. Xin kiểm tra lại lịch";
 }

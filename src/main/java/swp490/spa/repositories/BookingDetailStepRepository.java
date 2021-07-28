@@ -42,15 +42,16 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                             Pageable pageable);
 
     Page<BookingDetailStep> findByConsultant_IdAndDateBookingOrderByStartTimeAsc(Integer staffId,
-                                                                                    Date dateBooking,
-                                                                                    Pageable pageable);
+                                                                                 Date dateBooking,
+                                                                                 Pageable pageable);
 
     @Query("FROM BookingDetailStep s WHERE s.statusBooking = ?1 AND s.bookingDetail.booking.spa.id = ?2 " +
             "ORDER BY s.dateBooking ASC, s.startTime ASC")
     List<BookingDetailStep> findByStatusAndSpa(StatusBooking status, Integer spaId);
 
     List<BookingDetailStep> findByBookingDetail_IdAndAndDateBookingOrderByStartTimeAsc(Integer bookingDetailId,
-                                                                                           Date dateBooking);
+                                                                                       Date dateBooking);
+
     @Query("FROM BookingDetailStep b WHERE b.dateBooking = ?1 AND " +
             "((b.startTime <= ?2 AND b.endTime >= ?2) " +
             "OR (b.startTime <= ?3 AND b.endTime >= ?3) " +
@@ -59,6 +60,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
             "ORDER BY b.consultant.user.id ASC")
     List<BookingDetailStep> findByDateBookingAndStartEndTimeAndStaffId(Date dateBooking, Time startTime,
                                                                        Time endTime, Integer staffId);
+
     @Query("FROM BookingDetailStep b WHERE b.dateBooking = ?1 AND " +
             "((b.startTime <= ?2 AND b.endTime >= ?2) " +
             "OR (b.startTime <= ?3 AND b.endTime >= ?3) " +
@@ -69,6 +71,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                             Time startTime,
                                                                             Time endTime,
                                                                             Integer consultantId);
+
     @Query("FROM BookingDetailStep b WHERE b.consultant.user.id = ?1 " +
             "AND (b.statusBooking = ?2 OR b.statusBooking = ?3) ORDER BY b.bookingDetail.id ASC")
     List<BookingDetailStep> findByConsultantAndStatusBooking(Integer consultantId,
@@ -76,7 +79,7 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                              StatusBooking status2);
 
     List<BookingDetailStep> findByDateBookingAndConsultant_User_IdOrderByStartTime(Date dateBooking,
-                                                                   Integer consultantId);
+                                                                                   Integer consultantId);
 
     List<BookingDetailStep> findByDateBookingAndStaff_User_Id(Date dateBooking, Integer staffId);
 
@@ -96,4 +99,8 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     List<BookingDetailStep> findBySpaAndStaffIsNull(Integer spaId);
 
     List<BookingDetailStep> findByStaff_IdOrderByRatingDesc(Integer staffId);
+
+    List<BookingDetailStep> findByIsConsultationAndStatusBookingAndDateBooking(IsConsultation isConsultation,
+                                                                               StatusBooking status,
+                                                                               Date dateBooking);
 }

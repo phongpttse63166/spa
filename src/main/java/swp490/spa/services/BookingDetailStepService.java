@@ -133,4 +133,12 @@ public class BookingDetailStepService {
     public List<BookingDetailStep> findByStaff(Integer staffId) {
         return this.bookingDetailStepRepository.findByStaff_IdOrderByRatingDesc(staffId);
     }
+
+    public List<BookingDetailStep> findAllByDateAndIsConsultation(IsConsultation isConsultation,
+                                                                  StatusBooking statusBooking,
+                                                                  Date dateBooking) {
+        return this.bookingDetailStepRepository
+                .findByIsConsultationAndStatusBookingAndDateBooking(isConsultation,
+                        statusBooking, dateBooking);
+    }
 }

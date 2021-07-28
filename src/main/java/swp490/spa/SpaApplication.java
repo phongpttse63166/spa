@@ -8,11 +8,13 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import swp490.spa.utils.support.templates.Constant;
 
 import java.io.FileInputStream;
 
 @SpringBootApplication
+@EnableScheduling
 public class SpaApplication implements ApplicationRunner {
 
     public static void main(String[] args) {

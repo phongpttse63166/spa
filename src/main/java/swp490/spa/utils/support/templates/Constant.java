@@ -68,7 +68,7 @@ public class Constant {
     public static final String STEP_FINISH_TYPE = "STEP_FINISH";
     public static final String REMIND_TYPE = "REMIND";
     public static final String CHANGE_STAFF_TYPE = "CHANGE_STAFF";
-    public static final String ASSIGN_TYPE = "CHANGE_STAFF";
+    public static final String ASSIGN_TYPE = "ASSIGN";
     public static final String SKIP_TYPE = "SKIP";
     public static final String CANCEL_TYPE = "CANCEL";
 
