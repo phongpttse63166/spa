@@ -35,47 +35,66 @@ public class NotificationFireBaseService {
         switch (role) {
             case STAFF:
                 Staff staff = staffService.findByStaffId(userId);
-                notification = Message.builder()
-                        .putAllData(data)
-                        .setNotification(Notification.builder()
-                                .setTitle(title)
-                                .setBody(message)
-                                .build())
-                        .setToken(staff.getTokenFCM())
-                        .build();
+                if(staff.getTokenFCM() == null){
+                    return false;
+                } else {
+                    notification = Message.builder()
+                            .putAllData(data)
+                            .setNotification(Notification.builder()
+                                    .setTitle(title)
+                                    .setBody(message)
+                                    .build())
+                            .setToken(staff.getTokenFCM())
+                            .build();
+                }
                 break;
             case MANAGER:
                 Manager manager = managerService.findManagerById(userId);
-                notification = Message.builder()
-                        .putAllData(data)
-                        .setNotification(Notification.builder()
-                                .setTitle(title)
-                                .setBody(message)
-                                .build())
-                        .setToken(manager.getTokenFCM())
-                        .build();
+                if(manager.getTokenFCM() == null){
+                    return false;
+                } else {
+                    notification = Message.builder()
+                            .putAllData(data)
+                            .setNotification(Notification.builder()
+                                    .setTitle(title)
+                                    .setBody(message)
+                                    .build())
+                            .setToken(manager.getTokenFCM())
+                            .build();
+                }
+
                 break;
             case CUSTOMER:
                 Customer customer = customerService.findByUserId(userId);
-                notification = Message.builder()
-                        .putAllData(data)
-                        .setNotification(Notification.builder()
-                                .setTitle(title)
-                                .setBody(message)
-                                .build())
-                        .setToken(customer.getTokenFCM())
-                        .build();
+                if(customer.getTokenFCM() == null){
+                    return false;
+                } else {
+                    notification = Message.builder()
+                            .putAllData(data)
+                            .setNotification(Notification.builder()
+                                    .setTitle(title)
+                                    .setBody(message)
+                                    .build())
+                            .setToken(customer.getTokenFCM())
+                            .build();
+                }
+
                 break;
             case CONSULTANT:
                 Consultant consultant = consultantService.findByConsultantId(userId);
-                notification = Message.builder()
-                        .putAllData(data)
-                        .setNotification(Notification.builder()
-                                .setTitle(title)
-                                .setBody(message)
-                                .build())
-                        .setToken(consultant.getTokenFCM())
-                        .build();
+                if(consultant.getTokenFCM() == null){
+                    return false;
+                } else {
+                    notification = Message.builder()
+                            .putAllData(data)
+                            .setNotification(Notification.builder()
+                                    .setTitle(title)
+                                    .setBody(message)
+                                    .build())
+                            .setToken(consultant.getTokenFCM())
+                            .build();
+
+                }
                 break;
             case ADMIN:
                 break;
@@ -84,8 +103,15 @@ public class NotificationFireBaseService {
             try {
                 String response = FirebaseMessaging.getInstance().send(notification);
                 LOGGER.info("Notification sent {}", response);
+                return true;
             } catch (FirebaseMessagingException ex) {
-                return false;
+                try {
+                    Thread.sleep(WAIT_NOTIFICATION_RETRY);
+                } catch (InterruptedException exception) {
+                    LOGGER.error("Error when retrying sending notification");
+                    ex.printStackTrace();
+                    return false;
+                }
             }
         }
         return false;

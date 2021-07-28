@@ -7,7 +7,7 @@ public class MessageTemplate {
 
     public static final String ASSIGN_STATUS = "ASSIGN";
     public static final String ASSIGN_TITLE = "Phân công";
-    public static final String ASSIGN_MESSAGE = "Bạn đã được xếp vào liệu trình của khách hàng %";
+    public static final String ASSIGN_MESSAGE = "Bạn đã được xếp vào liệu trình của khách hàng %s";
 
     public static final String FINISH_STATUS = "FINISH";
     public static final String FINISH_TITLE = "Dịch vụ hoàn tất";
