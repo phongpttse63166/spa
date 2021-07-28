@@ -45,4 +45,5 @@ public class LoggingTemplate {
     public static final String CANCEL_SUCCESS = "Cancel thành công";
     public static final String CANCEL_FAILED = "Approve thành công";
 
+    public static final String WRONG_STAFF_ID = "Không có thẩm quyền để thực hiện";
 }

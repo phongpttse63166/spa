@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class ConfirmAStepRequest implements Serializable {
+    private Integer staffId;
     private Integer bookingDetailStepId;
     private String result;
 }
