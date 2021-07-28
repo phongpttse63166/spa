@@ -1071,7 +1071,7 @@ public class ManagerController {
 
     @PutMapping("/bookingdetailstep/addconsultant/{bookingDetailId}/{consultantId}")
     public Response addConsultantIntoBookingDetail(@PathVariable Integer bookingDetailId,
-                                                   @PathVariable Integer consultantId) {
+                                                   @PathVariable Integer consultantId) throws FirebaseMessagingException {
         List<BookingDetailStep> bookingDetailStepEdited = new ArrayList<>();
         int count = 0;
         boolean check = true;
@@ -1137,7 +1137,35 @@ public class ManagerController {
                                         }
                                     }
                                     if (Objects.nonNull(bookingEdited)) {
-                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
+                                        Map<String, String> map = new HashMap<>();
+                                        map.put(MessageTemplate.ASSIGN_STATUS, "- bookingDetailId "
+                                                + bookingDetailId.toString());
+                                        if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_TITLE,
+                                                String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                        bookingEdited.getCustomer().getUser().getFullname()),
+                                                map, consultant.getUser().getId(), Role.CONSULTANT)) {
+                                            Notification notification = new Notification();
+                                            notification.setRole(Role.CONSULTANT);
+                                            notification.setTitle(MessageTemplate.ASSIGN_TITLE);
+                                            notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                    bookingEdited.getCustomer().getUser().getFullname()));
+                                            notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
+                                            notification.setType(Constant.ASSIGN_TYPE);
+                                            notification.setUser(consultant.getUser());
+                                            notificationService.insertNewNotification(notification);
+                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
+                                        } else {
+                                            Notification notification = new Notification();
+                                            notification.setRole(Role.CONSULTANT);
+                                            notification.setTitle(MessageTemplate.ASSIGN_TITLE);
+                                            notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                    bookingEdited.getCustomer().getUser().getFullname()));
+                                            notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
+                                            notification.setType(Constant.ASSIGN_TYPE);
+                                            notification.setUser(consultant.getUser());
+                                            notificationService.insertNewNotification(notification);
+                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
+                                        }
                                     } else {
                                         check = false;
                                     }
