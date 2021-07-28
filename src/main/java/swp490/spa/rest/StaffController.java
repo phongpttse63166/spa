@@ -145,8 +145,9 @@ public class StaffController {
                 if (Objects.nonNull(dateOffResult)) {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                     Map<String, String> map = new HashMap<>();
-                    map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS, "- dateOffId "
-                            + dateOffResult.getId());
+                    map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS,
+                            MessageTemplate.REGISTER_DATE_OFF_STATUS + "- dateOffId "
+                                    + dateOffResult.getId());
                     if (notificationFireBaseService.notify(MessageTemplate.REGISTER_DATE_OFF_TITLE,
                             String.format(MessageTemplate.REGISTER_DATE_OFF_MESSAGE,
                                     LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -191,7 +192,7 @@ public class StaffController {
                 bookingDetailStepService.findById(confirmAStepRequest.getBookingDetailStepId());
         if (Objects.nonNull(bookingDetailStep)) {
             Staff staff = staffService.findByStaffId(confirmAStepRequest.getStaffId());
-            if(staff.equals(bookingDetailStep.getStaff())){
+            if (staff.equals(bookingDetailStep.getStaff())) {
                 ConsultationContent consultationContentGet = bookingDetailStep.getConsultationContent();
                 consultationContentGet.setResult(confirmAStepRequest.getResult());
                 if (Objects.nonNull(consultationContentService.editByConsultationContent(consultationContentGet))) {
@@ -220,8 +221,9 @@ public class StaffController {
                                 BookingDetail bookingDetailEdited =
                                         bookingDetailService.editBookingDetail(bookingDetail);
                                 if (Objects.nonNull(bookingDetailEdited)) {
-                                    map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailId "
-                                            + bookingDetailEdited.getId().toString());
+                                    map.put(MessageTemplate.FINISH_STATUS,
+                                            MessageTemplate.FINISH_STATUS + "- bookingDetailId "
+                                                    + bookingDetailEdited.getId().toString());
                                     if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                                             MessageTemplate.FINISH_ALL_MESSAGE, map,
                                             customer.getUser().getId(), Role.CUSTOMER)) {
@@ -250,8 +252,9 @@ public class StaffController {
                                 }
                             } else {
                                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-                                map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailStepId "
-                                        + bookingDetailStepEdited.getId().toString());
+                                map.put(MessageTemplate.FINISH_STATUS,
+                                        MessageTemplate.FINISH_STATUS + "- bookingDetailStepId "
+                                                + bookingDetailStepEdited.getId().toString());
                                 if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                                         String.format(MessageTemplate.FINISH_MESSAGE,
                                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -300,10 +303,10 @@ public class StaffController {
 
     @PutMapping("/bookingDetail/confirmFinishOneStep")
     public Response confirmFinishOneStep(@RequestBody BookingDetail bookingDetailRequest) throws FirebaseMessagingException {
-        if(bookingDetailRequest.getId() != null){
+        if (bookingDetailRequest.getId() != null) {
             BookingDetail bookingDetail =
                     bookingDetailService.findByBookingDetailId(bookingDetailRequest.getId());
-            if(Objects.nonNull(bookingDetail)) {
+            if (Objects.nonNull(bookingDetail)) {
                 bookingDetail.setStatusBooking(StatusBooking.FINISH);
                 List<BookingDetailStep> bookingDetailSteps = bookingDetail.getBookingDetailSteps();
                 Rating rating = new Rating();
@@ -313,9 +316,9 @@ public class StaffController {
                 rating.setCustomer(bookingDetail.getBooking().getCustomer());
                 rating.setBookingDetailStep(bookingDetailSteps.get(0));
                 Rating ratingNew = ratingService.insertNewRating(rating);
-                if(Objects.nonNull(ratingNew)){
+                if (Objects.nonNull(ratingNew)) {
                     for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                        if(bookingDetailStep.equals(bookingDetailSteps.get(0))){
+                        if (bookingDetailStep.equals(bookingDetailSteps.get(0))) {
                             bookingDetailStep.setRating(ratingNew);
                         }
                         bookingDetailStep.setStatusBooking(StatusBooking.FINISH);
@@ -323,17 +326,18 @@ public class StaffController {
                     bookingDetail.setBookingDetailSteps(bookingDetailSteps);
                     BookingDetail bookingDetailResult =
                             bookingDetailService.editBookingDetail(bookingDetail);
-                    if(Objects.nonNull(bookingDetailResult)){
+                    if (Objects.nonNull(bookingDetailResult)) {
                         Booking booking = bookingDetailResult.getBooking();
-                        if(booking.getBookingDetails().size() == 1){
+                        if (booking.getBookingDetails().size() == 1) {
                             booking.setStatusBooking(StatusBooking.FINISH);
                             bookingService.editBooking(booking);
                         }
                         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                         Customer customer = bookingDetailResult.getBooking().getCustomer();
                         Map<String, String> map = new HashMap<>();
-                        map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailId "
-                                + bookingDetailResult.getId());
+                        map.put(MessageTemplate.FINISH_STATUS,
+                                MessageTemplate.FINISH_STATUS + "- bookingDetailId "
+                                        + bookingDetailResult.getId());
                         if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                                 String.format(MessageTemplate.FINISH_MESSAGE,
                                         LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -386,7 +390,7 @@ public class StaffController {
                 if (imageLink != "") {
                     user.setImage(imageLink);
                     User userResult = userService.editUser(user);
-                    if(Objects.nonNull(userResult)){
+                    if (Objects.nonNull(userResult)) {
                         return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.IMAGE));
                     }
                 } else {
@@ -416,10 +420,10 @@ public class StaffController {
     }
 
     @GetMapping("/getAllNotification/{staffId}")
-    public Response getAllNotification(@PathVariable Integer staffId){
+    public Response getAllNotification(@PathVariable Integer staffId) {
         List<Notification> notifications =
                 notificationService.findByIdAndRole(staffId, Role.STAFF);
-        if(Objects.nonNull(notifications)){
+        if (Objects.nonNull(notifications)) {
             return ResponseHelper.ok(notifications);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));

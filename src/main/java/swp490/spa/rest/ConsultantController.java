@@ -114,8 +114,9 @@ public class ConsultantController {
             if (Objects.nonNull(dateOffResult)) {
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS, "- dateOffId "
-                        + dateOffResult.getId());
+                map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS,
+                        MessageTemplate.REGISTER_DATE_OFF_STATUS + "- dateOffId "
+                                + dateOffResult.getId());
                 if (notificationFireBaseService.notify(MessageTemplate.REGISTER_DATE_OFF_TITLE,
                         String.format(MessageTemplate.REGISTER_DATE_OFF_MESSAGE,
                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -326,14 +327,16 @@ public class ConsultantController {
                 Customer customer = bookingResult.getCustomer();
                 List<Manager> managers = managerService.findBySpa(bookingBeforeEdit.getSpa().getId());
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.FINISH_STATUS, "- bookingDetailStepId "
-                        + bookingDetailBeforeEdit.getBookingDetailSteps().get(0).getId());
-                map.put(MessageTemplate.ASSIGN_REQUEST_STATUS, "- bookingDetailId "
-                        + bookingDetailBeforeEdit.getId());
+                map.put(MessageTemplate.FINISH_STATUS,
+                        MessageTemplate.FINISH_STATUS + "- bookingDetailStepId "
+                                + bookingDetailBeforeEdit.getBookingDetailSteps().get(0).getId());
+                map.put(MessageTemplate.ASSIGN_REQUEST_STATUS,
+                        MessageTemplate.ASSIGN_REQUEST_STATUS + "- bookingDetailId "
+                                + bookingDetailBeforeEdit.getId());
                 if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_REQUEST_TITLE,
                         String.format(MessageTemplate.ASSIGN_REQUEST_MESSAGE,
                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
-                        map, managers.get(0).getUser().getId() , Role.MANAGER)) {
+                        map, managers.get(0).getUser().getId(), Role.MANAGER)) {
                     LOGGER.info("Send notification {}: OK");
                 } else {
                     LOGGER.info("Send notification {}: FAILED");
@@ -584,12 +587,12 @@ public class ConsultantController {
                                 dateBooking);
                 Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
                 Date dateCheck = Date.valueOf(LocalDate.parse(dateBooking));
-                if(currentDate.compareTo(dateCheck) == 0){
+                if (currentDate.compareTo(dateCheck) == 0) {
                     List<String> listTimeGet = new ArrayList<>();
                     Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
-                    for (String time: timeBookingList) {
+                    for (String time : timeBookingList) {
                         Time checkTime = Time.valueOf(time);
-                        if(checkTime.compareTo(currentTime)>0){
+                        if (checkTime.compareTo(currentTime) > 0) {
                             listTimeGet.add(time);
                         }
                     }
@@ -663,12 +666,12 @@ public class ConsultantController {
                                     dateBooking);
                     Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
                     Date dateCheck = Date.valueOf(LocalDate.parse(dateBooking));
-                    if(currentDate.compareTo(dateCheck) == 0){
+                    if (currentDate.compareTo(dateCheck) == 0) {
                         List<String> listTimeGet = new ArrayList<>();
                         Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
-                        for (String time: timeBookingList) {
+                        for (String time : timeBookingList) {
                             Time checkTime = Time.valueOf(time);
-                            if(checkTime.compareTo(currentTime)>0){
+                            if (checkTime.compareTo(currentTime) > 0) {
                                 listTimeGet.add(time);
                             }
                         }
@@ -705,8 +708,9 @@ public class ConsultantController {
                 List<Manager> managers =
                         managerService.findManagerBySpaAndStatusAvailable(bookingDetail.getBooking().getSpa().getId());
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.CHANGE_STAFF_STATUS, "- bookingDetailId "
-                        + bookingDetail.getId().toString());
+                map.put(MessageTemplate.CHANGE_STAFF_STATUS,
+                        MessageTemplate.CHANGE_STAFF_STATUS + "- bookingDetailId "
+                                + bookingDetail.getId().toString());
                 if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
                         String.format(MessageTemplate.CHANGE_STAFF_MESSAGE,
                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -770,10 +774,10 @@ public class ConsultantController {
     }
 
     @GetMapping("/getAllNotification/{consultantId}")
-    public Response getAllNotification(@PathVariable Integer consultantId){
+    public Response getAllNotification(@PathVariable Integer consultantId) {
         List<Notification> notifications =
                 notificationService.findByIdAndRole(consultantId, Role.CONSULTANT);
-        if(Objects.nonNull(notifications)){
+        if (Objects.nonNull(notifications)) {
             return ResponseHelper.ok(notifications);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));

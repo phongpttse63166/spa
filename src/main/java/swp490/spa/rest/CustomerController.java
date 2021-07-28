@@ -224,12 +224,12 @@ public class CustomerController {
                                 dateBooking);
                 Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
                 Date dateCheck = Date.valueOf(LocalDate.parse(dateBooking));
-                if(currentDate.compareTo(dateCheck) == 0){
+                if (currentDate.compareTo(dateCheck) == 0) {
                     List<String> listTimeGet = new ArrayList<>();
                     Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
-                    for (String time: timeBookingList) {
+                    for (String time : timeBookingList) {
                         Time checkTime = Time.valueOf(time);
-                        if(checkTime.compareTo(currentTime)>0){
+                        if (checkTime.compareTo(currentTime) > 0) {
                             listTimeGet.add(time);
                         }
                     }
@@ -537,7 +537,9 @@ public class CustomerController {
                         List<Manager> managers =
                                 managerService.findManagerBySpaAndStatusAvailable(spa.getId());
                         Map<String, String> map = new HashMap<>();
-                        map.put(MessageTemplate.BOOKING_STATUS, "- bookingId " + bookingInsert.getId().toString());
+                        map.put(MessageTemplate.BOOKING_STATUS,
+                                MessageTemplate.BOOKING_STATUS + "- bookingId " +
+                                        bookingInsert.getId().toString());
                         if (notificationFireBaseService.notify(MessageTemplate.BOOKING_TITLE,
                                 String.format(MessageTemplate.BOOKING_MESSAGE,
                                         LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -597,7 +599,7 @@ public class CustomerController {
                 if (imageLink != "") {
                     user.setImage(imageLink);
                     User userResult = userService.editUser(user);
-                    if(Objects.nonNull(userResult)){
+                    if (Objects.nonNull(userResult)) {
                         return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.IMAGE));
                     }
                 } else {
@@ -661,21 +663,22 @@ public class CustomerController {
 
     @PutMapping("/rating/edit")
     public Response ratingStep(@RequestBody RatingRequest ratingRequest) throws FirebaseMessagingException {
-        if(Objects.nonNull(ratingRequest.getRatingId())){
+        if (Objects.nonNull(ratingRequest.getRatingId())) {
             Rating ratingGet = ratingService.findByRatingId(ratingRequest.getRatingId());
-            if(Objects.nonNull(ratingRequest.getRate())){
+            if (Objects.nonNull(ratingRequest.getRate())) {
                 ratingGet.setRate(ratingRequest.getRate());
             }
-            if(Objects.nonNull(ratingRequest.getComment())){
+            if (Objects.nonNull(ratingRequest.getComment())) {
                 ratingGet.setComment(ratingRequest.getComment());
             }
             ratingGet.setStatusRating(StatusRating.RATED);
             Rating ratingResult = ratingService.editRating(ratingGet);
-            if(Objects.nonNull(ratingResult)){
+            if (Objects.nonNull(ratingResult)) {
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.RATING_STATUS, "- ratingId "
-                        + ratingRequest.getRatingId());
+                map.put(MessageTemplate.RATING_STATUS,
+                        MessageTemplate.RATING_STATUS + "- ratingId "
+                                + ratingRequest.getRatingId());
                 if (notificationFireBaseService.notify(MessageTemplate.RATING_TITLE,
                         String.format(MessageTemplate.RATING_MESSAGE,
                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -694,10 +697,10 @@ public class CustomerController {
     }
 
     @GetMapping("/getAllNotification/{customerId}")
-    public Response getAllNotification(@PathVariable Integer customerId){
+    public Response getAllNotification(@PathVariable Integer customerId) {
         List<Notification> notifications =
                 notificationService.findByIdAndRole(customerId, Role.CUSTOMER);
-        if(Objects.nonNull(notifications)){
+        if (Objects.nonNull(notifications)) {
             return ResponseHelper.ok(notifications);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));

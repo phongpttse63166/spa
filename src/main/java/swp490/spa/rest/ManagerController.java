@@ -1022,11 +1022,11 @@ public class ManagerController {
                                         boolean checkBookingAll = true;
                                         booking = bookingDetailEdited.getBooking();
                                         for (BookingDetail bookingDetail : booking.getBookingDetails()) {
-                                            if(!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)){
+                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
                                                 checkBookingAll = false;
                                             }
                                         }
-                                        if(checkBookingAll){
+                                        if (checkBookingAll) {
                                             booking.setStatusBooking(StatusBooking.BOOKING);
                                             bookingEdited = bookingService.editBooking(booking);
                                         }
@@ -1127,19 +1127,20 @@ public class ManagerController {
                                         boolean checkBookingAll = true;
                                         booking = bookingDetailEdited.getBooking();
                                         for (BookingDetail bookingDetail : booking.getBookingDetails()) {
-                                            if(!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)){
+                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
                                                 checkBookingAll = false;
                                             }
                                         }
-                                        if(checkBookingAll){
+                                        if (checkBookingAll) {
                                             booking.setStatusBooking(StatusBooking.BOOKING);
                                             bookingEdited = bookingService.editBooking(booking);
                                         }
                                     }
                                     if (Objects.nonNull(bookingEdited)) {
                                         Map<String, String> map = new HashMap<>();
-                                        map.put(MessageTemplate.ASSIGN_STATUS, "- bookingDetailId "
-                                                + bookingDetailId.toString());
+                                        map.put(MessageTemplate.ASSIGN_STATUS,
+                                                MessageTemplate.ASSIGN_STATUS + "- bookingDetailId "
+                                                        + bookingDetailId.toString());
                                         if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_TITLE,
                                                 String.format(MessageTemplate.ASSIGN_MESSAGE,
                                                         bookingEdited.getCustomer().getUser().getFullname()),
@@ -1323,7 +1324,7 @@ public class ManagerController {
                             bookingDetailStep.setStaff(staff);
                             bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
                             bookingDetailStep.setReason(null);
-                        } else if(bookingDetailStep.getStatusBooking().equals(StatusBooking.FINISH)){
+                        } else if (bookingDetailStep.getStatusBooking().equals(StatusBooking.FINISH)) {
                             oldStaff = staffService.findByStaffId(bookingDetailStep.getStaff().getId());
                         }
                     }
@@ -1335,10 +1336,12 @@ public class ManagerController {
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Customer customer = bookingDetail.getBooking().getCustomer();
                 Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.CHANGE_STAFF_STATUS, "- bookingDetailId "
-                        + bookingDetail.getId().toString());
-                map.put(MessageTemplate.ASSIGN_STATUS, "- bookingDetailId "
-                        + bookingDetail.getId().toString());
+                map.put(MessageTemplate.CHANGE_STAFF_STATUS,
+                        MessageTemplate.CHANGE_STAFF_STATUS + "- bookingDetailId "
+                                + bookingDetail.getId().toString());
+                map.put(MessageTemplate.ASSIGN_STATUS,
+                        MessageTemplate.ASSIGN_STATUS + "- bookingDetailId "
+                                + bookingDetail.getId().toString());
                 if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
                         String.format(MessageTemplate.CHANGE_STAFF_CUSTOMER_FINISH_MESSAGE,
                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
@@ -1701,19 +1704,19 @@ public class ManagerController {
     }
 
     @GetMapping("/ratings/findAllAndGroupByEmployee")
-    public Response findAllAndGroupByEmployee(@RequestParam Integer spaId){
+    public Response findAllAndGroupByEmployee(@RequestParam Integer spaId) {
         List<TotalRatingResponse> response = new ArrayList<>();
         List<Staff> allStaffList = staffService.findBySpaIdAndStatusAvailable(spaId);
-        if(Objects.nonNull(allStaffList)){
+        if (Objects.nonNull(allStaffList)) {
             for (Staff staff : allStaffList) {
                 TotalRatingResponse data = new TotalRatingResponse();
                 data.setStaff(staff.getUser().getFullname());
                 List<Rating> ratings = new ArrayList<>();
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByStaff(staff.getUser().getId());
-                if(Objects.nonNull(bookingDetailSteps)){
+                if (Objects.nonNull(bookingDetailSteps)) {
                     for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                        if(bookingDetailStep.getRating()!=null){
+                        if (bookingDetailStep.getRating() != null) {
                             ratings.add(bookingDetailStep.getRating());
                         }
                     }
