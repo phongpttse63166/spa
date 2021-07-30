@@ -138,6 +138,7 @@ public class StaffController {
                     managerService.findManagerBySpaAndStatusAvailable(staff.getSpa().getId());
             dateOff.setStatusDateOff(StatusDateOff.WAITING);
             dateOff.setReasonCancel(dateOffRequest.getReasonDateOff());
+            dateOff.setDateOff(Date.valueOf(dateOffRequest.getDateOff()));
             dateOff.setEmployee(staff.getUser());
             dateOff.setSpa(staff.getSpa());
             DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);

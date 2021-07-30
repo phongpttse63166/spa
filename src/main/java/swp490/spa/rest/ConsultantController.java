@@ -108,6 +108,7 @@ public class ConsultantController {
                     managerService.findManagerBySpaAndStatusAvailable(consultant.getSpa().getId());
             dateOff.setStatusDateOff(StatusDateOff.WAITING);
             dateOff.setReasonCancel(dateOffRequest.getReasonDateOff());
+            dateOff.setDateOff(Date.valueOf(dateOffRequest.getDateOff()));
             dateOff.setEmployee(consultant.getUser());
             dateOff.setSpa(consultant.getSpa());
             DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);
