@@ -472,25 +472,21 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.LIST_CONSULTANT_FREE));
     }
 
-    @GetMapping("/bookingDetail/findBySpaAndStaffIsNull")
+    @GetMapping("/bookingDetailStep/findBySpaAndStaffIsNull")
     public Response findByBookingDetailStepHaveStaffNullAndSpa(@RequestParam Integer spaId) {
-        List<BookingDetail> bookingDetails = new ArrayList<>();
+        List<BookingDetailStep> result = new ArrayList<>();
         List<BookingDetailStep> bookingDetailSteps =
-                bookingDetailStepService.findBySpaAndStaffIsNull(spaId);
+                bookingDetailStepService.findBySpaAndStaffIsNullAndIsConsultation(spaId,
+                        IsConsultation.FALSE);
         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-            BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
-            if (bookingDetails.size() == 0) {
-                bookingDetails.add(bookingDetailStep.getBookingDetail());
-            } else {
-                if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)) {
-                    bookingDetails.add(bookingDetail);
-                }
+            if(bookingDetailStep.getStatusBooking().equals(StatusBooking.BOOKING)){
+                result.add(bookingDetailStep);
             }
         }
-        Page<BookingDetail> page = new PageImpl<>(bookingDetails,
+        Page<BookingDetailStep> page = new PageImpl<>(result,
                 PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
-                bookingDetails.size());
-        return ResponseHelper.ok(page);
+                result.size());
+        return ResponseHelper.ok(conversion.convertToPageBookingDetailStepResponse(page));
     }
 
     @PostMapping(value = "/spaservice/insert", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},

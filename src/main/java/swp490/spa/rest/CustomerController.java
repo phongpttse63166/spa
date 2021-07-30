@@ -13,6 +13,7 @@ import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.BookingRequest;
 import swp490.spa.dto.requests.RatingRequest;
+import swp490.spa.dto.responses.ScheduleBookingResponse;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
@@ -706,5 +707,65 @@ public class CustomerController {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
+    }
+
+    @GetMapping("/getScheduleBooking/{customerId}")
+    public Response getScheduleBookingByCustomer(@PathVariable Integer customerId) {
+        List<ScheduleBookingResponse> scheduleBookingResponses = new ArrayList<>();
+        ScheduleBookingResponse scheduleBookingResponse = new ScheduleBookingResponse();
+        List<BookingDetailStep> bookingDetailStepAdd = new ArrayList<>();
+        Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
+        Date finalDate = Date.valueOf(currentDate.toLocalDate().plusDays(7));
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findByCustomerAndFromToDate(customerId, currentDate, finalDate);
+        if (Objects.nonNull(bookingDetailSteps)) {
+            if (bookingDetailSteps.size() == 0) {
+                return ResponseHelper.ok("");
+            } else {
+                Date oldDate;
+                Date newDate = Date.valueOf(Constant.DATE_DEFAULT);
+                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                    oldDate = newDate;
+                    newDate = bookingDetailStep.getDateBooking();
+                    if (oldDate.compareTo(newDate) == 0) {
+                        bookingDetailStepAdd.add(bookingDetailStep);
+                        if (bookingDetailSteps.get(bookingDetailSteps.size() - 1).equals(bookingDetailStep)) {
+                            scheduleBookingResponse.setBookingDetailSteps(bookingDetailStepAdd);
+                            scheduleBookingResponses.add(scheduleBookingResponse);
+                        }
+                    } else {
+                        if (!bookingDetailSteps.get(bookingDetailSteps.size() - 1).equals(bookingDetailStep)) {
+                            if (scheduleBookingResponses.size() == 0) {
+                                if (!bookingDetailSteps.get(0).equals(bookingDetailStep)) {
+                                    scheduleBookingResponse.setBookingDetailSteps(bookingDetailStepAdd);
+                                    scheduleBookingResponses.add(scheduleBookingResponse);
+                                    scheduleBookingResponse = new ScheduleBookingResponse();
+                                    bookingDetailStepAdd = new ArrayList<>();
+                                }
+                            } else {
+                                scheduleBookingResponse.setBookingDetailSteps(bookingDetailStepAdd);
+                                scheduleBookingResponses.add(scheduleBookingResponse);
+                                scheduleBookingResponse = new ScheduleBookingResponse();
+                                bookingDetailStepAdd = new ArrayList<>();
+                            }
+                            scheduleBookingResponse.setDateBooking(newDate);
+                            bookingDetailStepAdd.add(bookingDetailStep);
+                        } else {
+                            scheduleBookingResponse.setBookingDetailSteps(bookingDetailStepAdd);
+                            scheduleBookingResponses.add(scheduleBookingResponse);
+                            scheduleBookingResponse = new ScheduleBookingResponse();
+                            bookingDetailStepAdd = new ArrayList<>();
+                            scheduleBookingResponse.setDateBooking(newDate);
+                            bookingDetailStepAdd.add(bookingDetailStep);
+                            scheduleBookingResponse.setBookingDetailSteps(bookingDetailStepAdd);
+                            scheduleBookingResponses.add(scheduleBookingResponse);
+                        }
+                    }
+                }
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
     }
 }

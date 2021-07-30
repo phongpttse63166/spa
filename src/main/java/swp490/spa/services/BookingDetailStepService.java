@@ -122,8 +122,10 @@ public class BookingDetailStepService {
     }
 
 
-    public List<BookingDetailStep> findBySpaAndStaffIsNull(Integer spaId) {
-        return this.bookingDetailStepRepository.findBySpaAndStaffIsNull(spaId);
+    public List<BookingDetailStep> findBySpaAndStaffIsNullAndIsConsultation(Integer spaId,
+                                                                            IsConsultation isConsultation) {
+        return this.bookingDetailStepRepository.findBySpaAndStaffIsNullAndIsConsultation(spaId,
+                isConsultation);
     }
 
     public BookingDetailStep findById(Integer bookingDetailStepId) {
@@ -140,5 +142,12 @@ public class BookingDetailStepService {
         return this.bookingDetailStepRepository
                 .findByIsConsultationAndStatusBookingAndDateBooking(isConsultation,
                         statusBooking, dateBooking);
+    }
+
+    public List<BookingDetailStep> findByCustomerAndFromToDate(Integer customerId,
+                                                               Date currentDate,
+                                                               Date finalDate) {
+        return this.bookingDetailStepRepository.findByCustomerAndFromToDateBooking(customerId,
+                currentDate,finalDate);
     }
 }

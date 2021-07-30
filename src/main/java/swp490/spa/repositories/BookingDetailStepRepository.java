@@ -93,14 +93,20 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                    IsConsultation value);
 
     @Query("FROM BookingDetailStep b WHERE b.bookingDetail.booking.spa.id = ?1 " +
-            "AND (b.staff.id = 0 OR b.staff.id IS NULL) AND b.isConsultation = 0 " +
+            "AND b.staff.id IS NULL AND b.isConsultation = ?2 " +
             "AND b.bookingDetail.type = 1 " +
             "ORDER BY b.bookingDetail.id ASC")
-    List<BookingDetailStep> findBySpaAndStaffIsNull(Integer spaId);
+    List<BookingDetailStep> findBySpaAndStaffIsNullAndIsConsultation(Integer spaId,
+                                                                     IsConsultation isConsultation);
 
     List<BookingDetailStep> findByStaff_IdOrderByRatingDesc(Integer staffId);
 
     List<BookingDetailStep> findByIsConsultationAndStatusBookingAndDateBooking(IsConsultation isConsultation,
                                                                                StatusBooking status,
                                                                                Date dateBooking);
+    @Query("FROM BookingDetailStep b WHERE b.bookingDetail.booking.customer.user.id = ?1 " +
+            "AND b.dateBooking BETWEEN ?2 AND ?3 ORDER BY b.dateBooking")
+    List<BookingDetailStep> findByCustomerAndFromToDateBooking(Integer customerId,
+                                                               Date startDate,
+                                                               Date endDate);
 }
