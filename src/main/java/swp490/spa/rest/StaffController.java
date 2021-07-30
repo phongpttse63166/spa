@@ -130,7 +130,7 @@ public class StaffController {
         Date dateRegister = Date.valueOf(dateOffRequest.getDateOff());
         DateOff dateOffGet = dateOffService.findByEmployeeAndDateOff(staffId,dateRegister);
         if(dateOffGet!=null){
-            ResponseHelper.error(LoggingTemplate.DATE_OFF_REGISTERED);
+            return ResponseHelper.error(LoggingTemplate.DATE_OFF_REGISTERED);
         } else {
             List<BookingDetailStep> bookingDetailSteps =
                     bookingDetailStepService.findByDateBookingAndStaff(dateRegister,
