@@ -98,37 +98,42 @@ public class ConsultantController {
     public Response insertNewDateOff(@PathVariable Integer consultantId,
                                      @RequestBody DateOffRequest dateOffRequest) throws FirebaseMessagingException {
         Date dateRegister = Date.valueOf(dateOffRequest.getDateOff());
-        List<BookingDetailStep> bookingDetailSteps =
-                bookingDetailStepService.findByDateBookingAndConsultant(dateRegister,
-                        consultantId);
-        if (bookingDetailSteps.size() == 0) {
-            DateOff dateOff = new DateOff();
-            Consultant consultant = consultantService.findByConsultantId(consultantId);
-            List<Manager> managers =
-                    managerService.findManagerBySpaAndStatusAvailable(consultant.getSpa().getId());
-            dateOff.setStatusDateOff(StatusDateOff.WAITING);
-            dateOff.setReasonDateOff(dateOffRequest.getReasonDateOff());
-            dateOff.setDateOff(Date.valueOf(dateOffRequest.getDateOff()));
-            dateOff.setEmployee(consultant.getUser());
-            dateOff.setSpa(consultant.getSpa());
-            DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);
-            if (Objects.nonNull(dateOffResult)) {
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-                Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS,
-                        MessageTemplate.REGISTER_DATE_OFF_STATUS + "- dateOffId "
-                                + dateOffResult.getId());
-                if (notificationFireBaseService.notify(MessageTemplate.REGISTER_DATE_OFF_TITLE,
-                        String.format(MessageTemplate.REGISTER_DATE_OFF_MESSAGE,
-                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
-                        map, managers.get(0).getUser().getId(), Role.MANAGER)) {
-                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
-                } else {
-                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
-                }
-            }
+        DateOff dateOffGet = dateOffService.findByEmployeeAndDateOff(consultantId,dateRegister);
+        if(dateOffGet!=null){
+            ResponseHelper.error(LoggingTemplate.DATE_OFF_REGISTERED);
         } else {
-            return ResponseHelper.error(String.format(LoggingTemplate.BOOKING_SERVICE_EXISTED));
+            List<BookingDetailStep> bookingDetailSteps =
+                    bookingDetailStepService.findByDateBookingAndConsultant(dateRegister,
+                            consultantId);
+            if (bookingDetailSteps.size() == 0) {
+                DateOff dateOff = new DateOff();
+                Consultant consultant = consultantService.findByConsultantId(consultantId);
+                List<Manager> managers =
+                        managerService.findManagerBySpaAndStatusAvailable(consultant.getSpa().getId());
+                dateOff.setStatusDateOff(StatusDateOff.WAITING);
+                dateOff.setReasonDateOff(dateOffRequest.getReasonDateOff());
+                dateOff.setDateOff(dateRegister);
+                dateOff.setEmployee(consultant.getUser());
+                dateOff.setSpa(consultant.getSpa());
+                DateOff dateOffResult = dateOffService.insertNewDateOff(dateOff);
+                if (Objects.nonNull(dateOffResult)) {
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                    Map<String, String> map = new HashMap<>();
+                    map.put(MessageTemplate.REGISTER_DATE_OFF_STATUS,
+                            MessageTemplate.REGISTER_DATE_OFF_STATUS + "- dateOffId "
+                                    + dateOffResult.getId());
+                    if (notificationFireBaseService.notify(MessageTemplate.REGISTER_DATE_OFF_TITLE,
+                            String.format(MessageTemplate.REGISTER_DATE_OFF_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                            map, managers.get(0).getUser().getId(), Role.MANAGER)) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
+                    } else {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.DATE_OFF));
+                    }
+                }
+            } else {
+                return ResponseHelper.error(String.format(LoggingTemplate.BOOKING_SERVICE_EXISTED));
+            }
         }
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.DATE_OFF));
     }
