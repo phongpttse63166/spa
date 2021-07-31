@@ -762,6 +762,11 @@ public class CustomerController {
                         }
                     }
                 }
+                Page<ScheduleBookingResponse> page =
+                        new PageImpl<>(scheduleBookingResponses,
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.by("dateBooking")),
+                                scheduleBookingResponses.size());
+                return ResponseHelper.ok(page);
             }
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
