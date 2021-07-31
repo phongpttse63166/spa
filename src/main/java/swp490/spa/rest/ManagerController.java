@@ -1373,7 +1373,7 @@ public class ManagerController {
                             customer.getUser().getFullname()));
                     notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
                     notification.setType(Constant.ASSIGN_TYPE);
-                    notification.setUser(customer.getUser());
+                    notification.setUser(staff.getUser());
                     notificationService.insertNewNotification(notification);
                 } else {
                     Notification notification = new Notification();
@@ -1383,7 +1383,7 @@ public class ManagerController {
                             customer.getUser().getFullname()));
                     notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
                     notification.setType(Constant.ASSIGN_TYPE);
-                    notification.setUser(customer.getUser());
+                    notification.setUser(staff.getUser());
                     notificationService.insertNewNotification(notification);
                 }
                 if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
@@ -1397,7 +1397,7 @@ public class ManagerController {
                             customer.getUser().getFullname()));
                     notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
                     notification.setType(Constant.CHANGE_STAFF_TYPE);
-                    notification.setUser(customer.getUser());
+                    notification.setUser(oldStaff.getUser());
                     notificationService.insertNewNotification(notification);
                     return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
                 } else {
@@ -1408,7 +1408,7 @@ public class ManagerController {
                             customer.getUser().getFullname()));
                     notification.setData(map.get(MessageTemplate.CHANGE_STAFF_STATUS));
                     notification.setType(Constant.CHANGE_STAFF_TYPE);
-                    notification.setUser(customer.getUser());
+                    notification.setUser(oldStaff.getUser());
                     notificationService.insertNewNotification(notification);
                     return ResponseHelper.ok(LoggingTemplate.CHANGE_STAFF_SUCCESS);
                 }
