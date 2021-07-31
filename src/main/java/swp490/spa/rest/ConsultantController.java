@@ -791,7 +791,7 @@ public class ConsultantController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
     }
-    
+
     @PutMapping("/bookingDetailStep/changeDate")
     public Response changeDateBooking(@RequestBody BookingDetailStepRequest bookingDetailStepRequest) throws FirebaseMessagingException {
         if (bookingDetailStepRequest.getBookingDetailStepId() != null) {
