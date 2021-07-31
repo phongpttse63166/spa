@@ -44,4 +44,14 @@ public class MessageTemplate {
     public static final String CHANGE_BOOKING_TIME_TITLE = "Đổi thời gian đặt lịch";
     public static final String CHANGE_BOOKING_TIME_MESSAGE = "Lịch đặt dịch vụ đã được đổi" +
             " lúc %s. Xin khách hàng kiểm tra lại";
+
+    public static final String APPROVE_DATE_OFF_STATUS = "APPROVE_DATE_OFF";
+    public static final String APPROVE_DATE_OFF_TITLE = "Chấp nhận đơn xin nghỉ";
+    public static final String APPROVE_DATE_OFF_MESSAGE = "Đơn xin nghỉ đã được chấp nhận lúc %s, " +
+            "xin kiểm tra lại";
+
+    public static final String CANCEL_DATE_OFF_STATUS = "CANCEL_DATE_OFF";
+    public static final String CANCEL_DATE_OFF_TITLE = "Không chấp nhận đơn xin nghỉ";
+    public static final String CANCEL_DATE_OFF_MESSAGE = "Đơn xin nghỉ đã không được chấp nhận. Xin liên" +
+            "hệ quản lý để biết thêm chi tiết";
 }

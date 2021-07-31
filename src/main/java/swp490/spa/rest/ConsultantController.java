@@ -8,7 +8,6 @@ import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sun.rmi.runtime.Log;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;

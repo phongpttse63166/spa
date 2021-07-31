@@ -72,6 +72,6 @@ public class Constant {
     public static final String ASSIGN_TYPE = "ASSIGN";
     public static final String SKIP_TYPE = "SKIP";
     public static final String CANCEL_TYPE = "CANCEL";
-
-
+    public static final String APPROVE_DATE_OFF_TYPE = "APPROVE_DATE_OFF";
+    public static final String CANCEL_DATE_OFF_TYPE = "CANCEL_DATE_OFF";
 }

@@ -1652,7 +1652,8 @@ public class ManagerController {
     }
 
     @PutMapping("/dateOff/approveDateOffRequest")
-    public Response approveDateOffRequest(@RequestBody DateOffCheckRequest dateOffRequest) {
+    public Response approveDateOffRequest(@RequestBody DateOffCheckRequest dateOffRequest)
+            throws FirebaseMessagingException {
         if (dateOffRequest.getDateOffId() != null) {
             DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getDateOffId());
             if (Objects.nonNull(dateOffEdit)) {
@@ -1661,7 +1662,47 @@ public class ManagerController {
                 dateOffEdit.setManager(manager);
                 DateOff dateOffResult = dateOffService.editDateOff(dateOffEdit);
                 if (Objects.nonNull(dateOffResult)) {
-                    return ResponseHelper.ok(LoggingTemplate.APPROVE_SUCCESS);
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                    User employee = null;
+                    if(dateOffRequest.getRole().equals(Role.STAFF)){
+                        employee = staffService.findByStaffId(dateOffResult.getEmployee().getId())
+                                .getUser();
+                    } else {
+                        employee = consultantService.findByConsultantId(dateOffResult.getEmployee().getId())
+                                .getUser();
+                    }
+                    Map<String, String> map = new HashMap<>();
+                    map.put(MessageTemplate.APPROVE_DATE_OFF_STATUS,
+                            MessageTemplate.APPROVE_DATE_OFF_STATUS + "- dateOffId "
+                                    + dateOffResult.getId().toString());
+                    if (notificationFireBaseService.notify(MessageTemplate.APPROVE_DATE_OFF_TITLE,
+                            String.format(MessageTemplate.APPROVE_DATE_OFF_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                            map, employee.getId(), dateOffRequest.getRole())) {
+                        Notification notification = new Notification();
+                        notification.setRole(dateOffRequest.getRole());
+                        notification.setTitle(MessageTemplate.APPROVE_DATE_OFF_TITLE);
+                        notification.setMessage(String.format(MessageTemplate.APPROVE_DATE_OFF_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                        notification.setData(map.get(MessageTemplate.APPROVE_DATE_OFF_STATUS));
+                        notification.setType(Constant.APPROVE_DATE_OFF_TYPE);
+                        notification.setUser(employee);
+                        notificationService.insertNewNotification(notification);
+                        LOGGER.info(LoggingTemplate.APPROVE_SUCCESS);
+                        return ResponseHelper.ok(LoggingTemplate.APPROVE_SUCCESS);
+                    } else {
+                        Notification notification = new Notification();
+                        notification.setRole(dateOffRequest.getRole());
+                        notification.setTitle(MessageTemplate.APPROVE_DATE_OFF_TITLE);
+                        notification.setMessage(String.format(MessageTemplate.APPROVE_DATE_OFF_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                        notification.setData(map.get(MessageTemplate.APPROVE_DATE_OFF_STATUS));
+                        notification.setType(Constant.APPROVE_DATE_OFF_TYPE);
+                        notification.setUser(employee);
+                        notificationService.insertNewNotification(notification);
+                        LOGGER.info(LoggingTemplate.APPROVE_SUCCESS);
+                        return ResponseHelper.ok(LoggingTemplate.APPROVE_SUCCESS);
+                    }
                 } else {
                     LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.DATE_OFF));
                 }
@@ -1675,7 +1716,7 @@ public class ManagerController {
     }
 
     @PutMapping("/dateOff/cancelDateOffRequest")
-    public Response cancelDateOffRequest(@RequestBody DateOffCheckRequest dateOffRequest) {
+    public Response cancelDateOffRequest(@RequestBody DateOffCheckRequest dateOffRequest) throws FirebaseMessagingException {
         if (dateOffRequest.getDateOffId() != null && dateOffRequest.getReasonCancel() != null
                 && dateOffRequest.getManagerId() != null) {
             DateOff dateOffEdit = dateOffService.findDateOffById(dateOffRequest.getDateOffId());
@@ -1686,7 +1727,47 @@ public class ManagerController {
                 dateOffEdit.setManager(manager);
                 DateOff dateOffResult = dateOffService.editDateOff(dateOffEdit);
                 if (Objects.nonNull(dateOffResult)) {
-                    return ResponseHelper.ok(LoggingTemplate.CANCEL_SUCCESS);
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                    User employee = null;
+                    if(dateOffRequest.getRole().equals(Role.STAFF)){
+                        employee = staffService.findByStaffId(dateOffResult.getEmployee().getId())
+                                .getUser();
+                    } else {
+                        employee = consultantService.findByConsultantId(dateOffResult.getEmployee().getId())
+                                .getUser();
+                    }
+                    Map<String, String> map = new HashMap<>();
+                    map.put(MessageTemplate.CANCEL_DATE_OFF_STATUS,
+                            MessageTemplate.CANCEL_DATE_OFF_STATUS + "- dateOffId "
+                                    + dateOffResult.getId().toString());
+                    if (notificationFireBaseService.notify(MessageTemplate.CANCEL_DATE_OFF_TITLE,
+                            String.format(MessageTemplate.CANCEL_DATE_OFF_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                            map, employee.getId(), dateOffRequest.getRole())) {
+                        Notification notification = new Notification();
+                        notification.setRole(dateOffRequest.getRole());
+                        notification.setTitle(MessageTemplate.CANCEL_DATE_OFF_TITLE);
+                        notification.setMessage(String.format(MessageTemplate.CANCEL_DATE_OFF_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                        notification.setData(map.get(MessageTemplate.CANCEL_DATE_OFF_STATUS));
+                        notification.setType(Constant.CANCEL_DATE_OFF_TYPE);
+                        notification.setUser(employee);
+                        notificationService.insertNewNotification(notification);
+                        LOGGER.info(LoggingTemplate.CANCEL_SUCCESS);
+                        return ResponseHelper.ok(LoggingTemplate.CANCEL_SUCCESS);
+                    } else {
+                        Notification notification = new Notification();
+                        notification.setRole(dateOffRequest.getRole());
+                        notification.setTitle(MessageTemplate.CANCEL_DATE_OFF_TITLE);
+                        notification.setMessage(String.format(MessageTemplate.CANCEL_DATE_OFF_MESSAGE,
+                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                        notification.setData(map.get(MessageTemplate.CANCEL_DATE_OFF_STATUS));
+                        notification.setType(Constant.CANCEL_DATE_OFF_TYPE);
+                        notification.setUser(employee);
+                        notificationService.insertNewNotification(notification);
+                        LOGGER.info(LoggingTemplate.CANCEL_SUCCESS);
+                        return ResponseHelper.ok(LoggingTemplate.CANCEL_SUCCESS);
+                    }
                 } else {
                     LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.DATE_OFF));
                 }
