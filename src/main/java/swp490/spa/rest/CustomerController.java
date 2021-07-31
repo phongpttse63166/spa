@@ -773,4 +773,15 @@ public class CustomerController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
     }
+
+    @GetMapping("/bookingDetail/findByBookingDetailId/{bookingDetailId}")
+    public Response findBookingDetailById(@PathVariable Integer bookingDetailId){
+        BookingDetail bookingDetailResult = bookingDetailService.findByBookingDetailId(bookingDetailId);
+        if(Objects.nonNull(bookingDetailResult)){
+            return ResponseHelper.ok(conversion.convertToBookingDetailResponse(bookingDetailResult));
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+    }
 }

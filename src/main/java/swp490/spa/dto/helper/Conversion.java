@@ -203,6 +203,33 @@ public class Conversion {
                 totalElements);
     }
 
+    public BookingDetailResponse convertToBookingDetailResponse(BookingDetail bookingDetailResult) {
+        BookingDetailResponse response = new BookingDetailResponse(bookingDetailResult.getId(),
+                bookingDetailResult.getTotalTime(),
+                bookingDetailResult.getType(),
+                bookingDetailResult.getTotalPrice(),
+                bookingDetailResult.getStatusBooking(),
+                bookingDetailResult.getBooking(),
+                bookingDetailResult.getSpaTreatment(),
+                bookingDetailResult.getSpaPackage(),
+                bookingDetailResult.getBookingDetailSteps().stream()
+                        .map(bookingDetailStep -> new BookingDetailStepResponse(bookingDetailStep.getId(),
+                            bookingDetailStep.getDateBooking(),
+                            bookingDetailStep.getStartTime(),
+                            bookingDetailStep.getEndTime(),
+                            bookingDetailStep.getBookingPrice(),
+                            bookingDetailStep.getStatusBooking(),
+                            bookingDetailStep.getReason(),
+                            bookingDetailStep.getIsConsultation(),
+                            bookingDetailStep.getConsultationContent(),
+                            bookingDetailStep.getRating(),
+                            bookingDetailStep.getTreatmentService(),
+                            bookingDetailStep.getStaff(),
+                            bookingDetailStep.getConsultant(),
+                            bookingDetailStep.getBookingDetail())).collect(Collectors.toList()));
+        return response;
+    }
+
     public Page<DateOffResponse> convertToPageDateOffResponse(Page<DateOff> dateOffPage) {
         List<DateOffResponse> dateOffData = dateOffPage.getContent().stream()
                 .map(dateOff -> new DateOffResponse(dateOff.getId(),
@@ -241,4 +268,6 @@ public class Conversion {
                 totalElements == 0 ? Pageable.unpaged() : bookingDetailSteps.getPageable(),
                 totalElements);
     }
+
+
 }
