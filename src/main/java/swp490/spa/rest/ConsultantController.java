@@ -8,6 +8,7 @@ import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.rmi.runtime.Log;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;
@@ -98,8 +99,8 @@ public class ConsultantController {
     public Response insertNewDateOff(@PathVariable Integer consultantId,
                                      @RequestBody DateOffRequest dateOffRequest) throws FirebaseMessagingException {
         Date dateRegister = Date.valueOf(dateOffRequest.getDateOff());
-        DateOff dateOffGet = dateOffService.findByEmployeeAndDateOff(consultantId,dateRegister);
-        if(dateOffGet!=null){
+        DateOff dateOffGet = dateOffService.findByEmployeeAndDateOff(consultantId, dateRegister);
+        if (dateOffGet != null) {
             return ResponseHelper.error(LoggingTemplate.DATE_OFF_REGISTERED);
         } else {
             List<BookingDetailStep> bookingDetailSteps =
@@ -789,5 +790,71 @@ public class ConsultantController {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
+    }
+    
+    @PutMapping("/bookingDetailStep/changeDate")
+    public Response changeDateBooking(@RequestBody BookingDetailStepRequest bookingDetailStepRequest) throws FirebaseMessagingException {
+        if (bookingDetailStepRequest.getBookingDetailStepId() != null) {
+            if (bookingDetailStepRequest.getDateBooking() != null &&
+                    bookingDetailStepRequest.getTimeBooking() != null){
+                BookingDetailStep bookingDetailStep =
+                        bookingDetailStepService.findById(bookingDetailStepRequest.getBookingDetailStepId());
+                if(Objects.nonNull(bookingDetailStep)){
+                    Date dateBooking = Date.valueOf(bookingDetailStepRequest.getDateBooking());
+                    Time startTime = Time.valueOf(bookingDetailStepRequest.getTimeBooking());
+                    Integer durationMin = bookingDetailStep.getTreatmentService().getSpaService().getDurationMin();
+                    Time endTime = Time.valueOf(startTime.toLocalTime().plusMinutes(durationMin));
+                    bookingDetailStep.setDateBooking(dateBooking);
+                    bookingDetailStep.setStartTime(startTime);
+                    bookingDetailStep.setEndTime(endTime);
+                    BookingDetailStep bookingDetailStepResult =
+                            bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
+                    if(Objects.nonNull(bookingDetailStepResult)){
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                        Customer customer = bookingDetailStep.getBookingDetail()
+                                .getBooking().getCustomer();
+                        Map<String, String> map = new HashMap<>();
+                        map.put(MessageTemplate.CHANGE_BOOKING_TIME_STATUS,
+                                MessageTemplate.CHANGE_BOOKING_TIME_STATUS + "- bookingDetailStepId "
+                                        + bookingDetailStepResult.getId().toString());
+                        if (notificationFireBaseService.notify(MessageTemplate.CHANGE_BOOKING_TIME_TITLE,
+                                String.format(MessageTemplate.CHANGE_BOOKING_TIME_MESSAGE,
+                                        LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                                map, customer.getUser().getId(), Role.CUSTOMER)) {
+                            Notification notification = new Notification();
+                            notification.setRole(Role.CUSTOMER);
+                            notification.setTitle(MessageTemplate.CHANGE_BOOKING_TIME_TITLE);
+                            notification.setMessage(String.format(MessageTemplate.CHANGE_BOOKING_TIME_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                            notification.setData(map.get(MessageTemplate.CHANGE_BOOKING_TIME_STATUS));
+                            notification.setType(Constant.CHANGE_BOOKING_TIME_TYPE);
+                            notification.setUser(customer.getUser());
+                            notificationService.insertNewNotification(notification);
+                            LOGGER.info(LoggingTemplate.CHANGE_BOOKING_TIME_SUCCESS);
+                            return ResponseHelper.ok(LoggingTemplate.CHANGE_BOOKING_TIME_SUCCESS);
+                        } else {
+                            Notification notification = new Notification();
+                            notification.setRole(Role.CUSTOMER);
+                            notification.setTitle(MessageTemplate.CHANGE_BOOKING_TIME_TITLE);
+                            notification.setMessage(String.format(MessageTemplate.CHANGE_BOOKING_TIME_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                            notification.setData(map.get(MessageTemplate.CHANGE_BOOKING_TIME_STATUS));
+                            notification.setType(Constant.CHANGE_BOOKING_TIME_TYPE);
+                            notification.setUser(customer.getUser());
+                            notificationService.insertNewNotification(notification);
+                            LOGGER.info(LoggingTemplate.CHANGE_BOOKING_TIME_SUCCESS);
+                            return ResponseHelper.ok(LoggingTemplate.CHANGE_BOOKING_TIME_SUCCESS);
+                        }
+                    }
+                } else {
+                    LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
+                }
+            } else {
+                LOGGER.error(LoggingTemplate.DATA_MISSING);
+            }
+        } else {
+            LOGGER.error(LoggingTemplate.ID_NOT_EXISTED);
+        }
+        return ResponseHelper.error(LoggingTemplate.CHANGE_BOOKING_TIME_FAILED);
     }
 }

@@ -1,7 +1,5 @@
 package swp490.spa.utils.support.templates;
 
-import org.springframework.data.domain.Page;
-
 public class LoggingTemplate {
     public static final String USER_EXISTED = "Đã có tài khoản";
     public static final String REGISTER_SUCCESS = "Đăng kí thành công";
@@ -43,8 +41,11 @@ public class LoggingTemplate {
     public static final String APPROVE_FAILED = "Approve thất bại";
     public static final String APPROVE_SUCCESS = "Approve thành công";
     public static final String CANCEL_SUCCESS = "Cancel thành công";
-    public static final String CANCEL_FAILED = "Approve thành công";
+    public static final String CANCEL_FAILED = "Cancel thất bại";
+    public static final String CHANGE_BOOKING_TIME_SUCCESS = "Thay đổi thời gian đặt lịch thành công";
+    public static final String CHANGE_BOOKING_TIME_FAILED = "Thay đổi thời gian đặt lịch thất bại";
 
     public static final String WRONG_STAFF_ID = "Không có thẩm quyền để thực hiện";
     public static final String DATE_OFF_REGISTERED = "Ngày đã đăng kí nghỉ";
+
 }

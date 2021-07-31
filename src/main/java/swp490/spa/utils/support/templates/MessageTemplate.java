@@ -39,4 +39,9 @@ public class MessageTemplate {
     public static final String REMIND_STATUS = "REMIND";
     public static final String REMIND_TITLE = "Thông báo nhắc nhở";
     public static final String REMIND_MESSAGE = "Hôm nay bạn có lịch hẹn. Xin kiểm tra lại lịch";
+
+    public static final String CHANGE_BOOKING_TIME_STATUS = "CHANGE_BOOKING_TIME";
+    public static final String CHANGE_BOOKING_TIME_TITLE = "Đổi thời gian đặt lịch";
+    public static final String CHANGE_BOOKING_TIME_MESSAGE = "Lịch đặt dịch vụ đã được đổi" +
+            " lúc %s. Xin khách hàng kiểm tra lại";
 }
