@@ -1809,4 +1809,14 @@ public class ManagerController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.RATING));
     }
+
+    @GetMapping("/findById/{id}")
+    public Response getProfile(@PathVariable Integer id) {
+        Manager manager = managerService.findManagerById(id);
+        if (Objects.nonNull(manager)) {
+            return ResponseHelper.ok(manager);
+        }
+        LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
+    }
 }
