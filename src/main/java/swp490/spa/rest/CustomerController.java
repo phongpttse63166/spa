@@ -718,6 +718,18 @@ public class CustomerController {
         Date finalDate = Date.valueOf(currentDate.toLocalDate().plusDays(7));
         List<BookingDetailStep> bookingDetailSteps =
                 bookingDetailStepService.findByCustomerAndFromToDate(customerId, currentDate, finalDate);
+        List<BookingDetailStep> bookingDetailStepsFilter = new ArrayList<>();
+        for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+            BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+            if(bookingDetail.getType().equals(Type.ONESTEP)){
+                if(bookingDetailStep.equals(bookingDetail.getBookingDetailSteps().get(0))){
+                    bookingDetailStepsFilter.add(bookingDetailStep);
+                }
+            } else {
+                bookingDetailStepsFilter.add(bookingDetailStep);
+            }
+        }
+        bookingDetailSteps = bookingDetailStepsFilter;
         if (Objects.nonNull(bookingDetailSteps)) {
             if (bookingDetailSteps.size() == 0) {
                 return ResponseHelper.ok("");
