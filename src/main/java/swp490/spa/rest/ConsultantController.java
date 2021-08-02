@@ -148,17 +148,18 @@ public class ConsultantController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTANT));
     }
 
-    @PutMapping("/editprofile")
+    @PutMapping("/editProfile")
     public Response editProfileStaff(@RequestBody User user) {
         Consultant consultant = consultantService.findByConsultantId(user.getId());
         if (Objects.nonNull(consultant)) {
-            User userResult = consultant.getUser();
-            userResult.setFullname(user.getFullname());
-            userResult.setEmail(user.getEmail());
-            userResult.setAddress(user.getAddress());
-            userResult.setBirthdate(user.getBirthdate());
-            userResult.setGender(user.getGender());
-            if (Objects.nonNull(userService.editUser(user))) {
+            User userEdit = consultant.getUser();
+            userEdit.setFullname(user.getFullname());
+            userEdit.setEmail(user.getEmail());
+            userEdit.setAddress(user.getAddress());
+            userEdit.setBirthdate(user.getBirthdate());
+            userEdit.setGender(user.getGender());
+            User userResult = userService.editUser(userEdit);
+            if (Objects.nonNull(userResult)) {
                 return ResponseHelper.ok(userResult);
             }
             return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));

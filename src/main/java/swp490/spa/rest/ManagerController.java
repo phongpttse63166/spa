@@ -761,18 +761,19 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.IMAGE));
     }
 
-    @PutMapping("/editprofile")
+    @PutMapping("/editProfile")
     public Response editProfileManager(@RequestBody User user) {
         Manager managerResult = managerService.findManagerById(user.getId());
         if (Objects.nonNull(managerResult)) {
-            User userResult = managerResult.getUser();
-            userResult.setFullname(user.getFullname());
-            if (Objects.nonNull(userService.editUser(user))) {
+            User userEdit = managerResult.getUser();
+            userEdit.setFullname(user.getFullname());
+            User userResult = userService.editUser(userEdit);
+            if (Objects.nonNull(userResult)) {
                 return ResponseHelper.ok(userResult);
             }
             return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));
         }
-        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
     }
 
     @PutMapping("/editpassword")

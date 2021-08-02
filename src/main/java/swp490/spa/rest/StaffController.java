@@ -92,17 +92,18 @@ public class StaffController {
         return ResponseHelper.ok(staff);
     }
 
-    @PutMapping("/editprofile")
+    @PutMapping("/editProfile")
     public Response editProfileStaff(@RequestBody User user) {
         Staff staffResult = staffService.findByStaffId(user.getId());
         if (Objects.nonNull(staffResult)) {
-            User userResult = staffResult.getUser();
-            userResult.setFullname(user.getFullname());
-            userResult.setEmail(user.getEmail());
-            userResult.setAddress(user.getAddress());
-            userResult.setBirthdate(user.getBirthdate());
-            userResult.setGender(user.getGender());
-            if (Objects.nonNull(userService.editUser(user))) {
+            User userEdit = staffResult.getUser();
+            userEdit.setFullname(user.getFullname());
+            userEdit.setEmail(user.getEmail());
+            userEdit.setAddress(user.getAddress());
+            userEdit.setBirthdate(user.getBirthdate());
+            userEdit.setGender(user.getGender());
+            User userResult = userService.editUser(user);
+            if (Objects.nonNull(userResult)) {
                 return ResponseHelper.ok(userResult);
             }
             return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));
