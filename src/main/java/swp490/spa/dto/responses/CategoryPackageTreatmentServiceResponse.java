@@ -18,7 +18,7 @@ public class CategoryPackageTreatmentServiceResponse implements Serializable {
     private Category category;
     private List<PackageResponse> packages;
 
-    public static class PackageResponse {
+    public static class PackageResponse implements Serializable{
         private Integer id;
         private String name;
         private String description;
@@ -98,7 +98,7 @@ public class CategoryPackageTreatmentServiceResponse implements Serializable {
         }
     }
 
-    public static class TreatmentResponse {
+    public static class TreatmentResponse implements Serializable{
         private Integer id;
         private String name;
         private String description;
