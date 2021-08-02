@@ -1,5 +1,6 @@
 package swp490.spa.rest;
 
+import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -365,6 +366,15 @@ public class PublicController {
                 SpaTreatment spaTreatment =
                         spaTreatmentService.findByPackageIdAndTypeOneStep(spaPackage.getId());
                 spaPackage.setTotalTime(spaTreatment.getTotalTime());
+                List<TreatmentService> treatmentServices =
+                        new ArrayList<>(spaTreatment.getTreatmentServices());
+                spaTreatment.setTreatmentServices(new TreeSet<>());
+                Collections.sort(treatmentServices);
+                List<swp490.spa.entities.SpaService> spaServices = new ArrayList<>();
+                for (TreatmentService treatmentService : treatmentServices) {
+                    spaServices.add(treatmentService.getSpaService());
+                }
+                spaPackage.setSpaServices(spaServices);
             } else {
                 spaPackage.setTotalTime(Constant.DURATION_OF_CONSULTATION);
             }

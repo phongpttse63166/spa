@@ -1819,4 +1819,67 @@ public class ManagerController {
         LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.MANAGER));
     }
+
+    @GetMapping("/getAllCategoryWithElements")
+    public Response getAllCategoryWithElements(){
+        List<CategoryPackageTreatmentServiceResponse> response = new ArrayList<>();
+        List<Category> categories =
+                categoryService.findAllByStatus(Status.AVAILABLE,
+                        PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                .getContent();
+        if(Objects.nonNull(categories)){
+            for (Category category : categories) {
+                CategoryPackageTreatmentServiceResponse categoryPackageTreatmentServiceResponse =
+                        new CategoryPackageTreatmentServiceResponse();
+                categoryPackageTreatmentServiceResponse.setCategory(category);
+                List<CategoryPackageTreatmentServiceResponse.PackageResponse> packageResponses =
+                        new ArrayList<>();
+                List<SpaPackage> spaPackages =
+                        spaPackageService.findByCategoryId(category.getId());
+                for (SpaPackage spaPackage : spaPackages) {
+                    List<CategoryPackageTreatmentServiceResponse.TreatmentResponse> treatmentResponses =
+                            new ArrayList<>();
+                    List<SpaTreatment> spaTreatments =
+                            spaTreatmentService.findByPackageId(spaPackage.getId(), Constant.SEARCH_NO_CONTENT,
+                                    PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                                    .getContent();
+                    for (SpaTreatment spaTreatment : spaTreatments) {
+                        List<TreatmentService> treatmentServices =
+                                new ArrayList<>(spaTreatment.getTreatmentServices());
+                        spaTreatment.setTreatmentServices(new TreeSet<>());
+                        Collections.sort(treatmentServices);
+                        List<SpaService> spaServices = new ArrayList<>();
+                        for (TreatmentService treatmentService : treatmentServices) {
+                            spaServices.add(treatmentService.getSpaService());
+                        }
+                        CategoryPackageTreatmentServiceResponse.TreatmentResponse treatmentResponse =
+                                new CategoryPackageTreatmentServiceResponse.TreatmentResponse(
+                                        spaTreatment.getId(),
+                                        spaTreatment.getName(),
+                                        spaTreatment.getDescription(),
+                                        spaTreatment.getTotalPrice(),
+                                        spaTreatment.getTotalTime(),
+                                        spaServices);
+                        treatmentResponses.add(treatmentResponse);
+                    }
+                    CategoryPackageTreatmentServiceResponse.PackageResponse packageResponse =
+                            new CategoryPackageTreatmentServiceResponse.PackageResponse(
+                                    spaPackage.getId(),
+                                    spaPackage.getName(),
+                                    spaPackage.getDescription(),
+                                    spaPackage.getImage(),
+                                    spaPackage.getType(),
+                                    spaPackage.getStatus(),
+                                    treatmentResponses);
+                    packageResponses.add(packageResponse);
+                }
+                categoryPackageTreatmentServiceResponse.setPackages(packageResponses);
+                response.add(categoryPackageTreatmentServiceResponse);
+            }
+            return ResponseHelper.ok(response);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
+    }
 }
