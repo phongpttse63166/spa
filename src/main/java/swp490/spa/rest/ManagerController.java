@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.*;
@@ -479,7 +480,7 @@ public class ManagerController {
                 bookingDetailStepService.findBySpaAndStaffIsNullAndIsConsultation(spaId,
                         IsConsultation.FALSE);
         for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-            if(bookingDetailStep.getStatusBooking().equals(StatusBooking.BOOKING)){
+            if (bookingDetailStep.getStatusBooking().equals(StatusBooking.BOOKING)) {
                 result.add(bookingDetailStep);
             }
         }
@@ -731,6 +732,47 @@ public class ManagerController {
             }
         }
         return ResponseHelper.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.EMPLOYEE));
+    }
+
+    @PutMapping(value = "/image/edit/{userId}",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response editImage(@PathVariable Integer userId, MultipartFile file) {
+        User user = userService.findByUserId(userId);
+        if (Objects.nonNull(user)) {
+            if (!file.isEmpty()) {
+                String imageLink = UploadImage.uploadImage(file);
+                if (imageLink != "") {
+                    user.setImage(imageLink);
+                    User userResult = userService.editUser(user);
+                    if (Objects.nonNull(userResult)) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.IMAGE));
+                    }
+                } else {
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
+                }
+            } else {
+                LOGGER.error(LoggingTemplate.FILE_NOT_EXISTED);
+            }
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.USER));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.IMAGE));
+    }
+
+    @PutMapping("/editprofile")
+    public Response editProfileStaff(@RequestBody User user) {
+        Manager managerResult = managerService.findManagerById(user.getId());
+        if (Objects.nonNull(managerResult)) {
+            User userResult = managerResult.getUser();
+            userResult.setFullname(user.getFullname());
+            if (Objects.nonNull(userService.editUser(user))) {
+                return ResponseHelper.ok(userResult);
+            }
+            return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.PROFILE));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
     }
 
     @PutMapping("/editpassword")
@@ -1200,8 +1242,8 @@ public class ManagerController {
     @PutMapping(value = "/editProfileEmployee/{userId}",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Response editProfileStaff(@PathVariable Integer userId,
-                                     EmployeeRequest user) {
+    public Response editProfileEmployee(@PathVariable Integer userId,
+                                        EmployeeRequest user) {
         User userResult = userService.findByUserId(userId);
         if (Objects.nonNull(userResult)) {
             if (Objects.nonNull(user.getFile())) {
@@ -1664,7 +1706,7 @@ public class ManagerController {
                 if (Objects.nonNull(dateOffResult)) {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                     User employee = null;
-                    if(dateOffRequest.getRole().equals(Role.STAFF)){
+                    if (dateOffRequest.getRole().equals(Role.STAFF)) {
                         employee = staffService.findByStaffId(dateOffResult.getEmployee().getId())
                                 .getUser();
                     } else {
@@ -1729,7 +1771,7 @@ public class ManagerController {
                 if (Objects.nonNull(dateOffResult)) {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                     User employee = null;
-                    if(dateOffRequest.getRole().equals(Role.STAFF)){
+                    if (dateOffRequest.getRole().equals(Role.STAFF)) {
                         employee = staffService.findByStaffId(dateOffResult.getEmployee().getId())
                                 .getUser();
                     } else {
@@ -1821,13 +1863,13 @@ public class ManagerController {
     }
 
     @GetMapping("/getAllCategoryWithElements")
-    public Response getAllCategoryWithElements(){
+    public Response getAllCategoryWithElements() {
         List<CategoryPackageTreatmentServiceResponse> response = new ArrayList<>();
         List<Category> categories =
                 categoryService.findAllByStatus(Status.AVAILABLE,
-                        PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
-                .getContent();
-        if(Objects.nonNull(categories)){
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                        .getContent();
+        if (Objects.nonNull(categories)) {
             for (Category category : categories) {
                 CategoryPackageTreatmentServiceResponse categoryPackageTreatmentServiceResponse =
                         new CategoryPackageTreatmentServiceResponse();
@@ -1841,7 +1883,7 @@ public class ManagerController {
                             new ArrayList<>();
                     List<SpaTreatment> spaTreatments =
                             spaTreatmentService.findByPackageId(spaPackage.getId(), Constant.SEARCH_NO_CONTENT,
-                                    PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                                    PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                     .getContent();
                     for (SpaTreatment spaTreatment : spaTreatments) {
                         List<TreatmentService> treatmentServices =
