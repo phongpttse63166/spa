@@ -1832,12 +1832,12 @@ public class ManagerController {
                 CategoryPackageTreatmentServiceResponse categoryPackageTreatmentServiceResponse =
                         new CategoryPackageTreatmentServiceResponse();
                 categoryPackageTreatmentServiceResponse.setCategory(category);
-                List<CategoryPackageTreatmentServiceResponse.PackageResponse> packageResponses =
+                List<PackageCategoryResponse> packageCategoryRespons =
                         new ArrayList<>();
                 List<SpaPackage> spaPackages =
                         spaPackageService.findByCategoryId(category.getId());
                 for (SpaPackage spaPackage : spaPackages) {
-                    List<CategoryPackageTreatmentServiceResponse.TreatmentResponse> treatmentResponses =
+                    List<TreatmentCategoryResponse> treatmentCategoryResponses =
                             new ArrayList<>();
                     List<SpaTreatment> spaTreatments =
                             spaTreatmentService.findByPackageId(spaPackage.getId(), Constant.SEARCH_NO_CONTENT,
@@ -1848,32 +1848,41 @@ public class ManagerController {
                                 new ArrayList<>(spaTreatment.getTreatmentServices());
                         spaTreatment.setTreatmentServices(new TreeSet<>());
                         Collections.sort(treatmentServices);
-                        List<SpaService> spaServices = new ArrayList<>();
+                        List<ServiceCategoryResponse> spaServices = new ArrayList<>();
                         for (TreatmentService treatmentService : treatmentServices) {
-                            spaServices.add(treatmentService.getSpaService());
+                            SpaService spaService = treatmentService.getSpaService();
+                            spaServices.add(new ServiceCategoryResponse(
+                                    spaService.getId(),
+                                    spaService.getName(),
+                                    spaService.getImage(),
+                                    spaService.getDescription(),
+                                    spaService.getPrice(),
+                                    spaService.getStatus(),
+                                    spaService.getType(),
+                                    spaService.getDurationMin()));
                         }
-                        CategoryPackageTreatmentServiceResponse.TreatmentResponse treatmentResponse =
-                                new CategoryPackageTreatmentServiceResponse.TreatmentResponse(
+                        TreatmentCategoryResponse treatmentCategoryResponse =
+                                new TreatmentCategoryResponse(
                                         spaTreatment.getId(),
                                         spaTreatment.getName(),
                                         spaTreatment.getDescription(),
                                         spaTreatment.getTotalPrice(),
                                         spaTreatment.getTotalTime(),
                                         spaServices);
-                        treatmentResponses.add(treatmentResponse);
+                        treatmentCategoryResponses.add(treatmentCategoryResponse);
                     }
-                    CategoryPackageTreatmentServiceResponse.PackageResponse packageResponse =
-                            new CategoryPackageTreatmentServiceResponse.PackageResponse(
+                    PackageCategoryResponse packageCategoryResponse =
+                            new PackageCategoryResponse(
                                     spaPackage.getId(),
                                     spaPackage.getName(),
                                     spaPackage.getDescription(),
                                     spaPackage.getImage(),
                                     spaPackage.getType(),
                                     spaPackage.getStatus(),
-                                    treatmentResponses);
-                    packageResponses.add(packageResponse);
+                                    treatmentCategoryResponses);
+                    packageCategoryRespons.add(packageCategoryResponse);
                 }
-                categoryPackageTreatmentServiceResponse.setPackages(packageResponses);
+                categoryPackageTreatmentServiceResponse.setPackages(packageCategoryRespons);
                 response.add(categoryPackageTreatmentServiceResponse);
             }
             return ResponseHelper.ok(response);
