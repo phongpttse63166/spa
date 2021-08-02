@@ -790,6 +790,11 @@ public class CustomerController {
     public Response findBookingDetailById(@PathVariable Integer bookingDetailId){
         BookingDetail bookingDetailResult = bookingDetailService.findByBookingDetailId(bookingDetailId);
         if(Objects.nonNull(bookingDetailResult)){
+            List<BookingDetailStep> bookingDetailSteps =
+                    bookingDetailStepService.findByBookingDetail(bookingDetailId,
+                            PageRequest.of(Constant.PAGE_DEFAULT,Constant.SIZE_DEFAULT,Sort.unsorted()))
+                    .getContent();
+            bookingDetailResult.setBookingDetailSteps(bookingDetailSteps);
             return ResponseHelper.ok(conversion.convertToBookingDetailResponse(bookingDetailResult));
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
