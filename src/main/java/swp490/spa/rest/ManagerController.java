@@ -762,7 +762,7 @@ public class ManagerController {
     }
 
     @PutMapping("/editprofile")
-    public Response editProfileStaff(@RequestBody User user) {
+    public Response editProfileManager(@RequestBody User user) {
         Manager managerResult = managerService.findManagerById(user.getId());
         if (Objects.nonNull(managerResult)) {
             User userResult = managerResult.getUser();
