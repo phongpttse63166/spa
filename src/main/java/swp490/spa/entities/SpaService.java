@@ -1,10 +1,8 @@
 package swp490.spa.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 @Table(name = "spa_service", schema = "public")
 public class SpaService implements Serializable {
     @Id

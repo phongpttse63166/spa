@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import swp490.spa.entities.*;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 @Getter
-public class SpaPackageGetAllResponse {
+public class SpaPackageGetAllResponse implements Serializable {
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("name")

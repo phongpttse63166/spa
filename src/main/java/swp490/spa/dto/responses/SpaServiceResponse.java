@@ -2,12 +2,14 @@ package swp490.spa.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import swp490.spa.entities.*;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +17,8 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SpaServiceResponse {
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
+public class SpaServiceResponse implements Serializable {
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("name")
