@@ -586,8 +586,14 @@ public class ConsultantController {
                     supportFunctions.separateBookingDetailStepListAndPutIntoMap(bookingDetailSteps);
             int check = countEmployee - map.size();
             List<String> timeBookingList = null;
+            int totaltime = 0;
+            for (TreatmentService treatmentService : spaTreatment.getTreatmentServices()) {
+                if(treatmentService.getOrdinal() == 1){
+                    totaltime = treatmentService.getSpaService().getDurationMin();
+                }
+            }
             timeBookingList =
-                    supportFunctions.getBookTime(spaTreatment.getTotalTime(), map, check);
+                    supportFunctions.getBookTime(totaltime, map, check);
             if (timeBookingList.size() != 0) {
                 timeBookingList =
                         supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
