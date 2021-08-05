@@ -23,6 +23,10 @@ public class ConsultationContentResponse {
     private String result;
     @JsonProperty("note")
     private String note;
+    @JsonProperty("image_before")
+    private String imageBefore;
+    @JsonProperty("image_after")
+    private String imageAfter;
     @JsonProperty("booking_detail_step")
     @JsonIgnore
     private BookingDetailStep bookingDetailStep;

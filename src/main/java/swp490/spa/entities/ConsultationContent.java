@@ -23,6 +23,10 @@ public class ConsultationContent implements Serializable {
     private String description;
     @Column(name = "expectation", length = 65355)
     private String expectation;
+    @Column(name = "image_before", length = 65355)
+    private String imageBefore;
+    @Column(name = "image_after", length = 65355)
+    private String imageAfter;
     @Column(name = "result", length = 65355)
     private String result;
     @Column(name = "note", length = 65355)
