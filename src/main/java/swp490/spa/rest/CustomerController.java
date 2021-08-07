@@ -733,6 +733,11 @@ public class CustomerController {
         if (Objects.nonNull(bookingDetailSteps)) {
             if (bookingDetailSteps.size() == 0) {
                 return ResponseHelper.ok("");
+            } else if(bookingDetailSteps.size() == 1) {
+                scheduleBookingResponse.setDateBooking(bookingDetailSteps.get(0).getDateBooking());
+                bookingDetailStepAdd.add(bookingDetailSteps.get(0));
+                scheduleBookingResponse.setBookingDetailSteps(bookingDetailStepAdd);
+                scheduleBookingResponses.add(scheduleBookingResponse);
             } else {
                 Date oldDate;
                 Date newDate = Date.valueOf(Constant.DATE_DEFAULT);
@@ -774,12 +779,12 @@ public class CustomerController {
                         }
                     }
                 }
-                Page<ScheduleBookingResponse> page =
-                        new PageImpl<>(scheduleBookingResponses,
-                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.by("dateBooking")),
-                                scheduleBookingResponses.size());
-                return ResponseHelper.ok(page);
             }
+            Page<ScheduleBookingResponse> page =
+                    new PageImpl<>(scheduleBookingResponses,
+                            PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.by("dateBooking")),
+                            scheduleBookingResponses.size());
+            return ResponseHelper.ok(page);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
         }
