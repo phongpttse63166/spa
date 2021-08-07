@@ -15,4 +15,5 @@ public class BookingDetailEditRequest {
     private String timeBooking;
     private String dateBooking;
     private Integer consultantId;
+    private Integer staffId;
 }

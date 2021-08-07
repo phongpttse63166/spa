@@ -222,6 +222,15 @@ public class ConsultantController {
         Rating rating = null;
         Integer totalTime = 0;
         Double totalPrice = 0.0;
+        Staff staff = null;
+        //Get Staff
+        if(bookingDetailRequest.getStaffId() != null){
+            staff = staffService.findByStaffId(bookingDetailRequest.getStaffId());
+            if(staff == null){
+                LOGGER.error(String.format(LoggingTemplate.GET_FAILED,Constant.STAFF));
+                return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+            }
+        }
         //Get Booking to edit
         BookingDetail bookingDetailBeforeEdit =
                 bookingDetailService.findByBookingDetailId(bookingDetailRequest.getBookingDetailId());
@@ -278,7 +287,11 @@ public class ConsultantController {
                     bookingDetailStep.setTreatmentService(treatmentService);
                     bookingDetailStep.setConsultant(consultant);
                     bookingDetailStep.setBookingDetail(bookingDetailEdit);
+                    if(bookingDetailRequest.getStaffId()!= null){
+                        bookingDetailStep.setStaff(staff);
+                    }
                     bookingDetailStepEditList.add(bookingDetailStep);
+
                 }
                 bookingDetailEdit.getBookingDetailSteps().addAll(bookingDetailStepEditList);
             }
@@ -340,13 +353,15 @@ public class ConsultantController {
                 map.put(MessageTemplate.ASSIGN_REQUEST_STATUS,
                         MessageTemplate.ASSIGN_REQUEST_STATUS + "- bookingDetailId "
                                 + bookingDetailBeforeEdit.getId());
-                if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_REQUEST_TITLE,
-                        String.format(MessageTemplate.ASSIGN_REQUEST_MESSAGE,
-                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
-                        map, managers.get(0).getUser().getId(), Role.MANAGER)) {
-                    LOGGER.info("Send notification {}: OK");
-                } else {
-                    LOGGER.info("Send notification {}: FAILED");
+                if(bookingDetailRequest.getStaffId() == null) {
+                    if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_REQUEST_TITLE,
+                            String.format(MessageTemplate.ASSIGN_REQUEST_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                            map, managers.get(0).getUser().getId(), Role.MANAGER)) {
+                        LOGGER.info("Send notification {}: OK - " + MessageTemplate.ASSIGN_REQUEST_TITLE);
+                    } else {
+                        LOGGER.info("Send notification {}: FAILED - " + MessageTemplate.ASSIGN_REQUEST_TITLE);
+                    }
                 }
                 if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
                         String.format(MessageTemplate.FINISH_CONSULTATION_MESSAGE,

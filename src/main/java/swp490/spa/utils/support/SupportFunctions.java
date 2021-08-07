@@ -590,6 +590,8 @@ public class SupportFunctions {
                     timeShowList.add(timeCheck);
                 }
             }
+        } else {
+            timeShowList = timeBookingList;
         }
         result = timeShowList;
         return result;
