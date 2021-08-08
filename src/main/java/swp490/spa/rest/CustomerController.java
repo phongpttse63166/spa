@@ -806,15 +806,4 @@ public class CustomerController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
     }
-
-    @GetMapping("/getAllStaff/{spaId}")
-    public Response getAllStaffBySpa(@PathVariable Integer spaId){
-        List<Staff> staffList = staffService.findBySpaIdAndStatusAvailable(spaId);
-        if(Objects.nonNull(staffList)){
-            return ResponseHelper.ok(staffList);
-        } else {
-            LOGGER.error(String.format(LoggingTemplate.GET_FAILED,Constant.STAFF));
-        }
-        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED,Constant.STAFF));
-    }
 }
