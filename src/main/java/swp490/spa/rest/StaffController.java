@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -29,10 +30,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/staff")
@@ -129,8 +127,8 @@ public class StaffController {
     public Response insertNewDateOff(@PathVariable Integer staffId,
                                      @RequestBody DateOffRequest dateOffRequest) throws FirebaseMessagingException {
         Date dateRegister = Date.valueOf(dateOffRequest.getDateOff());
-        DateOff dateOffGet = dateOffService.findByEmployeeAndDateOff(staffId,dateRegister);
-        if(dateOffGet!=null){
+        DateOff dateOffGet = dateOffService.findByEmployeeAndDateOff(staffId, dateRegister);
+        if (dateOffGet != null) {
             return ResponseHelper.error(LoggingTemplate.DATE_OFF_REGISTERED);
         } else {
             List<BookingDetailStep> bookingDetailSteps =
@@ -176,11 +174,29 @@ public class StaffController {
                                                    @RequestParam String dateChosen) {
         Staff staff = staffService.findByStaffId(staffId);
         if (Objects.nonNull(staff)) {
-            Page<BookingDetailStep> bookingDetailSteps =
+            Page<BookingDetailStep> bookingDetailStepPage =
                     bookingDetailStepService.findByStaffIdAndDateBooking(staffId, Date.valueOf(dateChosen),
                             PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()));
-            if (Objects.nonNull(bookingDetailSteps)) {
-                return ResponseHelper.ok(conversion.convertToPageBookingDetailStepResponse(bookingDetailSteps));
+            if (Objects.nonNull(bookingDetailStepPage)) {
+                List<BookingDetailStep> result = new ArrayList<>();
+                List<BookingDetail> bookingDetails = new ArrayList<>();
+                List<BookingDetailStep> bookingDetailSteps = bookingDetailStepPage.getContent();
+                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                    if (result.size() == 0) {
+                        result.add(bookingDetailStep);
+                        bookingDetails.add(bookingDetailStep.getBookingDetail());
+                    } else {
+                        BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+                        if(!supportFunctions.checkBookingDetailExistedInList(bookingDetail,bookingDetails)){
+                            result.add(bookingDetailStep);
+                            bookingDetails.add(bookingDetailStep.getBookingDetail());
+                        }
+                    }
+                }
+                bookingDetailStepPage = new PageImpl<>(result,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
+                        result.size());
+                return ResponseHelper.ok(conversion.convertToPageBookingDetailStepResponse(bookingDetailStepPage));
             } else {
                 LOGGER.info(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
                 return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));
