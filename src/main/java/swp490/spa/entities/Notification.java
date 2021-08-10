@@ -25,6 +25,6 @@ public class Notification implements Serializable {
     @Column(name = "role")
     private Role role;
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "user_id")
     private User user;
 }
