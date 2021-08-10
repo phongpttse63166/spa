@@ -660,4 +660,27 @@ public class SupportFunctions {
         }
         return false;
     }
+
+    public Double roundRating(List<Rating> ratingList) {
+        float result = (float) 0.0;
+        float sum = (float) 0.0;
+        int count = 0;
+        if(ratingList.size()!=0){
+            for (Rating rating : ratingList) {
+                sum += rating.getRate();
+                count+=1;
+            }
+            result = sum/count;
+            int number = (int) result;
+            double decimal = result - number;
+            if(decimal < 0.25){
+                result = number;
+            } else if (decimal < 0.75) {
+                result = (float) (number + 0.5);
+            } else {
+                result = number+1;
+            }
+        }
+        return Double.valueOf(String.valueOf(result));
+    }
 }

@@ -381,7 +381,7 @@ public class ManagerController {
 
     @GetMapping("/getListStaffFree/{bookingDetailId}")
     public Response getListStaffsFree(@PathVariable Integer bookingDetailId) {
-        List<Staff> staffListResult = new ArrayList<>();
+        List<StaffRatingResponse> response = new ArrayList<>();
         Date dateBooking = null;
         Time startTime = null;
         Time endTime = null;
@@ -426,10 +426,34 @@ public class ManagerController {
                             bookingDetailStepService.findByDateBookingAndStartEndTimeAndStaffId(dateBooking,
                                     startTime, endTime, staff.getUser().getId());
                     if (bookingDetailStepsCheck.size() == 0) {
-                        staffListResult.add(staff);
+                        StaffRatingResponse staffRatingResponse = new StaffRatingResponse();
+                        staffRatingResponse.setStaff(staff);
+                        response.add(staffRatingResponse);
                     }
                 }
-                return ResponseHelper.ok(staffListResult);
+                for (StaffRatingResponse staffRating : response) {
+                    Staff staff = staffRating.getStaff();
+                    List<BookingDetailStep> bookingDetailStepsOfStaff =
+                            bookingDetailStepService.findByStatusAndStaff(staff.getUser().getId(),
+                                    IsConsultation.FALSE,StatusBooking.FINISH);
+                    if(bookingDetailStepsOfStaff!=null){
+                        if(bookingDetailStepsOfStaff.size() == 0){
+                            staffRating.setAverageRateValue(0.0);
+                        } else {
+                            List<Rating> ratingList = new ArrayList<>();
+                            for (BookingDetailStep bookingDetailStep : bookingDetailStepsOfStaff) {
+                                if(bookingDetailStep.getRating().getRate()!=null){
+                                    ratingList.add(bookingDetailStep.getRating());
+                                }
+                            }
+                            double average = supportFunctions.roundRating(ratingList);
+                            staffRating.setAverageRateValue(average);
+                        }
+                    }
+                }
+                response.sort(Comparator.comparingDouble(StaffRatingResponse::getAverageRateValue)
+                        .reversed());
+                return ResponseHelper.ok(response);
             } else {
                 LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
             }

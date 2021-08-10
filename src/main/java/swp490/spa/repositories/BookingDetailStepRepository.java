@@ -109,4 +109,8 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
     List<BookingDetailStep> findByCustomerAndFromToDateBooking(Integer customerId,
                                                                Date startDate,
                                                                Date endDate);
+
+    List<BookingDetailStep> findByStaff_IdAndAndIsConsultationAndAndStatusBooking(Integer staffId,
+                                                                                  IsConsultation isConsultation,
+                                                                                  StatusBooking status);
 }
