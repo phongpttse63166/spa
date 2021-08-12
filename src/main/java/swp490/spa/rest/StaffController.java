@@ -15,6 +15,7 @@ import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.requests.AccountPasswordRequest;
 import swp490.spa.dto.requests.ConfirmAStepRequest;
+import swp490.spa.dto.requests.ConsultationContentImageRequest;
 import swp490.spa.dto.requests.DateOffRequest;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
@@ -452,5 +453,67 @@ public class StaffController {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.NOTIFICATION));
+    }
+
+    @PutMapping(value = "/consultationContent/uploadImageBefore",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response uploadImageBefore(ConsultationContentImageRequest request) {
+        if(request.getConsultationContentId() == null || request.getFile() == null){
+            LOGGER.error(LoggingTemplate.DATA_MISSING);
+            return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+        } else {
+            ConsultationContent consultationContent =
+                    consultationContentService
+                            .findByConsultationContentId(request.getConsultationContentId());
+            if(Objects.nonNull(consultationContent)){
+                String imageLink = UploadImage.uploadImage(request.getFile());
+                if (imageLink != "") {
+                    consultationContent.setImageBefore(imageLink);
+                    ConsultationContent consultationContentResult =
+                            consultationContentService.editByConsultationContent(consultationContent);
+                    if (Objects.nonNull(consultationContentResult)) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.CONSULTATION_CONTENT));
+                    }
+                } else {
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
+                }
+            } else {
+                LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTATION_CONTENT));
+            }
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
+    }
+
+    @PutMapping(value = "/consultationContent/uploadImageAfter",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Response uploadImageAfter(ConsultationContentImageRequest request) {
+        if(request.getConsultationContentId() == null || request.getFile() == null){
+            LOGGER.error(LoggingTemplate.DATA_MISSING);
+            return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
+        } else {
+            ConsultationContent consultationContent =
+                    consultationContentService
+                            .findByConsultationContentId(request.getConsultationContentId());
+            if(Objects.nonNull(consultationContent)){
+                String imageLink = UploadImage.uploadImage(request.getFile());
+                if (imageLink != "") {
+                    consultationContent.setImageAfter(imageLink);
+                    ConsultationContent consultationContentResult =
+                            consultationContentService.editByConsultationContent(consultationContent);
+                    if (Objects.nonNull(consultationContentResult)) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.EDIT_SUCCESS, Constant.CONSULTATION_CONTENT));
+                    }
+                } else {
+                    LOGGER.info(LoggingTemplate.SAVE_IMAGE_FAILED);
+                    return ResponseHelper.error(LoggingTemplate.SAVE_IMAGE_FAILED);
+                }
+            } else {
+                LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CONSULTATION_CONTENT));
+            }
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
     }
 }
