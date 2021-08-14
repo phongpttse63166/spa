@@ -1983,7 +1983,7 @@ public class ManagerController {
             }
             List<BookingDetailStep> result = new ArrayList<>();
             List<Rating> ratings = new ArrayList<>();
-            if(dateRating == null){
+            if(dateRating == ""){
                  ratings = ratingService.findAllByStatusOrderByDate(StatusRating.RATED);
             } else {
                 ratings =
