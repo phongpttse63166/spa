@@ -1970,7 +1970,6 @@ public class ManagerController {
         List<BookingDetail> bookingDetails =
                 bookingDetailService.findBySpa(spaId);
         if(Objects.nonNull(bookingDetails)){
-            System.out.println(bookingDetails);
             List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
             for (BookingDetail bookingDetail : bookingDetails) {
                 for (BookingDetailStep bookingDetailStep : bookingDetail.getBookingDetailSteps()) {
@@ -1996,7 +1995,9 @@ public class ManagerController {
                     }
                 }
             }
-            Page<BookingDetailStep> page = new PageImpl<>(result,pageable,result.size());
+            int start = (int)pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), result.size());
+            Page<BookingDetailStep> page = new PageImpl<>(result.subList(start,end), pageable,result.size());
             return ResponseHelper.ok(page);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
