@@ -70,6 +70,8 @@ public class ManagerController {
     private NotificationFireBaseService notificationFireBaseService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private RatingService ratingService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
 
@@ -81,6 +83,7 @@ public class ManagerController {
                              TreatmentServiceService treatmentServiceService, ConsultantService consultantService,
                              BookingDetailStepService bookingDetailStepService,
                              ConsultationContentService consultationContentService,
+                             RatingService ratingService,
                              NotificationFireBaseService notificationFireBaseService,
                              NotificationService notificationService) {
         this.managerService = managerService;
@@ -97,6 +100,7 @@ public class ManagerController {
         this.consultantService = consultantService;
         this.bookingDetailStepService = bookingDetailStepService;
         this.consultationContentService = consultationContentService;
+        this.ratingService = ratingService;
         this.notificationFireBaseService = notificationFireBaseService;
         this.notificationService = notificationService;
         this.conversion = new Conversion();
@@ -1957,5 +1961,46 @@ public class ManagerController {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
+    }
+
+    @GetMapping("/getAllRating/{spaId}")
+    public Response getAllRating(@PathVariable Integer spaId,
+                                 @RequestParam String dateRating,
+                                 Pageable pageable){
+        List<BookingDetail> bookingDetails =
+                bookingDetailService.findBySpa(spaId);
+        if(Objects.nonNull(bookingDetails)){
+            System.out.println(bookingDetails);
+            List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
+            for (BookingDetail bookingDetail : bookingDetails) {
+                for (BookingDetailStep bookingDetailStep : bookingDetail.getBookingDetailSteps()) {
+                    if(bookingDetailStep.getRating()!=null){
+                        if(bookingDetailStep.getRating().getStatusRating().equals(StatusRating.RATED)){
+                            bookingDetailSteps.add(bookingDetailStep);
+                        }
+                    }
+                }
+            }
+            List<BookingDetailStep> result = new ArrayList<>();
+            List<Rating> ratings = new ArrayList<>();
+            if(dateRating == null){
+                 ratings = ratingService.findAllByStatusOrderByDate(StatusRating.RATED);
+            } else {
+                ratings =
+                        ratingService.findByDateAndStatus(StatusRating.RATED, Date.valueOf(dateRating));
+            }
+            for (Rating rating : ratings) {
+                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                    if(rating.equals(bookingDetailStep.getRating())){
+                        result.add(bookingDetailStep);
+                    }
+                }
+            }
+            Page<BookingDetailStep> page = new PageImpl<>(result,pageable,result.size());
+            return ResponseHelper.ok(page);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.RATING));
     }
 }

@@ -2,7 +2,6 @@ package swp490.spa.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import swp490.spa.entities.BookingDetail;
@@ -10,7 +9,6 @@ import swp490.spa.entities.StatusBooking;
 import swp490.spa.entities.Type;
 import swp490.spa.repositories.BookingDetailRepository;
 
-import java.net.ContentHandler;
 import java.util.List;
 
 @Service
@@ -56,5 +54,9 @@ public class BookingDetailService {
 
     public List<BookingDetail> findBySpaAndStatusBookingChangeStaff(Integer spaId, StatusBooking status) {
         return this.bookingDetailRepository.findByBooking_Spa_IdAndStatusBookingOrderById(spaId,status);
+    }
+
+    public List<BookingDetail> findBySpa(Integer spaId) {
+        return this.bookingDetailRepository.findByBooking_Spa_Id(spaId);
     }
 }
