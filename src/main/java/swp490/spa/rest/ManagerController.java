@@ -446,8 +446,10 @@ public class ManagerController {
                         } else {
                             List<Rating> ratingList = new ArrayList<>();
                             for (BookingDetailStep bookingDetailStep : bookingDetailStepsOfStaff) {
-                                if(bookingDetailStep.getRating().getRate()!=null){
-                                    ratingList.add(bookingDetailStep.getRating());
+                                if(bookingDetailStep.getRating()!=null) {
+                                    if (bookingDetailStep.getRating().getRate() != null) {
+                                        ratingList.add(bookingDetailStep.getRating());
+                                    }
                                 }
                             }
                             double average = supportFunctions.roundRating(ratingList);
