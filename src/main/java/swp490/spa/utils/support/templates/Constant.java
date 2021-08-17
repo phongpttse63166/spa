@@ -74,4 +74,43 @@ public class Constant {
     public static final String CANCEL_TYPE = "CANCEL";
     public static final String APPROVE_DATE_OFF_TYPE = "APPROVE_DATE_OFF";
     public static final String CANCEL_DATE_OFF_TYPE = "CANCEL_DATE_OFF";
+
+    // Month - Month's first date - Month's last date
+    public static final Integer JANUARY = 1;
+    public static final String FIRST_DATE_JANUARY = "-01-01";
+    public static final String LAST_DATE_JANUARY = "-01-31";
+    public static final Integer FEBRUARY = 2;
+    public static final String FIRST_DATE_FEBRUARY = "-02-01";
+    public static final String LAST_DATE_FEBRUARY = "-02-28";
+    public static final String LAST_DATE_FEBRUARY_LEAP = "-02-29";
+    public static final Integer MARCH = 3;
+    public static final String FIRST_DATE_MARCH = "-03-01";
+    public static final String LAST_DATE_MARCH = "-03-31";
+    public static final Integer APRIL = 4;
+    public static final String FIRST_DATE_APRIL = "-04-01";
+    public static final String LAST_DATE_APRIL = "-04-30";
+    public static final Integer MAY = 5;
+    public static final String FIRST_DATE_MAY = "-05-01";
+    public static final String LAST_DATE_MAY = "-01-31";
+    public static final Integer JUNE = 6;
+    public static final String FIRST_DATE_JUNE = "-06-01";
+    public static final String LAST_DATE_JUNE = "-06-30";
+    public static final Integer JULY = 7;
+    public static final String FIRST_DATE_JULY = "-07-01";
+    public static final String LAST_DATE_JULY = "-07-31";
+    public static final Integer AUGUST = 8;
+    public static final String FIRST_DATE_AUGUST = "-08-01";
+    public static final String LAST_DATE_AUGUST = "-08-31";
+    public static final Integer SEPTEMBER = 9;
+    public static final String FIRST_DATE_SEPTEMBER = "-09-01";
+    public static final String LAST_DATE_SEPTEMBER = "-09-30";
+    public static final Integer OCTOBER = 10;
+    public static final String FIRST_DATE_OCTOBER = "-10-01";
+    public static final String LAST_DATE_OCTOBER = "-10-31";
+    public static final Integer NOVEMBER = 11;
+    public static final String FIRST_DATE_NOVEMBER = "-11-01";
+    public static final String LAST_DATE_NOVEMBER = "-11-30";
+    public static final Integer DECEMBER = 12;
+    public static final String FIRST_DATE_DECEMBER = "-12-01";
+    public static final String LAST_DATE_DECEMBER = "-12-31";
 }

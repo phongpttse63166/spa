@@ -155,7 +155,15 @@ public class BookingDetailStepService {
                                                         IsConsultation isConsultation,
                                                         StatusBooking status) {
         return this.bookingDetailStepRepository
-                .findByStaff_IdAndAndIsConsultationAndAndStatusBooking(staffId,
+                .findByStaff_IdAndAndIsConsultationAndStatusBooking(staffId,
                         isConsultation,status);
+    }
+
+    public List<BookingDetailStep> findByStatusBookingAndSpaIdAndIsConsultationAndFromToDate(StatusBooking status,
+                                                                                             Integer spaId,
+                                                                                             IsConsultation isConsultation,
+                                                                                             Date firstDate,
+                                                                                             Date lastDate) {
+        return this.bookingDetailStepRepository.findByStatusBookingAndSpaIdAndIsConsultationAndFromToDate(status,spaId,isConsultation,firstDate,lastDate);
     }
 }

@@ -110,7 +110,16 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                Date startDate,
                                                                Date endDate);
 
-    List<BookingDetailStep> findByStaff_IdAndAndIsConsultationAndAndStatusBooking(Integer staffId,
-                                                                                  IsConsultation isConsultation,
-                                                                                  StatusBooking status);
+    List<BookingDetailStep> findByStaff_IdAndAndIsConsultationAndStatusBooking(Integer staffId,
+                                                                               IsConsultation isConsultation,
+                                                                               StatusBooking status);
+
+    @Query("FROM BookingDetailStep b WHERE b.statusBooking = ?1 AND " +
+            "b.bookingDetail.booking.spa.id = ?2 AND b.isConsultation = ?3 " +
+            "AND b.dateBooking BETWEEN ?4 AND ?5")
+    List<BookingDetailStep> findByStatusBookingAndSpaIdAndIsConsultationAndFromToDate(StatusBooking status,
+                                                                                      Integer spaId,
+                                                                                      IsConsultation isConsultation,
+                                                                                      Date firstDate,
+                                                                                      Date lastDate);
 }

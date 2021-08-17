@@ -2043,4 +2043,67 @@ public class ManagerController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.RATING));
     }
+
+    @GetMapping("/manageSpa/{spaId}")
+    public Response getAllInformationOfSpa(@PathVariable Integer spaId) {
+        SpaInformationResponse spaInformationResponse = new SpaInformationResponse();
+        List<Category> categories = categoryService.findAllByStatus(Status.AVAILABLE,
+                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                .getContent();
+        if (categories != null) {
+            spaInformationResponse.setCountCategory(categories.size());
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.CATEGORY));
+        }
+        List<SpaPackage> spaPackages =
+                spaPackageService.findAllStatusAvailable(PageRequest.of(Constant.PAGE_DEFAULT,
+                        Constant.SIZE_DEFAULT, Sort.unsorted()))
+                        .getContent();
+        if (spaPackages != null) {
+            spaInformationResponse.setCountPackage(spaPackages.size());
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_PACKAGE));
+        }
+        List<SpaService> spaServices =
+                spaServiceService.findByStatus(Status.AVAILABLE, Constant.SEARCH_NO_CONTENT,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                        .getContent();
+        if (spaServices != null) {
+            spaInformationResponse.setCountService(spaServices.size());
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SERVICE));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SERVICE));
+        }
+        List<Staff> staffList = staffService.findBySpaIdAndStatusAvailable(spaId);
+        List<Consultant> consultants = consultantService.findBySpaIdAndStatusAvailable(spaId);
+        if (staffList != null && consultants != null) {
+            spaInformationResponse.setCountEmployee(staffList.size()+consultants.size());
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.EMPLOYEE));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.EMPLOYEE));
+        }
+        return ResponseHelper.ok(spaInformationResponse);
+    }
+
+    @GetMapping("/summarizeOneYear/{spaId}")
+    public Response summarizeOneYearOfSpa(@PathVariable Integer spaId){
+        List<SpaSummation> response = new ArrayList<>();
+        TreeMap<Integer, String> map = supportFunctions.getAllMonth();
+        for (Map.Entry<Integer, String> entry : map.entrySet()) {
+            SpaSummation spaSummation = new SpaSummation(entry.getKey(), 0);
+            Date firstDate = Date.valueOf(entry.getValue().split("_")[0]);
+            Date lastDate = Date.valueOf(entry.getValue().split("_")[1]);
+            List<BookingDetailStep> bookingDetailSteps =
+                    bookingDetailStepService
+                            .findByStatusBookingAndSpaIdAndIsConsultationAndFromToDate(StatusBooking.FINISH,
+                                    spaId, IsConsultation.FALSE, firstDate, lastDate);
+            if(bookingDetailSteps!=null){
+                spaSummation.setCountServiceFinish(bookingDetailSteps.size());
+            }
+            response.add(spaSummation);
+        }
+        return ResponseHelper.ok(response);
+    }
 }

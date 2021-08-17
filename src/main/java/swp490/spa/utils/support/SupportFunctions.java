@@ -8,6 +8,8 @@ import swp490.spa.utils.support.templates.Constant;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 public class SupportFunctions {
@@ -35,7 +37,7 @@ public class SupportFunctions {
             for (Map.Entry<Integer, List<BookingDetailStep>> entry : map.entrySet()) {
                 String bookTimeFinal = "";
                 if (entry.getValue().size() < 2) {
-                    if(entry.getValue().size() == 0){
+                    if (entry.getValue().size() == 0) {
                         loop = calculateTimeDuration(Time.valueOf(Constant.TIME_START_RELAX),
                                 Time.valueOf(Constant.TIME_START_DATE), totalTime);
                         for (int i = 0; i <= loop; i++) {
@@ -412,7 +414,7 @@ public class SupportFunctions {
                     if (timeResult.size() == 0) {
                         timeResult = Arrays.asList(bookTimeFinal.split("-"));
                     } else {
-                        if(bookTimeFinal != "") {
+                        if (bookTimeFinal != "") {
                             List<String> checkTimeList = Arrays.asList(bookTimeFinal.split("-"));
                             List<String> addTimeList = new ArrayList<>();
                             for (String time : checkTimeList) {
@@ -555,7 +557,7 @@ public class SupportFunctions {
                             Date.valueOf(dateBooking));
             bookingDetailStepCustomerBooked.addAll(bookingDetailStepsCheck);
         }
-        if(bookingDetailStepCustomerBooked.size()!=0) {
+        if (bookingDetailStepCustomerBooked.size() != 0) {
             for (BookingDetailStep bookingDetailStep : bookingDetailStepCustomerBooked) {
                 Time startTime = bookingDetailStep.getStartTime();
                 Time endTime = bookingDetailStep.getEndTime();
@@ -609,7 +611,7 @@ public class SupportFunctions {
     public boolean checkBookingDetailExistedInList(BookingDetail bookingDetailCheck,
                                                    List<BookingDetail> bookingDetails) {
         for (BookingDetail bookingDetail : bookingDetails) {
-            if(bookingDetail.equals(bookingDetailCheck)){
+            if (bookingDetail.equals(bookingDetailCheck)) {
                 return true;
             }
         }
@@ -618,7 +620,7 @@ public class SupportFunctions {
 
     public boolean checkBookingExistedInList(Booking booking, List<Booking> bookings) {
         for (Booking bookingCheck : bookings) {
-            if(bookingCheck.equals(booking)){
+            if (bookingCheck.equals(booking)) {
                 return true;
             }
         }
@@ -627,7 +629,7 @@ public class SupportFunctions {
 
     public boolean checkSpaPackageExisted(SpaPackage spaPackage, List<SpaPackage> spaPackageList) {
         for (SpaPackage spaPackageCheck : spaPackageList) {
-            if(spaPackageCheck.equals(spaPackage)){
+            if (spaPackageCheck.equals(spaPackage)) {
                 return true;
             }
         }
@@ -636,7 +638,7 @@ public class SupportFunctions {
 
     public boolean checkUserExistedInList(User customer, List<User> userList) {
         for (User userCheck : userList) {
-            if(userCheck.equals(customer)){
+            if (userCheck.equals(customer)) {
                 return true;
             }
         }
@@ -645,7 +647,7 @@ public class SupportFunctions {
 
     public boolean checkConsultantExistedInList(Consultant consultant, List<Consultant> consultants) {
         for (Consultant consultantCheck : consultants) {
-            if(consultantCheck.equals(consultant)){
+            if (consultantCheck.equals(consultant)) {
                 return true;
             }
         }
@@ -654,7 +656,7 @@ public class SupportFunctions {
 
     public boolean checkDateExitedInList(Date dateOff, List<Date> dateList) {
         for (Date dateCheck : dateList) {
-            if(dateCheck.compareTo(dateOff) == 0){
+            if (dateCheck.compareTo(dateOff) == 0) {
                 return true;
             }
         }
@@ -665,22 +667,67 @@ public class SupportFunctions {
         float result = (float) 0.0;
         float sum = (float) 0.0;
         int count = 0;
-        if(ratingList.size()!=0){
+        if (ratingList.size() != 0) {
             for (Rating rating : ratingList) {
                 sum += rating.getRate();
-                count+=1;
+                count += 1;
             }
-            result = sum/count;
+            result = sum / count;
             int number = (int) result;
             double decimal = result - number;
-            if(decimal < 0.25){
+            if (decimal < 0.25) {
                 result = number;
             } else if (decimal < 0.75) {
                 result = (float) (number + 0.5);
             } else {
-                result = number+1;
+                result = number + 1;
             }
         }
         return Double.valueOf(String.valueOf(result));
+    }
+
+    public TreeMap<Integer, String> getAllMonth() {
+        boolean leapYear = false;
+        int year = LocalDate.now(ZoneId.of(Constant.ZONE_ID)).getYear();
+        if (year % 4 == 0) {
+            if (year % 100 == 0) {
+                if (year % 400 == 0)
+                    leapYear = true;
+            } else
+                leapYear = true;
+        }
+        Map<Integer, String> map = new HashMap<>();
+        map.put(Constant.JANUARY,
+                year + Constant.FIRST_DATE_JANUARY + "_" + year + Constant.LAST_DATE_JANUARY);
+        if (leapYear) {
+            map.put(Constant.FEBRUARY,
+                    year + Constant.FIRST_DATE_FEBRUARY + "_" + year + Constant.LAST_DATE_FEBRUARY_LEAP);
+        } else {
+            map.put(Constant.FEBRUARY,
+                    year + Constant.FIRST_DATE_FEBRUARY + "_" + year + Constant.LAST_DATE_FEBRUARY);
+        }
+        map.put(Constant.MARCH,
+                year + Constant.FIRST_DATE_MARCH + "_" + year + Constant.LAST_DATE_MARCH);
+        map.put(Constant.APRIL,
+                year + Constant.FIRST_DATE_APRIL + "_" + year + Constant.LAST_DATE_APRIL);
+        map.put(Constant.MAY,
+                year + Constant.FIRST_DATE_MAY + "_" + year + Constant.LAST_DATE_MAY);
+        map.put(Constant.JUNE,
+                year + Constant.FIRST_DATE_JUNE + "_" + year + Constant.LAST_DATE_JUNE);
+        map.put(Constant.JULY,
+                year + Constant.FIRST_DATE_JULY + "_" + year + Constant.LAST_DATE_JULY);
+        map.put(Constant.AUGUST,
+                year + Constant.FIRST_DATE_AUGUST + "_" + year + Constant.LAST_DATE_AUGUST);
+        map.put(Constant.SEPTEMBER,
+                year + Constant.FIRST_DATE_SEPTEMBER + "_" + year + Constant.LAST_DATE_SEPTEMBER);
+        map.put(Constant.OCTOBER,
+                year + Constant.FIRST_DATE_OCTOBER + "_" + year + Constant.LAST_DATE_OCTOBER);
+        map.put(Constant.NOVEMBER,
+                year + Constant.FIRST_DATE_NOVEMBER + "_" + year + Constant.LAST_DATE_NOVEMBER);
+        map.put(Constant.DECEMBER,
+                year + Constant.FIRST_DATE_DECEMBER + "_" + year + Constant.LAST_DATE_DECEMBER);
+        TreeMap<Integer, String> result = new TreeMap<>();
+        result.putAll(map);
+        return result;
     }
 }
