@@ -439,14 +439,14 @@ public class ManagerController {
                     Staff staff = staffRating.getStaff();
                     List<BookingDetailStep> bookingDetailStepsOfStaff =
                             bookingDetailStepService.findByStatusAndStaff(staff.getUser().getId(),
-                                    IsConsultation.FALSE,StatusBooking.FINISH);
-                    if(bookingDetailStepsOfStaff!=null){
-                        if(bookingDetailStepsOfStaff.size() == 0){
+                                    IsConsultation.FALSE, StatusBooking.FINISH);
+                    if (bookingDetailStepsOfStaff != null) {
+                        if (bookingDetailStepsOfStaff.size() == 0) {
                             staffRating.setAverageRateValue(0.0);
                         } else {
                             List<Rating> ratingList = new ArrayList<>();
                             for (BookingDetailStep bookingDetailStep : bookingDetailStepsOfStaff) {
-                                if(bookingDetailStep.getRating()!=null) {
+                                if (bookingDetailStep.getRating() != null) {
                                     if (bookingDetailStep.getRating().getRate() != null) {
                                         ratingList.add(bookingDetailStep.getRating());
                                     }
@@ -1340,7 +1340,7 @@ public class ManagerController {
             for (BookingDetail bookingDetail : bookingDetails) {
                 List<BookingDetailStep> bookingDetailSteps =
                         bookingDetailStepService.findByBookingDetail(bookingDetail.getId(),
-                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT,Sort.unsorted()))
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
                                 .getContent();
                 bookingDetail.setBookingDetailSteps(bookingDetailSteps);
             }
@@ -1358,6 +1358,7 @@ public class ManagerController {
     @GetMapping("/getListStaffChange")
     public Response getListStaffChange(@RequestParam Integer bookingDetailId) {
         List<Staff> staffResult = new ArrayList<>();
+        List<StaffRatingResponse> response = new ArrayList<>();
         BookingDetail bookingDetail = bookingDetailService.findByBookingDetailId(bookingDetailId);
         if (Objects.nonNull(bookingDetail)) {
             Spa spa = bookingDetail.getBooking().getSpa();
@@ -1373,7 +1374,36 @@ public class ManagerController {
                         staffResult.add(staff);
                     }
                 }
-                return ResponseHelper.ok(staffResult);
+                for (Staff staff : staffResult) {
+                    StaffRatingResponse staffRatingResponse = new StaffRatingResponse();
+                    staffRatingResponse.setStaff(staff);
+                    response.add(staffRatingResponse);
+                }
+                for (StaffRatingResponse staffRating : response) {
+                    Staff staff = staffRating.getStaff();
+                    List<BookingDetailStep> bookingDetailStepsOfStaff =
+                            bookingDetailStepService.findByStatusAndStaff(staff.getUser().getId(),
+                                    IsConsultation.FALSE, StatusBooking.FINISH);
+                    if (bookingDetailStepsOfStaff != null) {
+                        if (bookingDetailStepsOfStaff.size() == 0) {
+                            staffRating.setAverageRateValue(0.0);
+                        } else {
+                            List<Rating> ratingList = new ArrayList<>();
+                            for (BookingDetailStep bookingDetailStep : bookingDetailStepsOfStaff) {
+                                if (bookingDetailStep.getRating() != null) {
+                                    if (bookingDetailStep.getRating().getRate() != null) {
+                                        ratingList.add(bookingDetailStep.getRating());
+                                    }
+                                }
+                            }
+                            double average = supportFunctions.roundRating(ratingList);
+                            staffRating.setAverageRateValue(average);
+                        }
+                    }
+                }
+                response.sort(Comparator.comparingDouble(StaffRatingResponse::getAverageRateValue)
+                        .reversed());
+                return ResponseHelper.ok(response);
             } else {
                 LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
             }
@@ -1975,15 +2005,15 @@ public class ManagerController {
     @GetMapping("/getAllRating/{spaId}")
     public Response getAllRating(@PathVariable Integer spaId,
                                  @RequestParam String dateRating,
-                                 Pageable pageable){
+                                 Pageable pageable) {
         List<BookingDetail> bookingDetails =
                 bookingDetailService.findBySpa(spaId);
-        if(Objects.nonNull(bookingDetails)){
+        if (Objects.nonNull(bookingDetails)) {
             List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
             for (BookingDetail bookingDetail : bookingDetails) {
                 for (BookingDetailStep bookingDetailStep : bookingDetail.getBookingDetailSteps()) {
-                    if(bookingDetailStep.getRating()!=null){
-                        if(bookingDetailStep.getRating().getStatusRating().equals(StatusRating.RATED)){
+                    if (bookingDetailStep.getRating() != null) {
+                        if (bookingDetailStep.getRating().getStatusRating().equals(StatusRating.RATED)) {
                             bookingDetailSteps.add(bookingDetailStep);
                         }
                     }
@@ -1991,22 +2021,22 @@ public class ManagerController {
             }
             List<BookingDetailStep> result = new ArrayList<>();
             List<Rating> ratings = new ArrayList<>();
-            if(dateRating == ""){
-                 ratings = ratingService.findAllByStatusOrderByDate(StatusRating.RATED);
+            if (dateRating == "") {
+                ratings = ratingService.findAllByStatusOrderByDate(StatusRating.RATED);
             } else {
                 ratings =
                         ratingService.findByDateAndStatus(StatusRating.RATED, Date.valueOf(dateRating));
             }
             for (Rating rating : ratings) {
                 for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                    if(rating.equals(bookingDetailStep.getRating())){
+                    if (rating.equals(bookingDetailStep.getRating())) {
                         result.add(bookingDetailStep);
                     }
                 }
             }
-            int start = (int)pageable.getOffset();
+            int start = (int) pageable.getOffset();
             int end = Math.min((start + pageable.getPageSize()), result.size());
-            Page<BookingDetailStep> page = new PageImpl<>(result.subList(start,end), pageable,result.size());
+            Page<BookingDetailStep> page = new PageImpl<>(result.subList(start, end), pageable, result.size());
             return ResponseHelper.ok(page);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
