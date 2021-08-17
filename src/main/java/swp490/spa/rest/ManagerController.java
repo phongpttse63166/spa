@@ -1337,6 +1337,13 @@ public class ManagerController {
                 bookingDetailService.findBySpaAndStatusBookingChangeStaff(spaId,
                         StatusBooking.CHANGE_STAFF);
         if (Objects.nonNull(bookingDetails)) {
+            for (BookingDetail bookingDetail : bookingDetails) {
+                List<BookingDetailStep> bookingDetailSteps =
+                        bookingDetailStepService.findByBookingDetail(bookingDetail.getId(),
+                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT,Sort.unsorted()))
+                                .getContent();
+                bookingDetail.setBookingDetailSteps(bookingDetailSteps);
+            }
             Page<BookingDetail> bookingDetailPage =
                     new PageImpl<>(bookingDetails,
                             PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()),
