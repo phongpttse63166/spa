@@ -33,4 +33,8 @@ public class RatingService {
     public List<Rating> findByDateAndStatus(StatusRating statusRating, Date date) {
         return this.ratingRepository.findByStatusRatingAndCreateTime(statusRating, date);
     }
+
+    public List<Rating> findByStatusAndExpired(StatusRating status, Date currentDate) {
+        return this.ratingRepository.findByStatusRatingAndExpireTime(status, currentDate);
+    }
 }

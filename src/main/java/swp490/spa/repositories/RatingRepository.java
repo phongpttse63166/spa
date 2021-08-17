@@ -13,4 +13,6 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
     List<Rating> findByStatusRatingOrderByCreateTimeDesc(StatusRating status);
 
     List<Rating> findByStatusRatingAndCreateTime(StatusRating statusRating, Date date);
+
+    List<Rating> findByStatusRatingAndExpireTime(StatusRating statusRating, Date date);
 }

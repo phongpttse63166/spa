@@ -549,12 +549,25 @@ public class ConsultantController {
                 Constant.BOOKING_DETAIL_STEP));
     }
 
+    @GetMapping("/spaTreatment/{spaPackageId}")
+    public Response findSpaTreatmentMoreStepBySpaPackageId(@PathVariable Integer spaPackageId) {
+        Page<SpaTreatment> spaTreatments =
+                spaTreatmentService.findByPackageId(spaPackageId, Constant.SEARCH_NO_CONTENT,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()));
+        if (Objects.nonNull(spaTreatments)) {
+            return ResponseHelper.ok(spaTreatments);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_TREATMENT));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_TREATMENT));
+        }
+    }
+
     @GetMapping("/getListTimeBookingForAddTreatment")
-    public Response getListTimeBookingForAddTreatment(@RequestParam Integer spaTreatmentId,
-                                                      @RequestParam String dateBooking,
-                                                      @RequestParam Integer customerId,
-                                                      @RequestParam Integer consultantId,
-                                                      @RequestParam Integer spaId) {
+    public Response getListTimeBookingForAddTreatmentNoChosenStaff(@RequestParam Integer spaTreatmentId,
+                                                                   @RequestParam String dateBooking,
+                                                                   @RequestParam Integer customerId,
+                                                                   @RequestParam Integer consultantId,
+                                                                   @RequestParam Integer spaId) {
         int countEmployee = 0;
         List<DateOff> dateOffs = null;
         List<Staff> staffs = null;
@@ -638,17 +651,79 @@ public class ConsultantController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
     }
 
-    @GetMapping("/spaTreatment/{spaPackageId}")
-    public Response findSpaTreatmentMoreStepBySpaPackageId(@PathVariable Integer spaPackageId) {
-        Page<SpaTreatment> spaTreatments =
-                spaTreatmentService.findByPackageId(spaPackageId, Constant.SEARCH_NO_CONTENT,
-                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()));
-        if (Objects.nonNull(spaTreatments)) {
-            return ResponseHelper.ok(spaTreatments);
+    @GetMapping("/getListTimeBookingForAddTreatmentChosenStaff")
+    public Response getListTimeBookingForAddTreatmentWithChosenStaff(@RequestParam Integer spaTreatmentId,
+                                                                     @RequestParam String dateBooking,
+                                                                     @RequestParam Integer customerId,
+                                                                     @RequestParam Integer consultantId,
+                                                                     @RequestParam Integer spaId,
+                                                                     @RequestParam Integer staffId) {
+        List<DateOff> dateOffs = null;
+        List<BookingDetailStep> bookingDetailSteps = new ArrayList<>();
+        // Get List Staff and All Booking Detail Step List
+        Consultant consultant = consultantService.findByConsultantId(consultantId);
+        Staff chosenStaff = staffService.findByStaffId(staffId);
+        SpaTreatment spaTreatment = spaTreatmentService.findByTreatmentId(spaTreatmentId);
+        if (Objects.nonNull(spaTreatment)) {
+            dateOffs = dateOffService.findByDateOffAndSpaAndStatusApprove(Date.valueOf(dateBooking),
+                    spaId);
+            if (dateOffs.size() != 0) {
+                for (DateOff dateOff : dateOffs) {
+                    if (dateOff.getEmployee().getId().equals(consultant.getUser().getId())) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.CONSULTANT_DATE_OFF,
+                                dateBooking));
+                    }
+                    if(dateOff.getEmployee().getId().equals(chosenStaff.getUser().getId())) {
+                        return ResponseHelper.ok(String.format(LoggingTemplate.STAFF_DATE_OFF,
+                                dateBooking));
+                    }
+                }
+            }
+            bookingDetailSteps =
+                    bookingDetailStepService.findByDateBookingAndStaff(Date.valueOf(dateBooking),
+                            chosenStaff.getUser().getId());
+            /*
+                Separate bookingDetailSteps into lists with incrementation time
+                and put into map
+            */
+            Map<Integer, List<BookingDetailStep>> map =
+                    supportFunctions.separateBookingDetailStepListAndPutIntoMap(bookingDetailSteps);
+            List<String> timeBookingList = null;
+            int totaltime = 0;
+            for (TreatmentService treatmentService : spaTreatment.getTreatmentServices()) {
+                if(treatmentService.getOrdinal() == 1){
+                    totaltime = treatmentService.getSpaService().getDurationMin();
+                }
+            }
+            timeBookingList =
+                    supportFunctions.getBookTime(totaltime, map, 0);
+            if (timeBookingList.size() != 0) {
+                timeBookingList =
+                        supportFunctions.checkAndGetListTimeBookingByCustomer(customerId, timeBookingList,
+                                dateBooking);
+                Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
+                Date dateCheck = Date.valueOf(LocalDate.parse(dateBooking));
+                if (currentDate.compareTo(dateCheck) == 0) {
+                    List<String> listTimeGet = new ArrayList<>();
+                    Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
+                    for (String time : timeBookingList) {
+                        Time checkTime = Time.valueOf(time);
+                        if (checkTime.compareTo(currentTime) > 0) {
+                            listTimeGet.add(time);
+                        }
+                    }
+                    timeBookingList = listTimeGet;
+                }
+                Page<String> page = new PageImpl<>(timeBookingList,
+                        PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.unsorted()),
+                        timeBookingList.size());
+                return ResponseHelper.ok(page);
+            }
+            return ResponseHelper.ok(LoggingTemplate.NO_EMPLOYEE_FREE);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_TREATMENT));
-            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA_TREATMENT));
         }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.TIME_LIST));
     }
 
     @GetMapping("/getListTimeBookingForAStep")
