@@ -7,5 +7,5 @@ import swp490.spa.entities.Role;
 import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
-    List<Notification> findByUser_IdAndRole(Integer customerId, Role role);
+    List<Notification> findByUser_IdAndRoleOrderByIdDesc(Integer customerId, Role role);
 }

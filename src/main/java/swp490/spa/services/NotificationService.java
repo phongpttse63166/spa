@@ -18,6 +18,6 @@ public class NotificationService {
     }
 
     public List<Notification> findByIdAndRole(Integer customerId, Role role) {
-        return this.notificationRepository.findByUser_IdAndRole(customerId, role);
+        return this.notificationRepository.findByUser_IdAndRoleOrderByIdDesc(customerId, role);
     }
 }
