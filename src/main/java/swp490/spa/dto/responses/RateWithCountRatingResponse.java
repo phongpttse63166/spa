@@ -8,9 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SpaSummation {
-    @JsonProperty("month")
-    private Integer month;
-    @JsonProperty("count_finish_service")
-    private Integer countFinishService;
+public class RateWithCountRatingResponse {
+    @JsonProperty("rate")
+    private Double rate;
+    @JsonProperty("count_rating")
+    private Integer countRating;
 }

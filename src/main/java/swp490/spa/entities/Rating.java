@@ -20,7 +20,7 @@ public class Rating implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "rate")
+    @Column(name = "rate", precision = 2, scale = 1)
     private Double rate;
     @Column(name = "comment", length = 65355)
     private String comment;

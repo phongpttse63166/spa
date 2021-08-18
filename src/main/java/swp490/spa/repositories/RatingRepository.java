@@ -1,6 +1,7 @@
 package swp490.spa.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import swp490.spa.entities.Rating;
 import swp490.spa.entities.StatusRating;
@@ -15,4 +16,7 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
     List<Rating> findByStatusRatingAndCreateTime(StatusRating statusRating, Date date);
 
     List<Rating> findByStatusRatingAndExpireTime(StatusRating statusRating, Date date);
+
+    @Query("FROM Rating r WHERE r.rate = ?1 AND r.bookingDetailStep.bookingDetail.booking.spa.id = ?2")
+    List<Rating> findByRateAndSpa(Double rate, Integer spaId);
 }

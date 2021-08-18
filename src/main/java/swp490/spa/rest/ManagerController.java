@@ -2044,6 +2044,61 @@ public class ManagerController {
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.RATING));
     }
 
+    @GetMapping("/countRatingByRate/{spaId}")
+    public Response countRatingByRateOfSpa(@PathVariable Integer spaId) {
+        List<RateWithCountRatingResponse> response = supportFunctions.getAllRating();
+        for (RateWithCountRatingResponse rateWithRating : response) {
+            Double rate = rateWithRating.getRate();
+            List<Rating> ratings =  ratingService.findByRateAndSpa(rate, spaId);
+            if (ratings != null) {
+                rateWithRating.setCountRating(ratings.size());
+            }
+        }
+        return ResponseHelper.ok(response);
+    }
+
+    @GetMapping("/getStaffRating/{spaId}")
+    public Response getAllStaffRatingBySpa(@PathVariable Integer spaId){
+        List<StaffRatingResponse> response = new ArrayList<>();
+        List<Staff> allStaffList =
+                staffService.findBySpaIdAndStatusAvailable(spaId);
+        if(allStaffList!=null){
+            for (Staff staff : allStaffList) {
+                StaffRatingResponse staffRatingResponse = new StaffRatingResponse();
+                staffRatingResponse.setStaff(staff);
+                response.add(staffRatingResponse);
+            }
+            for (StaffRatingResponse staffRating : response) {
+                Staff staff = staffRating.getStaff();
+                List<BookingDetailStep> bookingDetailStepsOfStaff =
+                        bookingDetailStepService.findByStatusAndStaff(staff.getUser().getId(),
+                                IsConsultation.FALSE, StatusBooking.FINISH);
+                if (bookingDetailStepsOfStaff != null) {
+                    if (bookingDetailStepsOfStaff.size() == 0) {
+                        staffRating.setAverageRateValue(0.0);
+                    } else {
+                        List<Rating> ratingList = new ArrayList<>();
+                        for (BookingDetailStep bookingDetailStep : bookingDetailStepsOfStaff) {
+                            if (bookingDetailStep.getRating() != null) {
+                                if (bookingDetailStep.getRating().getRate() != null) {
+                                    ratingList.add(bookingDetailStep.getRating());
+                                }
+                            }
+                        }
+                        double average = supportFunctions.roundRating(ratingList);
+                        staffRating.setAverageRateValue(average);
+                    }
+                }
+            }
+            response.sort(Comparator.comparingDouble(StaffRatingResponse::getAverageRateValue)
+                    .reversed());
+            return ResponseHelper.ok(response);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+        }
+        return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.STAFF));
+    }
+
     @GetMapping("/manageSpa/{spaId}")
     public Response getAllInformationOfSpa(@PathVariable Integer spaId) {
         SpaInformationResponse spaInformationResponse = new SpaInformationResponse();
@@ -2079,7 +2134,7 @@ public class ManagerController {
         List<Staff> staffList = staffService.findBySpaIdAndStatusAvailable(spaId);
         List<Consultant> consultants = consultantService.findBySpaIdAndStatusAvailable(spaId);
         if (staffList != null && consultants != null) {
-            spaInformationResponse.setCountEmployee(staffList.size()+consultants.size());
+            spaInformationResponse.setCountEmployee(staffList.size() + consultants.size());
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.EMPLOYEE));
             return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.EMPLOYEE));
@@ -2088,7 +2143,7 @@ public class ManagerController {
     }
 
     @GetMapping("/summarizeOneYear/{spaId}")
-    public Response summarizeOneYearOfSpa(@PathVariable Integer spaId){
+    public Response summarizeOneYearOfSpa(@PathVariable Integer spaId) {
         List<SpaSummation> response = new ArrayList<>();
         TreeMap<Integer, String> map = supportFunctions.getAllMonth();
         for (Map.Entry<Integer, String> entry : map.entrySet()) {
@@ -2099,8 +2154,8 @@ public class ManagerController {
                     bookingDetailStepService
                             .findByStatusBookingAndSpaIdAndIsConsultationAndFromToDate(StatusBooking.FINISH,
                                     spaId, IsConsultation.FALSE, firstDate, lastDate);
-            if(bookingDetailSteps!=null){
-                spaSummation.setCountServiceFinish(bookingDetailSteps.size());
+            if (bookingDetailSteps != null) {
+                spaSummation.setCountFinishService(bookingDetailSteps.size());
             }
             response.add(spaSummation);
         }
