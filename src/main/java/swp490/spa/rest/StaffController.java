@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import swp490.spa.dto.helper.Conversion;
 import swp490.spa.dto.helper.ResponseHelper;
-import swp490.spa.dto.requests.AccountPasswordRequest;
-import swp490.spa.dto.requests.ConfirmAStepRequest;
-import swp490.spa.dto.requests.ConsultationContentImageRequest;
-import swp490.spa.dto.requests.DateOffRequest;
+import swp490.spa.dto.requests.*;
 import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.services.*;
@@ -27,6 +24,8 @@ import swp490.spa.utils.support.SupportFunctions;
 import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -217,103 +216,115 @@ public class StaffController {
         if (Objects.nonNull(bookingDetailStep)) {
             Staff staff = staffService.findByStaffId(confirmAStepRequest.getStaffId());
             if (staff.equals(bookingDetailStep.getStaff())) {
-                ConsultationContent consultationContentGet = bookingDetailStep.getConsultationContent();
-                consultationContentGet.setResult(confirmAStepRequest.getResult());
-                if (Objects.nonNull(consultationContentService.editByConsultationContent(consultationContentGet))) {
-                    Rating rating = new Rating();
-                    rating.setStatusRating(StatusRating.WAITING);
-                    rating.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
-                    rating.setExpireTime(Date.valueOf(LocalDateTime.now().plusDays(3).toLocalDate()));
-                    rating.setCustomer(bookingDetailStep.getBookingDetail().getBooking().getCustomer());
-                    Rating ratingNew = ratingService.insertNewRating(rating);
-                    if (Objects.nonNull(ratingNew)) {
-                        bookingDetailStep.setRating(rating);
-                        bookingDetailStep.setStatusBooking(StatusBooking.FINISH);
-                        BookingDetailStep bookingDetailStepEdited =
-                                bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
-                        if (Objects.nonNull(bookingDetailStepEdited)) {
-                            int ordinal = bookingDetailStep.getTreatmentService().getOrdinal();
-                            if (ordinal == bookingDetailStep.getBookingDetail().getBookingDetailSteps().size() - 1) {
-                                checkFinishAll = true;
-                            }
+                Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
+                if(currentDate.compareTo(bookingDetailStep.getDateBooking()) == 0){
+                    Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
+                    if(currentTime.compareTo(bookingDetailStep.getEndTime()) > 0){
+                        ConsultationContent consultationContentGet = bookingDetailStep.getConsultationContent();
+                        consultationContentGet.setResult(confirmAStepRequest.getResult());
+                        if (Objects.nonNull(consultationContentService.editByConsultationContent(consultationContentGet))) {
+                            Rating rating = new Rating();
+                            rating.setStatusRating(StatusRating.WAITING);
+                            rating.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
+                            rating.setExpireTime(Date.valueOf(LocalDateTime.now().plusDays(3).toLocalDate()));
+                            rating.setCustomer(bookingDetailStep.getBookingDetail().getBooking().getCustomer());
+                            Rating ratingNew = ratingService.insertNewRating(rating);
+                            if (Objects.nonNull(ratingNew)) {
+                                bookingDetailStep.setRating(rating);
+                                bookingDetailStep.setStatusBooking(StatusBooking.FINISH);
+                                BookingDetailStep bookingDetailStepEdited =
+                                        bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
+                                if (Objects.nonNull(bookingDetailStepEdited)) {
+                                    int ordinal = bookingDetailStep.getTreatmentService().getOrdinal();
+                                    if (ordinal == bookingDetailStep.getBookingDetail().getBookingDetailSteps().size() - 1) {
+                                        checkFinishAll = true;
+                                    }
 
-                            Customer customer = bookingDetailStep.getBookingDetail().getBooking().getCustomer();
-                            Map<String, String> map = new HashMap<>();
-                            if (checkFinishAll) {
-                                BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
-                                bookingDetail.setStatusBooking(StatusBooking.FINISH);
-                                BookingDetail bookingDetailEdited =
-                                        bookingDetailService.editBookingDetail(bookingDetail);
-                                if (Objects.nonNull(bookingDetailEdited)) {
-                                    map.put(MessageTemplate.FINISH_STATUS,
-                                            MessageTemplate.FINISH_STATUS + "- bookingDetailId "
-                                                    + bookingDetailEdited.getId().toString());
-                                    if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
-                                            MessageTemplate.FINISH_ALL_MESSAGE, map,
-                                            customer.getUser().getId(), Role.CUSTOMER)) {
-                                        Notification notification = new Notification();
-                                        notification.setRole(Role.CUSTOMER);
-                                        notification.setTitle(MessageTemplate.FINISH_TITLE);
-                                        notification.setMessage(MessageTemplate.FINISH_ALL_MESSAGE);
-                                        notification.setData(map.get(MessageTemplate.FINISH_STATUS));
-                                        notification.setType(Constant.TREATMENT_FINISH_TYPE);
-                                        notification.setUser(customer.getUser());
-                                        notificationService.insertNewNotification(notification);
-                                        return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
+                                    Customer customer = bookingDetailStep.getBookingDetail().getBooking().getCustomer();
+                                    Map<String, String> map = new HashMap<>();
+                                    if (checkFinishAll) {
+                                        BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+                                        bookingDetail.setStatusBooking(StatusBooking.FINISH);
+                                        BookingDetail bookingDetailEdited =
+                                                bookingDetailService.editBookingDetail(bookingDetail);
+                                        if (Objects.nonNull(bookingDetailEdited)) {
+                                            map.put(MessageTemplate.FINISH_STATUS,
+                                                    MessageTemplate.FINISH_STATUS + "- bookingDetailId "
+                                                            + bookingDetailEdited.getId().toString());
+                                            if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
+                                                    MessageTemplate.FINISH_ALL_MESSAGE, map,
+                                                    customer.getUser().getId(), Role.CUSTOMER)) {
+                                                Notification notification = new Notification();
+                                                notification.setRole(Role.CUSTOMER);
+                                                notification.setTitle(MessageTemplate.FINISH_TITLE);
+                                                notification.setMessage(MessageTemplate.FINISH_ALL_MESSAGE);
+                                                notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                                                notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                                                notification.setUser(customer.getUser());
+                                                notificationService.insertNewNotification(notification);
+                                                return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
+                                            } else {
+                                                Notification notification = new Notification();
+                                                notification.setRole(Role.CUSTOMER);
+                                                notification.setTitle(MessageTemplate.FINISH_TITLE);
+                                                notification.setMessage(MessageTemplate.FINISH_ALL_MESSAGE);
+                                                notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                                                notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                                                notification.setUser(customer.getUser());
+                                                notificationService.insertNewNotification(notification);
+                                                return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
+                                            }
+                                        } else {
+                                            LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+                                        }
                                     } else {
-                                        Notification notification = new Notification();
-                                        notification.setRole(Role.CUSTOMER);
-                                        notification.setTitle(MessageTemplate.FINISH_TITLE);
-                                        notification.setMessage(MessageTemplate.FINISH_ALL_MESSAGE);
-                                        notification.setData(map.get(MessageTemplate.FINISH_STATUS));
-                                        notification.setType(Constant.TREATMENT_FINISH_TYPE);
-                                        notification.setUser(customer.getUser());
-                                        notificationService.insertNewNotification(notification);
-                                        return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
+                                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                                        map.put(MessageTemplate.FINISH_STATUS,
+                                                MessageTemplate.FINISH_STATUS + "- bookingDetailStepId "
+                                                        + bookingDetailStepEdited.getId().toString());
+                                        if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
+                                                String.format(MessageTemplate.FINISH_MESSAGE,
+                                                        LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                                                map, customer.getUser().getId(), Role.CUSTOMER)) {
+                                            Notification notification = new Notification();
+                                            notification.setRole(Role.CUSTOMER);
+                                            notification.setTitle(MessageTemplate.FINISH_TITLE);
+                                            notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
+                                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                                            notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                                            notification.setType(Constant.STEP_FINISH_TYPE);
+                                            notification.setUser(customer.getUser());
+                                            notificationService.insertNewNotification(notification);
+                                            return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
+                                        } else {
+                                            Notification notification = new Notification();
+                                            notification.setRole(Role.CUSTOMER);
+                                            notification.setTitle(MessageTemplate.FINISH_TITLE);
+                                            notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
+                                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                                            notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                                            notification.setType(Constant.STEP_FINISH_TYPE);
+                                            notification.setUser(customer.getUser());
+                                            notificationService.insertNewNotification(notification);
+                                            return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
+                                        }
                                     }
                                 } else {
-                                    LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
+                                    LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL_STEP));
                                 }
                             } else {
-                                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-                                map.put(MessageTemplate.FINISH_STATUS,
-                                        MessageTemplate.FINISH_STATUS + "- bookingDetailStepId "
-                                                + bookingDetailStepEdited.getId().toString());
-                                if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
-                                        String.format(MessageTemplate.FINISH_MESSAGE,
-                                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
-                                        map, customer.getUser().getId(), Role.CUSTOMER)) {
-                                    Notification notification = new Notification();
-                                    notification.setRole(Role.CUSTOMER);
-                                    notification.setTitle(MessageTemplate.FINISH_TITLE);
-                                    notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
-                                            LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
-                                    notification.setData(map.get(MessageTemplate.FINISH_STATUS));
-                                    notification.setType(Constant.STEP_FINISH_TYPE);
-                                    notification.setUser(customer.getUser());
-                                    notificationService.insertNewNotification(notification);
-                                    return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
-                                } else {
-                                    Notification notification = new Notification();
-                                    notification.setRole(Role.CUSTOMER);
-                                    notification.setTitle(MessageTemplate.FINISH_TITLE);
-                                    notification.setMessage(String.format(MessageTemplate.FINISH_MESSAGE,
-                                            LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
-                                    notification.setData(map.get(MessageTemplate.FINISH_STATUS));
-                                    notification.setType(Constant.STEP_FINISH_TYPE);
-                                    notification.setUser(customer.getUser());
-                                    notificationService.insertNewNotification(notification);
-                                    return ResponseHelper.ok(LoggingTemplate.CONFIRM_FINISH_SUCCESS);
-                                }
+                                LOGGER.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.RATING));
                             }
                         } else {
-                            LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL_STEP));
+                            LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
                         }
                     } else {
-                        LOGGER.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.RATING));
+                        LOGGER.error(LoggingTemplate.WRONG_TIME_CONFIRM);
+                        return ResponseHelper.error(LoggingTemplate.WRONG_TIME_CONFIRM);
                     }
                 } else {
-                    LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.CONSULTATION_CONTENT));
+                    LOGGER.error(LoggingTemplate.WRONG_TIME_CONFIRM);
+                    return ResponseHelper.error(LoggingTemplate.WRONG_TIME_CONFIRM);
                 }
             } else {
                 LOGGER.error(LoggingTemplate.WRONG_STAFF_ID);
@@ -326,73 +337,92 @@ public class StaffController {
     }
 
     @PutMapping("/bookingDetail/confirmFinishOneStep")
-    public Response confirmFinishOneStep(@RequestBody BookingDetail bookingDetailRequest) throws FirebaseMessagingException {
-        if (bookingDetailRequest.getId() != null) {
+    public Response confirmFinishOneStep(@RequestBody ConfirmOneStepRequest request) throws FirebaseMessagingException {
+        if (request.getBookingDetailId() != null) {
             BookingDetail bookingDetail =
-                    bookingDetailService.findByBookingDetailId(bookingDetailRequest.getId());
+                    bookingDetailService.findByBookingDetailId(request.getBookingDetailId());
             if (Objects.nonNull(bookingDetail)) {
-                bookingDetail.setStatusBooking(StatusBooking.FINISH);
-                List<BookingDetailStep> bookingDetailSteps = bookingDetail.getBookingDetailSteps();
-                Rating rating = new Rating();
-                rating.setStatusRating(StatusRating.WAITING);
-                rating.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
-                rating.setExpireTime(Date.valueOf(LocalDateTime.now().plusDays(3).toLocalDate()));
-                rating.setCustomer(bookingDetail.getBooking().getCustomer());
-                rating.setBookingDetailStep(bookingDetailSteps.get(0));
-                Rating ratingNew = ratingService.insertNewRating(rating);
-                if (Objects.nonNull(ratingNew)) {
-                    for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
-                        if (bookingDetailStep.equals(bookingDetailSteps.get(0))) {
-                            bookingDetailStep.setRating(ratingNew);
-                        }
-                        bookingDetailStep.setStatusBooking(StatusBooking.FINISH);
-                    }
-                    bookingDetail.setBookingDetailSteps(bookingDetailSteps);
-                    BookingDetail bookingDetailResult =
-                            bookingDetailService.editBookingDetail(bookingDetail);
-                    if (Objects.nonNull(bookingDetailResult)) {
-                        Booking booking = bookingDetailResult.getBooking();
-                        if (booking.getBookingDetails().size() == 1) {
-                            booking.setStatusBooking(StatusBooking.FINISH);
-                            bookingService.editBooking(booking);
-                        }
-                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-                        Customer customer = bookingDetailResult.getBooking().getCustomer();
-                        Map<String, String> map = new HashMap<>();
-                        map.put(MessageTemplate.FINISH_STATUS,
-                                MessageTemplate.FINISH_STATUS + "- bookingDetailId "
-                                        + bookingDetailResult.getId());
-                        if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
-                                String.format(MessageTemplate.FINISH_MESSAGE,
-                                        LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
-                                map, customer.getUser().getId(), Role.CUSTOMER)) {
-                            Notification notification = new Notification();
-                            notification.setRole(Role.CUSTOMER);
-                            notification.setTitle(MessageTemplate.FINISH_ALL_MESSAGE);
-                            notification.setMessage(String.format(MessageTemplate.FINISH_ALL_MESSAGE,
-                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
-                            notification.setData(map.get(MessageTemplate.FINISH_STATUS));
-                            notification.setType(Constant.TREATMENT_FINISH_TYPE);
-                            notification.setUser(customer.getUser());
-                            notificationService.insertNewNotification(notification);
-                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
-                                    Constant.BOOKING_DETAIL_TREATMENT));
+                Staff staff = staffService.findByStaffId(request.getStaffId());
+                if(staff.equals(bookingDetail.getBookingDetailSteps().get(0).getStaff())){
+                    Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
+                    if(currentDate.compareTo(bookingDetail.getBookingDetailSteps().get(0).getDateBooking()) == 0) {
+                        Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
+                        if (currentTime.compareTo(bookingDetail.getBookingDetailSteps()
+                                .get(bookingDetail.getBookingDetailSteps().size() - 1).getEndTime()) > 0) {
+                            bookingDetail.setStatusBooking(StatusBooking.FINISH);
+                            List<BookingDetailStep> bookingDetailSteps = bookingDetail.getBookingDetailSteps();
+                            Rating rating = new Rating();
+                            rating.setStatusRating(StatusRating.WAITING);
+                            rating.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
+                            rating.setExpireTime(Date.valueOf(LocalDateTime.now().plusDays(3).toLocalDate()));
+                            rating.setCustomer(bookingDetail.getBooking().getCustomer());
+                            rating.setBookingDetailStep(bookingDetailSteps.get(0));
+                            Rating ratingNew = ratingService.insertNewRating(rating);
+                            if (Objects.nonNull(ratingNew)) {
+                                for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                                    if (bookingDetailStep.equals(bookingDetailSteps.get(0))) {
+                                        bookingDetailStep.setRating(ratingNew);
+                                    }
+                                    bookingDetailStep.setStatusBooking(StatusBooking.FINISH);
+                                }
+                                bookingDetail.setBookingDetailSteps(bookingDetailSteps);
+                                BookingDetail bookingDetailResult =
+                                        bookingDetailService.editBookingDetail(bookingDetail);
+                                if (Objects.nonNull(bookingDetailResult)) {
+                                    Booking booking = bookingDetailResult.getBooking();
+                                    if (booking.getBookingDetails().size() == 1) {
+                                        booking.setStatusBooking(StatusBooking.FINISH);
+                                        bookingService.editBooking(booking);
+                                    }
+                                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                                    Customer customer = bookingDetailResult.getBooking().getCustomer();
+                                    Map<String, String> map = new HashMap<>();
+                                    map.put(MessageTemplate.FINISH_STATUS,
+                                            MessageTemplate.FINISH_STATUS + "- bookingDetailId "
+                                                    + bookingDetailResult.getId());
+                                    if (notificationFireBaseService.notify(MessageTemplate.FINISH_TITLE,
+                                            String.format(MessageTemplate.FINISH_MESSAGE,
+                                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                                            map, customer.getUser().getId(), Role.CUSTOMER)) {
+                                        Notification notification = new Notification();
+                                        notification.setRole(Role.CUSTOMER);
+                                        notification.setTitle(MessageTemplate.FINISH_ALL_MESSAGE);
+                                        notification.setMessage(String.format(MessageTemplate.FINISH_ALL_MESSAGE,
+                                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                                        notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                                        notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                                        notification.setUser(customer.getUser());
+                                        notificationService.insertNewNotification(notification);
+                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
+                                                Constant.BOOKING_DETAIL_TREATMENT));
+                                    } else {
+                                        Notification notification = new Notification();
+                                        notification.setRole(Role.CUSTOMER);
+                                        notification.setTitle(MessageTemplate.FINISH_ALL_MESSAGE);
+                                        notification.setMessage(String.format(MessageTemplate.FINISH_ALL_MESSAGE,
+                                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
+                                        notification.setData(map.get(MessageTemplate.FINISH_STATUS));
+                                        notification.setType(Constant.TREATMENT_FINISH_TYPE);
+                                        notification.setUser(customer.getUser());
+                                        notificationService.insertNewNotification(notification);
+                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
+                                                Constant.BOOKING_DETAIL_TREATMENT));
+                                    }
+                                }
+                            } else {
+                                LOGGER.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.RATING));
+                            }
                         } else {
-                            Notification notification = new Notification();
-                            notification.setRole(Role.CUSTOMER);
-                            notification.setTitle(MessageTemplate.FINISH_ALL_MESSAGE);
-                            notification.setMessage(String.format(MessageTemplate.FINISH_ALL_MESSAGE,
-                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
-                            notification.setData(map.get(MessageTemplate.FINISH_STATUS));
-                            notification.setType(Constant.TREATMENT_FINISH_TYPE);
-                            notification.setUser(customer.getUser());
-                            notificationService.insertNewNotification(notification);
-                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS,
-                                    Constant.BOOKING_DETAIL_TREATMENT));
+                            LOGGER.error(LoggingTemplate.WRONG_TIME_CONFIRM);
+                            return ResponseHelper.error(LoggingTemplate.WRONG_TIME_CONFIRM);
                         }
+                    } else {
+                        LOGGER.error(LoggingTemplate.WRONG_TIME_CONFIRM);
+                        return ResponseHelper.error(LoggingTemplate.WRONG_TIME_CONFIRM);
                     }
                 } else {
-                    LOGGER.error(String.format(LoggingTemplate.INSERT_FAILED, Constant.RATING));
+                    LOGGER.error(LoggingTemplate.WRONG_STAFF_ID);
+                    return ResponseHelper.error(LoggingTemplate.WRONG_STAFF_ID);
                 }
             } else {
                 LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));

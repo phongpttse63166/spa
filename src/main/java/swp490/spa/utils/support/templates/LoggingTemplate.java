@@ -48,4 +48,5 @@ public class LoggingTemplate {
     public static final String WRONG_STAFF_ID = "Không có thẩm quyền để thực hiện";
     public static final String DATE_OFF_REGISTERED = "Ngày đã đăng kí nghỉ";
 
+    public static final String WRONG_TIME_CONFIRM = "Chưa đến thời gian xác nhận hoàn thành";
 }
