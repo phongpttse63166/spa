@@ -16,7 +16,4 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
     List<Rating> findByStatusRatingAndCreateTime(StatusRating statusRating, Date date);
 
     List<Rating> findByStatusRatingAndExpireTime(StatusRating statusRating, Date date);
-
-    @Query("FROM Rating r WHERE r.rate = ?1 AND r.bookingDetailStep.bookingDetail.booking.spa.id = ?2")
-    List<Rating> findByRateAndSpa(Integer rate, Integer spaId);
 }

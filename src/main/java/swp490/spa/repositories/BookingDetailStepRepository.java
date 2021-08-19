@@ -122,4 +122,8 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                                       IsConsultation isConsultation,
                                                                                       Date firstDate,
                                                                                       Date lastDate);
+
+    @Query("FROM BookingDetailStep b WHERE b.bookingDetail.booking.spa.id = ?1 " +
+            "AND NOT(b.rating.id IS NULL)")
+    List<BookingDetailStep> findBySpaAndRatingNotNull(Integer spaId);
 }

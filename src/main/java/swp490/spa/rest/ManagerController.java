@@ -2047,12 +2047,20 @@ public class ManagerController {
     @GetMapping("/countRatingByRate/{spaId}")
     public Response countRatingByRateOfSpa(@PathVariable Integer spaId) {
         List<RateWithCountRatingResponse> response = supportFunctions.getAllRating();
+        List<BookingDetailStep> bookingDetailSteps =
+                bookingDetailStepService.findBySpaAndRatingNotNull(spaId);
         for (RateWithCountRatingResponse rateWithRating : response) {
             Integer rate = rateWithRating.getRate();
-            List<Rating> ratings =  ratingService.findByRateAndSpa(rate, spaId);
-            if (ratings != null) {
-                rateWithRating.setCountRating(ratings.size());
+            Integer count = 0;
+            for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
+                Rating rating = bookingDetailStep.getRating();
+                if(rating.getStatusRating().equals(StatusRating.RATED)){
+                    if(rating.getRate().equals(rate)){
+                        count++;
+                    }
+                }
             }
+            rateWithRating.setCountRating(count);
         }
         return ResponseHelper.ok(response);
     }

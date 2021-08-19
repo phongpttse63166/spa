@@ -166,4 +166,8 @@ public class BookingDetailStepService {
                                                                                              Date lastDate) {
         return this.bookingDetailStepRepository.findByStatusBookingAndSpaIdAndIsConsultationAndFromToDate(status,spaId,isConsultation,firstDate,lastDate);
     }
+
+    public List<BookingDetailStep> findBySpaAndRatingNotNull(Integer spaId) {
+        return this.bookingDetailStepRepository.findBySpaAndRatingNotNull(spaId);
+    }
 }
