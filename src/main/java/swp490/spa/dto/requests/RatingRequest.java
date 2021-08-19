@@ -11,5 +11,5 @@ public class RatingRequest {
     private Integer staffId;
     private Integer ratingId;
     private String comment;
-    private Double rate;
+    private Integer rate;
 }

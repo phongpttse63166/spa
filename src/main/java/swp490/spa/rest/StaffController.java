@@ -219,7 +219,8 @@ public class StaffController {
                 Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
                 if(currentDate.compareTo(bookingDetailStep.getDateBooking()) == 0){
                     Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
-                    if(currentTime.compareTo(bookingDetailStep.getEndTime()) > 0){
+                    Time confirmTime = Time.valueOf(bookingDetailStep.getStartTime().toLocalTime().plusMinutes(15));
+                    if(currentTime.compareTo(confirmTime) > 0){
                         ConsultationContent consultationContentGet = bookingDetailStep.getConsultationContent();
                         consultationContentGet.setResult(confirmAStepRequest.getResult());
                         if (Objects.nonNull(consultationContentService.editByConsultationContent(consultationContentGet))) {
@@ -347,8 +348,11 @@ public class StaffController {
                     Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
                     if(currentDate.compareTo(bookingDetail.getBookingDetailSteps().get(0).getDateBooking()) == 0) {
                         Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
-                        if (currentTime.compareTo(bookingDetail.getBookingDetailSteps()
-                                .get(bookingDetail.getBookingDetailSteps().size() - 1).getEndTime()) > 0) {
+                        Time confirmTime =
+                                Time.valueOf(bookingDetail.getBookingDetailSteps()
+                                        .get(bookingDetail.getBookingDetailSteps().size() - 1).getStartTime()
+                                        .toLocalTime().plusMinutes(15));
+                        if(currentTime.compareTo(confirmTime) > 0){
                             bookingDetail.setStatusBooking(StatusBooking.FINISH);
                             List<BookingDetailStep> bookingDetailSteps = bookingDetail.getBookingDetailSteps();
                             Rating rating = new Rating();

@@ -18,7 +18,7 @@ public class RatingResponse {
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("rate")
-    private Double rate;
+    private Integer rate;
     @JsonProperty("comment")
     private String comment;
     @JsonProperty("create_time")
