@@ -765,16 +765,11 @@ public class SupportFunctions {
 
     public List<RateWithCountRatingResponse> getAllRating() {
         List<RateWithCountRatingResponse> result = new ArrayList<>();
-        result.add(new RateWithCountRatingResponse(Double.parseDouble("5"),0));
-        result.add(new RateWithCountRatingResponse(4.5,0));
-        result.add(new RateWithCountRatingResponse(Double.parseDouble("4"),0));
-        result.add(new RateWithCountRatingResponse(3.5,0));
-        result.add(new RateWithCountRatingResponse(Double.parseDouble("3"),0));
-        result.add(new RateWithCountRatingResponse(2.5,0));
-        result.add(new RateWithCountRatingResponse(Double.parseDouble("2"),0));
-        result.add(new RateWithCountRatingResponse(1.5,0));
-        result.add(new RateWithCountRatingResponse(Double.parseDouble("1"),0));
-        result.add(new RateWithCountRatingResponse(0.5,0));
+        result.add(new RateWithCountRatingResponse(Constant.RATE_5,0));
+        result.add(new RateWithCountRatingResponse(Constant.RATE_4,0));
+        result.add(new RateWithCountRatingResponse(Constant.RATE_3,0));
+        result.add(new RateWithCountRatingResponse(Constant.RATE_2,0));
+        result.add(new RateWithCountRatingResponse(Constant.RATE_1,0));
         return result;
     }
 }

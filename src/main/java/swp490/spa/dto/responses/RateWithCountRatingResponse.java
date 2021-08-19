@@ -10,7 +10,7 @@ import lombok.*;
 @Setter
 public class RateWithCountRatingResponse {
     @JsonProperty("rate")
-    private Double rate;
+    private Integer rate;
     @JsonProperty("count_rating")
     private Integer countRating;
 }

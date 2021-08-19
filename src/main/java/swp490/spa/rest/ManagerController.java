@@ -2048,7 +2048,7 @@ public class ManagerController {
     public Response countRatingByRateOfSpa(@PathVariable Integer spaId) {
         List<RateWithCountRatingResponse> response = supportFunctions.getAllRating();
         for (RateWithCountRatingResponse rateWithRating : response) {
-            Double rate = rateWithRating.getRate();
+            Integer rate = rateWithRating.getRate();
             List<Rating> ratings =  ratingService.findByRateAndSpa(rate, spaId);
             if (ratings != null) {
                 rateWithRating.setCountRating(ratings.size());

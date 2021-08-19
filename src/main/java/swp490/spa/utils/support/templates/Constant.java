@@ -113,4 +113,11 @@ public class Constant {
     public static final Integer DECEMBER = 12;
     public static final String FIRST_DATE_DECEMBER = "-12-01";
     public static final String LAST_DATE_DECEMBER = "-12-31";
+
+    // Level_Rating
+    public static final Integer RATE_5 = 5;
+    public static final Integer RATE_4 = 4;
+    public static final Integer RATE_3 = 3;
+    public static final Integer RATE_2 = 2;
+    public static final Integer RATE_1 = 1;
 }
