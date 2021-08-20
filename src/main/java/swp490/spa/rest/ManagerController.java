@@ -2169,4 +2169,15 @@ public class ManagerController {
         }
         return ResponseHelper.ok(response);
     }
+
+    @GetMapping("/spa/getInfo/{spaId}")
+    public Response getSpaInformation(@PathVariable Integer spaId){
+        Spa spa = spaService.findById(spaId);
+        if(spa!=null){
+            return ResponseHelper.ok(spa);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
+        }
+    }
 }
