@@ -350,7 +350,7 @@ public class StaffController {
                         Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
                         Time confirmTime =
                                 Time.valueOf(bookingDetail.getBookingDetailSteps()
-                                        .get(bookingDetail.getBookingDetailSteps().size() - 1).getStartTime()
+                                        .get(0).getStartTime()
                                         .toLocalTime().plusMinutes(15));
                         if(currentTime.compareTo(confirmTime) > 0){
                             bookingDetail.setStatusBooking(StatusBooking.FINISH);

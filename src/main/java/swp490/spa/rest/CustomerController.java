@@ -806,4 +806,30 @@ public class CustomerController {
         }
         return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
     }
+
+    @GetMapping("/bookingDetailFinishTypeMoreStep/getAll/{customerId}")
+    public Response getAllBookingDetailFinishTypeMoreStep(@PathVariable Integer customerId){
+        List<BookingDetail> bookingDetails =
+                bookingDetailService.findByCustomerAndTypeAndStatus(customerId,
+                        Type.MORESTEP, StatusBooking.FINISH);
+        if(bookingDetails!=null){
+            return ResponseHelper.ok(bookingDetails);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+    }
+
+    @GetMapping("/bookingDetailFinishTypeOneStep/getAll/{customerId}")
+    public Response getAllBookingDetailFinishTypeOneStep(@PathVariable Integer customerId){
+        List<BookingDetail> bookingDetails =
+                bookingDetailService.findByCustomerAndTypeAndStatus(customerId,
+                        Type.ONESTEP, StatusBooking.FINISH);
+        if(bookingDetails!=null){
+            return ResponseHelper.ok(bookingDetails);
+        } else {
+            LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+            return ResponseHelper.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL));
+        }
+    }
 }

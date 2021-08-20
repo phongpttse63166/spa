@@ -59,4 +59,12 @@ public class BookingDetailService {
     public List<BookingDetail> findBySpa(Integer spaId) {
         return this.bookingDetailRepository.findByBooking_Spa_Id(spaId);
     }
+
+    public List<BookingDetail> findByCustomerAndTypeAndStatus(Integer customerId,
+                                                              Type type,
+                                                              StatusBooking status) {
+        return this.bookingDetailRepository
+                .findByBooking_Customer_User_IdAndTypeAndStatusBookingOrderByIdDesc(customerId,
+                        type,status);
+    }
 }
