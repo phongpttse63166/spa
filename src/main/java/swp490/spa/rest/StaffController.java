@@ -238,6 +238,8 @@ public class StaffController {
                                         bookingDetailStepService.editBookingDetailStep(bookingDetailStep);
                                 if (Objects.nonNull(bookingDetailStepEdited)) {
                                     int ordinal = bookingDetailStep.getTreatmentService().getOrdinal();
+                                    bookingDetailStep.getBookingDetail().getBookingDetailSteps()
+                                            .sort(Comparator.comparing(BookingDetailStep::getId));
                                     if (ordinal == bookingDetailStep.getBookingDetail().getBookingDetailSteps().size() - 1) {
                                         checkFinishAll = true;
                                     }
