@@ -49,4 +49,6 @@ public class LoggingTemplate {
     public static final String DATE_OFF_REGISTERED = "Ngày đã đăng kí nghỉ";
 
     public static final String WRONG_TIME_CONFIRM = "Chưa đến thời gian xác nhận hoàn thành";
+    public static final String CANNOT_REQUEST_CHANGE_STAFF = "Không thể yêu cầu đổi staff vì step trước " +
+            "chưa hoàn thành";
 }

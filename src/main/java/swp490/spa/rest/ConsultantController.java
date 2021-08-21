@@ -800,28 +800,41 @@ public class ConsultantController {
         BookingDetailStep bookingDetailStep =
                 bookingDetailStepService.findById(requestChangeStaff.getId());
         if (Objects.nonNull(bookingDetailStep)) {
-            bookingDetailStep.setReason(Constant.CHANGE_STAFF_STATUS_REASON + "-" +
-                    requestChangeStaff.getReason());
-            bookingDetailStep.setStatusBooking(StatusBooking.CHANGE_STAFF);
-            BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
-            bookingDetail.setStatusBooking(StatusBooking.CHANGE_STAFF);
-            if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep)) &&
-                    Objects.nonNull(bookingDetailService.editBookingDetail(bookingDetail))) {
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-                List<Manager> managers =
-                        managerService.findManagerBySpaAndStatusAvailable(bookingDetail.getBooking().getSpa().getId());
-                Map<String, String> map = new HashMap<>();
-                map.put(MessageTemplate.CHANGE_STAFF_STATUS,
-                        MessageTemplate.CHANGE_STAFF_STATUS + "- bookingDetailId "
-                                + bookingDetail.getId().toString());
-                if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
-                        String.format(MessageTemplate.CHANGE_STAFF_MESSAGE,
-                                LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
-                        map, managers.get(0).getUser().getId(), Role.MANAGER)) {
-                    return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
-                } else {
-                    return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
+            List<BookingDetailStep> bookingDetailSteps = bookingDetailStep.getBookingDetail().getBookingDetailSteps();
+            bookingDetailSteps.sort(Comparator.comparing(BookingDetailStep::getId));
+            int pos = 0;
+            for (int i = 1; i < bookingDetailSteps.size(); i++) {
+                if(bookingDetailStep.equals(bookingDetailSteps.get(i))){
+                    pos = i-1;
                 }
+            }
+            if(bookingDetailSteps.get(pos).getStatusBooking().equals(StatusBooking.FINISH)){
+                bookingDetailStep.setReason(Constant.CHANGE_STAFF_STATUS_REASON + "-" +
+                        requestChangeStaff.getReason());
+                bookingDetailStep.setStatusBooking(StatusBooking.CHANGE_STAFF);
+                BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
+                bookingDetail.setStatusBooking(StatusBooking.CHANGE_STAFF);
+                if (Objects.nonNull(bookingDetailStepService.editBookingDetailStep(bookingDetailStep)) &&
+                        Objects.nonNull(bookingDetailService.editBookingDetail(bookingDetail))) {
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+                    List<Manager> managers =
+                            managerService.findManagerBySpaAndStatusAvailable(bookingDetail.getBooking().getSpa().getId());
+                    Map<String, String> map = new HashMap<>();
+                    map.put(MessageTemplate.CHANGE_STAFF_STATUS,
+                            MessageTemplate.CHANGE_STAFF_STATUS + "- bookingDetailId "
+                                    + bookingDetail.getId().toString());
+                    if (notificationFireBaseService.notify(MessageTemplate.CHANGE_STAFF_TITLE,
+                            String.format(MessageTemplate.CHANGE_STAFF_MESSAGE,
+                                    LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)),
+                            map, managers.get(0).getUser().getId(), Role.MANAGER)) {
+                        return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
+                    } else {
+                        return ResponseHelper.ok(LoggingTemplate.REQUEST_CHANGE_STAFF_SUCCESS);
+                    }
+                }
+            } else {
+                LOGGER.error(LoggingTemplate.CANNOT_REQUEST_CHANGE_STAFF);
+                return ResponseHelper.error(LoggingTemplate.CANNOT_REQUEST_CHANGE_STAFF);
             }
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.BOOKING_DETAIL_STEP));

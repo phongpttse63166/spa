@@ -1437,7 +1437,7 @@ public class ManagerController {
                     bookingDetailStepEdit.add(bookingDetailStep);
                 }
                 bookingDetail.setBookingDetailSteps(bookingDetailStepEdit);
-                bookingDetail.setStatusBooking(StatusBooking.BOOKING);
+                bookingDetail.setStatusBooking(StatusBooking.PENDING);
                 bookingDetailService.editBookingDetail(bookingDetail);
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Customer customer = bookingDetail.getBooking().getCustomer();
