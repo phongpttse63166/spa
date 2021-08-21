@@ -187,7 +187,7 @@ public class StaffController {
                         bookingDetails.add(bookingDetailStep.getBookingDetail());
                     } else {
                         BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
-                        if(!supportFunctions.checkBookingDetailExistedInList(bookingDetail,bookingDetails)){
+                        if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)) {
                             result.add(bookingDetailStep);
                             bookingDetails.add(bookingDetailStep.getBookingDetail());
                         }
@@ -217,10 +217,11 @@ public class StaffController {
             Staff staff = staffService.findByStaffId(confirmAStepRequest.getStaffId());
             if (staff.equals(bookingDetailStep.getStaff())) {
                 Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
-                if(currentDate.compareTo(bookingDetailStep.getDateBooking()) == 0){
+                if (currentDate.compareTo(bookingDetailStep.getDateBooking()) == 0 ||
+                        currentDate.compareTo(bookingDetailStep.getDateBooking()) == 1) {
                     Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
                     Time confirmTime = Time.valueOf(bookingDetailStep.getStartTime().toLocalTime().plusMinutes(15));
-                    if(currentTime.compareTo(confirmTime) > 0){
+                    if (currentTime.compareTo(confirmTime) > 0) {
                         ConsultationContent consultationContentGet = bookingDetailStep.getConsultationContent();
                         consultationContentGet.setResult(confirmAStepRequest.getResult());
                         if (Objects.nonNull(consultationContentService.editByConsultationContent(consultationContentGet))) {
@@ -344,15 +345,16 @@ public class StaffController {
                     bookingDetailService.findByBookingDetailId(request.getBookingDetailId());
             if (Objects.nonNull(bookingDetail)) {
                 Staff staff = staffService.findByStaffId(request.getStaffId());
-                if(staff.equals(bookingDetail.getBookingDetailSteps().get(0).getStaff())){
+                if (staff.equals(bookingDetail.getBookingDetailSteps().get(0).getStaff())) {
                     Date currentDate = Date.valueOf(LocalDate.now(ZoneId.of(Constant.ZONE_ID)));
-                    if(currentDate.compareTo(bookingDetail.getBookingDetailSteps().get(0).getDateBooking()) == 0) {
+                    if (currentDate.compareTo(bookingDetail.getBookingDetailSteps().get(0).getDateBooking()) == 0 ||
+                            currentDate.compareTo(bookingDetail.getBookingDetailSteps().get(0).getDateBooking()) == 1) {
                         Time currentTime = Time.valueOf(LocalTime.now(ZoneId.of(Constant.ZONE_ID)));
                         Time confirmTime =
                                 Time.valueOf(bookingDetail.getBookingDetailSteps()
                                         .get(0).getStartTime()
                                         .toLocalTime().plusMinutes(15));
-                        if(currentTime.compareTo(confirmTime) > 0){
+                        if (currentTime.compareTo(confirmTime) > 0) {
                             bookingDetail.setStatusBooking(StatusBooking.FINISH);
                             List<BookingDetailStep> bookingDetailSteps = bookingDetail.getBookingDetailSteps();
                             Rating rating = new Rating();
@@ -390,7 +392,7 @@ public class StaffController {
                                             map, customer.getUser().getId(), Role.CUSTOMER)) {
                                         Notification notification = new Notification();
                                         notification.setRole(Role.CUSTOMER);
-                                        notification.setTitle(MessageTemplate.FINISH_ALL_MESSAGE);
+                                        notification.setTitle(MessageTemplate.FINISH_TITLE);
                                         notification.setMessage(String.format(MessageTemplate.FINISH_ALL_MESSAGE,
                                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                                         notification.setData(map.get(MessageTemplate.FINISH_STATUS));
@@ -402,7 +404,7 @@ public class StaffController {
                                     } else {
                                         Notification notification = new Notification();
                                         notification.setRole(Role.CUSTOMER);
-                                        notification.setTitle(MessageTemplate.FINISH_ALL_MESSAGE);
+                                        notification.setTitle(MessageTemplate.FINISH_TITLE);
                                         notification.setMessage(String.format(MessageTemplate.FINISH_ALL_MESSAGE,
                                                 LocalTime.now(ZoneId.of(Constant.ZONE_ID)).format(dtf)));
                                         notification.setData(map.get(MessageTemplate.FINISH_STATUS));
@@ -493,14 +495,14 @@ public class StaffController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response uploadImageBefore(ConsultationContentImageRequest request) {
-        if(request.getConsultationContentId() == null || request.getFile() == null){
+        if (request.getConsultationContentId() == null || request.getFile() == null) {
             LOGGER.error(LoggingTemplate.DATA_MISSING);
             return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
         } else {
             ConsultationContent consultationContent =
                     consultationContentService
                             .findByConsultationContentId(request.getConsultationContentId());
-            if(Objects.nonNull(consultationContent)){
+            if (Objects.nonNull(consultationContent)) {
                 String imageLink = UploadImage.uploadImage(request.getFile());
                 if (imageLink != "") {
                     consultationContent.setImageBefore(imageLink);
@@ -524,14 +526,14 @@ public class StaffController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public Response uploadImageAfter(ConsultationContentImageRequest request) {
-        if(request.getConsultationContentId() == null || request.getFile() == null){
+        if (request.getConsultationContentId() == null || request.getFile() == null) {
             LOGGER.error(LoggingTemplate.DATA_MISSING);
             return ResponseHelper.error(LoggingTemplate.DATA_MISSING);
         } else {
             ConsultationContent consultationContent =
                     consultationContentService
                             .findByConsultationContentId(request.getConsultationContentId());
-            if(Objects.nonNull(consultationContent)){
+            if (Objects.nonNull(consultationContent)) {
                 String imageLink = UploadImage.uploadImage(request.getFile());
                 if (imageLink != "") {
                     consultationContent.setImageAfter(imageLink);

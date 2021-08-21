@@ -780,6 +780,9 @@ public class CustomerController {
                     }
                 }
             }
+            for (ScheduleBookingResponse sbr : scheduleBookingResponses) {
+                sbr.getBookingDetailSteps().sort(Comparator.comparing(BookingDetailStep::getStartTime));
+            }
             Page<ScheduleBookingResponse> page =
                     new PageImpl<>(scheduleBookingResponses,
                             PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_MAX, Sort.by("dateBooking")),

@@ -21,6 +21,10 @@ public class Constant {
     public static final String FILE_JSON = "testuploadimgae-firebase-adminsdk-tpl07-8b469b8252.json";
     public static final String STORAGE_BUCKET = "testuploadimgae.appspot.com";
     public static final String DATABASE_URL = "https://testuploadimgae-default-rtdb.asia-southeast1.firebasedatabase.app/";
+    // Setting send OTP & Password
+    public static final String ACCOUNT_SID = "AC09e33d1014c54d9dbc2f302ca6bc3ff1";
+    public static final String AUTH_TOKEN = "68486189aea6416e9d9b5ac66cef11eb";
+    public static final String PHONE_SERVICE = "+14062047088";
     // Properties
     public static final Integer TOTAL_TIME_DEFAULT = 0;
     public static final int PASSWORD_LENGTH = 12;
