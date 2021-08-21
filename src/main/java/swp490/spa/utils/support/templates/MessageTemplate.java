@@ -54,4 +54,7 @@ public class MessageTemplate {
     public static final String CANCEL_DATE_OFF_TITLE = "Không chấp nhận đơn xin nghỉ";
     public static final String CANCEL_DATE_OFF_MESSAGE = "Đơn xin nghỉ đã không được chấp nhận. Xin liên" +
             "hệ quản lý để biết thêm chi tiết";
+
+    public static final String PHONE_MESSAGE_OTP = "Mã OTP của bạn là ";
+    public static final String PHONE_MESSAGE_PASSWORD = "Mật khẩu của bạn là ";
 }

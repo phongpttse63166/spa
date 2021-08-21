@@ -17,6 +17,7 @@ import swp490.spa.dto.support.Response;
 import swp490.spa.entities.*;
 import swp490.spa.entities.SpaService;
 import swp490.spa.services.*;
+import swp490.spa.utils.support.phoneMessage.ResponseGetAccessToken;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.templates.LoggingTemplate;
 import swp490.spa.utils.support.SupportFunctions;
@@ -74,6 +75,7 @@ public class ManagerController {
     private RatingService ratingService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
+    private PhoneMessageService phoneMessageService;
 
     public ManagerController(ManagerService managerService, SpaServiceService spaServiceService,
                              SpaPackageService spaPackageService, SpaTreatmentService spaTreatmentService,
@@ -105,6 +107,7 @@ public class ManagerController {
         this.notificationService = notificationService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions();
+        this.phoneMessageService = new PhoneMessageService();
     }
 
     @GetMapping("/spaPackage/findByStatus")
@@ -703,6 +706,14 @@ public class ManagerController {
                             staff.setStatus(Status.AVAILABLE);
                             Staff staffResult = staffService.insertNewStaff(staff);
                             if (Objects.nonNull(staffResult)) {
+                                phoneMessageService
+                                        .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
+                                                user.getPhone());
+                                ResponseGetAccessToken responseGetAccessToken =
+                                        phoneMessageService.setResponseGetAccessToken();
+                                phoneMessageService.sendMessageZalo(Constant.RECEIVER_EMPLOYEE_ID,
+                                        MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
+                                        responseGetAccessToken.getAccess_token());
                                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                             }
                         } else {
@@ -712,6 +723,14 @@ public class ManagerController {
                             consultant.setStatus(Status.AVAILABLE);
                             Consultant consultantResult = consultantService.insertNewConsultant(consultant);
                             if (Objects.nonNull(consultantResult)) {
+                                phoneMessageService
+                                        .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
+                                                user.getPhone());
+                                ResponseGetAccessToken responseGetAccessToken =
+                                        phoneMessageService.setResponseGetAccessToken();
+                                phoneMessageService.sendMessageZalo(Constant.RECEIVER_EMPLOYEE_ID,
+                                        MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
+                                        responseGetAccessToken.getAccess_token());
                                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                             }
                         }
@@ -733,6 +752,14 @@ public class ManagerController {
                         staff.setStatus(Status.AVAILABLE);
                         Staff staffResult = staffService.insertNewStaff(staff);
                         if (Objects.nonNull(staffResult)) {
+                            phoneMessageService
+                                    .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
+                                            user.getPhone());
+                            ResponseGetAccessToken responseGetAccessToken =
+                                    phoneMessageService.setResponseGetAccessToken();
+                            phoneMessageService.sendMessageZalo(Constant.RECEIVER_EMPLOYEE_ID,
+                                    MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
+                                    responseGetAccessToken.getAccess_token());
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                         }
                     }
@@ -752,6 +779,14 @@ public class ManagerController {
                         consultant.setStatus(Status.AVAILABLE);
                         Consultant consultantResult = consultantService.insertNewConsultant(consultant);
                         if (Objects.nonNull(consultantResult)) {
+                            phoneMessageService
+                                    .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
+                                            user.getPhone());
+                            ResponseGetAccessToken responseGetAccessToken =
+                                    phoneMessageService.setResponseGetAccessToken();
+                            phoneMessageService.sendMessageZalo(Constant.RECEIVER_EMPLOYEE_ID,
+                                    MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
+                                    responseGetAccessToken.getAccess_token());
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                         }
                     }

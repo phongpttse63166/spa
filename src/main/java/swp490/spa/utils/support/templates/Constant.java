@@ -22,9 +22,16 @@ public class Constant {
     public static final String STORAGE_BUCKET = "testuploadimgae.appspot.com";
     public static final String DATABASE_URL = "https://testuploadimgae-default-rtdb.asia-southeast1.firebasedatabase.app/";
     // Setting send OTP & Password
+    public static final String RECEIVER_EMPLOYEE_ID = "1942478711700648091";
+    public static final String RECEIVER_CUSTOMER_ID = "4079618529664678643";
     public static final String ACCOUNT_SID = "AC09e33d1014c54d9dbc2f302ca6bc3ff1";
     public static final String AUTH_TOKEN = "68486189aea6416e9d9b5ac66cef11eb";
     public static final String PHONE_SERVICE = "+14062047088";
+    public static final String ZALO_URL = "https://graph.zalo.me/v2.0/me";
+    public static final String ZALO_OAUTH_URL = "https://oauth.zaloapp.com/v3";
+    public final static String APP_ID = "1383309215977390719";
+    public final static String APP_SECRET = "h3NeAfGT2FmZ63ATALDu";
+    public final static String CODE = "p3QTtRotGGEw9QVfYCDK5F1acTdCxbWjkcJbtiEv6Gk23z7cjfy-1eWEtjBDc1KOzHBQxOEjSmxMJR3Gd_n-FQHjdDsHYqOFu2Mtq-YOVoQT1CJh_Fi8Fw9DnzNIoG0Rc7U0huIr7dowADUUriqt2UjpjPQxkHrhYItbYBNSFqNQHFI2yOyxT9mTy_sre6D6e4RKyjVDDnBdClxvjxHAJUWO_iE0YXjJiZxE-AVPMKgDNSpn-EDRIQTqbfkSwLjiwMxOku6A57UYRuxBqwBuBjHo8eMbxDzPgbqBgkhFXnEz7dhVofbGWUbSfbJkZH1OiQ_lfBeSDpU--PsBmtfDC-sdbxl4Icadwil2kir6U6AKqDN-MIO4swK5aUjeCG";
     // Properties
     public static final Integer TOTAL_TIME_DEFAULT = 0;
     public static final int PASSWORD_LENGTH = 12;
@@ -124,4 +131,6 @@ public class Constant {
     public static final Integer RATE_3 = 3;
     public static final Integer RATE_2 = 2;
     public static final Integer RATE_1 = 1;
+
+
 }

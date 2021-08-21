@@ -1,6 +1,5 @@
 package swp490.spa.rest;
 
-import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,11 @@ import swp490.spa.dto.helper.ResponseHelper;
 import swp490.spa.dto.support.Response;
 import swp490.spa.services.SpaService;
 import swp490.spa.utils.support.SupportFunctions;
+import swp490.spa.utils.support.phoneMessage.ResponseGetAccessToken;
 import swp490.spa.utils.support.templates.Constant;
 import swp490.spa.utils.support.otp.GenerationOTP;
 import swp490.spa.utils.support.templates.LoggingTemplate;
+import swp490.spa.utils.support.templates.MessageTemplate;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
@@ -63,6 +64,7 @@ public class PublicController {
     private NotificationService notificationService;
     private Conversion conversion;
     private SupportFunctions supportFunctions;
+    private PhoneMessageService phoneMessageService;
     @Autowired
     JWTUtils jwtUtils;
 
@@ -91,6 +93,7 @@ public class PublicController {
         this.notificationService = notificationService;
         this.conversion = new Conversion();
         this.supportFunctions = new SupportFunctions();
+        this.phoneMessageService = new PhoneMessageService();
     }
 
     @GetMapping("/category/findall")
@@ -167,6 +170,14 @@ public class PublicController {
             result.setCreateTime(createTime);
             result.setExpiredTime(expiredTime);
             if (Objects.nonNull(accountRegisterService.updateAccountRegister(result))) {
+                phoneMessageService
+                        .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
+                                result.getPhone());
+                ResponseGetAccessToken responseGetAccessToken =
+                        phoneMessageService.setResponseGetAccessToken();
+                phoneMessageService.sendMessageZalo(Constant.RECEIVER_CUSTOMER_ID,
+                        MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
+                        responseGetAccessToken.getAccess_token());
                 return ResponseHelper.ok(result);
             }
             return ResponseHelper.error(LoggingTemplate.SEND_OTP_FAILED);
@@ -179,6 +190,14 @@ public class PublicController {
                 AccountRegister newAccountRegister = accountRegisterService
                         .insertNewAccountRegister(accountRegister);
                 if (Objects.nonNull(newAccountRegister)) {
+                    phoneMessageService
+                            .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
+                                    result.getPhone());
+                    ResponseGetAccessToken responseGetAccessToken =
+                            phoneMessageService.setResponseGetAccessToken();
+                    phoneMessageService.sendMessageZalo(Constant.RECEIVER_CUSTOMER_ID,
+                            MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
+                            responseGetAccessToken.getAccess_token());
                     return ResponseHelper.ok(accountRegister);
                 }
             } else {

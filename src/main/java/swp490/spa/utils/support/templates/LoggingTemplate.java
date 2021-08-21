@@ -1,6 +1,9 @@
 package swp490.spa.utils.support.templates;
 
 public class LoggingTemplate {
+    public static final String SEND_PHONE_MESSAGE_FAILED = "Gửi phone message thất bại";
+    public static final String GET_ACCESS_TOKEN_FAILED = "Lấy token thất bại";
+
     public static final String USER_EXISTED = "Đã có tài khoản";
     public static final String REGISTER_SUCCESS = "Đăng kí thành công";
     public static final String REGISTER_FAILED = "Đăng kí thất bại";
@@ -51,4 +54,5 @@ public class LoggingTemplate {
     public static final String WRONG_TIME_CONFIRM = "Chưa đến thời gian xác nhận hoàn thành";
     public static final String CANNOT_REQUEST_CHANGE_STAFF = "Không thể yêu cầu đổi staff vì step trước " +
             "chưa hoàn thành";
+
 }
