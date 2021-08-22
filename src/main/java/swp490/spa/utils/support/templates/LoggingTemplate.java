@@ -55,4 +55,6 @@ public class LoggingTemplate {
     public static final String CANNOT_REQUEST_CHANGE_STAFF = "Không thể yêu cầu đổi staff vì step trước " +
             "chưa hoàn thành";
 
+    public static final String NO_STAFF_IN_SPA = "Không có staff nào làm cho spa ";
+    public static final String NO_CONSULTANT_IN_SPA = "Không có consultant nào làm cho spa ";
 }

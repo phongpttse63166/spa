@@ -175,10 +175,15 @@ public class CustomerController {
                     }
                     staffs.removeAll(staffDateOff);
                 }
-                countEmployee = staffs.size();
-                bookingDetailSteps = bookingDetailStepService
-                        .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
-                                IsConsultation.FALSE, spaId);
+                if(staffs.size()!=0) {
+                    countEmployee = staffs.size();
+                    bookingDetailSteps = bookingDetailStepService
+                            .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
+                                    IsConsultation.FALSE, spaId);
+                } else {
+                    LOGGER.error(LoggingTemplate.NO_STAFF_IN_SPA + spaId);
+                    return ResponseHelper.ok("");
+                }
             } else {
                 consultants =
                         consultantService.findBySpaIdAndStatusAvailable(spaId);
@@ -197,10 +202,15 @@ public class CustomerController {
                     }
                     consultants.removeAll(consultantDateOff);
                 }
-                countEmployee = consultants.size();
-                bookingDetailSteps = bookingDetailStepService
-                        .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
-                                IsConsultation.TRUE, spaId);
+                if(consultants.size()!=0) {
+                    countEmployee = consultants.size();
+                    bookingDetailSteps = bookingDetailStepService
+                            .findByDateBookingAndIsConsultationAndSpa(Date.valueOf(dateBooking),
+                                    IsConsultation.TRUE, spaId);
+                } else {
+                    LOGGER.error(LoggingTemplate.NO_CONSULTANT_IN_SPA + spaId);
+                    return ResponseHelper.ok("");
+                }
             }
             /*
                 Separate bookingDetailSteps into lists with incrementation time
