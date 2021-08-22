@@ -193,7 +193,7 @@ public class StaffController {
                                 bookingDetails.add(bookingDetailStep.getBookingDetail());
                             }
                         } else {
-                            bookingDetails.add(bookingDetailStep.getBookingDetail());
+                            result.add(bookingDetailStep);
                         }
                     }
                 }
