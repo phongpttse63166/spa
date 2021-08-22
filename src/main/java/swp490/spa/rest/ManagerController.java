@@ -1113,7 +1113,8 @@ public class ManagerController {
                             bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetailGet);
                             if (Objects.nonNull(bookingDetailEdited)) {
-                                Booking booking = bookingDetailEdited.getBooking();
+                                Booking booking =
+                                        bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
 //                                Integer countBookingDetail =
 //                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
 //                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
@@ -1224,7 +1225,8 @@ public class ManagerController {
 //                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
 //                                                .getContent().size();
 //                                if (Objects.nonNull(countBookingDetail)) {
-                                Booking booking = bookingDetailEdited.getBooking();
+                                Booking booking =
+                                        bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
 //                                    if (countBookingDetail == 1) {
                                 booking.setStatusBooking(StatusBooking.BOOKING);
                                 bookingEdited = bookingService.editBooking(booking);
