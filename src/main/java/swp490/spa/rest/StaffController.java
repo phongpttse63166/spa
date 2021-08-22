@@ -187,8 +187,12 @@ public class StaffController {
                         bookingDetails.add(bookingDetailStep.getBookingDetail());
                     } else {
                         BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();
-                        if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)) {
-                            result.add(bookingDetailStep);
+                        if(bookingDetail.getType().equals(Type.ONESTEP)){
+                            if (!supportFunctions.checkBookingDetailExistedInList(bookingDetail, bookingDetails)) {
+                                result.add(bookingDetailStep);
+                                bookingDetails.add(bookingDetailStep.getBookingDetail());
+                            }
+                        } else {
                             bookingDetails.add(bookingDetailStep.getBookingDetail());
                         }
                     }
