@@ -1113,36 +1113,34 @@ public class ManagerController {
                             bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetailGet);
                             if (Objects.nonNull(bookingDetailEdited)) {
-                                Booking booking =
-                                        bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
-//                                Integer countBookingDetail =
-//                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
-//                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-//                                                .getContent().size();
-//                                if (Objects.nonNull(countBookingDetail)) {
-//                                    Booking booking =
-//                                            bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
-//                                    if (countBookingDetail == 1) {
-                                booking.setStatusBooking(StatusBooking.BOOKING);
-                                bookingEdited = bookingService.editBooking(booking);
-//                                    } else {
-//                                        boolean checkBookingAll = true;
-//                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
-//                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
-//                                                checkBookingAll = false;
-//                                            }
-//                                        }
-//                                        if (checkBookingAll) {
-//                                            booking.setStatusBooking(StatusBooking.BOOKING);
-//                                            bookingEdited = bookingService.editBooking(booking);
-//                                        }
-//                                    }
-                                if (Objects.nonNull(bookingEdited)) {
-                                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
-                                } else {
-                                    check = false;
+                                Integer countBookingDetail =
+                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
+                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                                                .getContent().size();
+                                if (Objects.nonNull(countBookingDetail)) {
+                                    Booking booking =
+                                            bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
+                                    if (countBookingDetail == 1) {
+                                        booking.setStatusBooking(StatusBooking.BOOKING);
+                                        bookingEdited = bookingService.editBooking(booking);
+                                    } else {
+                                        boolean checkBookingAll = true;
+                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
+                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
+                                                checkBookingAll = false;
+                                            }
+                                        }
+                                        if (checkBookingAll) {
+                                            booking.setStatusBooking(StatusBooking.BOOKING);
+                                            bookingEdited = bookingService.editBooking(booking);
+                                        }
+                                    }
+                                    if (Objects.nonNull(bookingEdited)) {
+                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
+                                    } else {
+                                        check = false;
+                                    }
                                 }
-//                                }
                             } else {
                                 check = false;
                                 LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
@@ -1220,64 +1218,63 @@ public class ManagerController {
                             bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetailGet);
                             if (Objects.nonNull(bookingDetailEdited)) {
-//                                Integer countBookingDetail =
-//                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
-//                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-//                                                .getContent().size();
-//                                if (Objects.nonNull(countBookingDetail)) {
-                                Booking booking =
-                                        bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
-//                                    if (countBookingDetail == 1) {
-                                booking.setStatusBooking(StatusBooking.BOOKING);
-                                bookingEdited = bookingService.editBooking(booking);
-//                                    } else {
-//                                        boolean checkBookingAll = true;
-//                                        booking = bookingDetailEdited.getBooking();
-//                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
-//                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
-//                                                checkBookingAll = false;
-//                                            }
-//                                        }
-//                                        if (checkBookingAll) {
-//                                            booking.setStatusBooking(StatusBooking.BOOKING);
-//                                            bookingEdited = bookingService.editBooking(booking);
-//                                        }
-//                                    }
-                                if (Objects.nonNull(bookingEdited)) {
-                                    Map<String, String> map = new HashMap<>();
-                                    map.put(MessageTemplate.ASSIGN_STATUS,
-                                            MessageTemplate.ASSIGN_STATUS + "- bookingDetailId "
-                                                    + bookingDetailId.toString());
-                                    if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_TITLE,
-                                            String.format(MessageTemplate.ASSIGN_MESSAGE,
-                                                    bookingEdited.getCustomer().getUser().getFullname()),
-                                            map, consultant.getUser().getId(), Role.CONSULTANT)) {
-                                        Notification notification = new Notification();
-                                        notification.setRole(Role.CONSULTANT);
-                                        notification.setTitle(MessageTemplate.ASSIGN_TITLE);
-                                        notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
-                                                bookingEdited.getCustomer().getUser().getFullname()));
-                                        notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
-                                        notification.setType(Constant.ASSIGN_TYPE);
-                                        notification.setUser(consultant.getUser());
-                                        notificationService.insertNewNotification(notification);
-                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
+                                Integer countBookingDetail =
+                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
+                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+                                                .getContent().size();
+                                if (Objects.nonNull(countBookingDetail)) {
+                                    Booking booking =
+                                            bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
+                                    if (countBookingDetail == 1) {
+                                        booking.setStatusBooking(StatusBooking.BOOKING);
+                                        bookingEdited = bookingService.editBooking(booking);
                                     } else {
-                                        Notification notification = new Notification();
-                                        notification.setRole(Role.CONSULTANT);
-                                        notification.setTitle(MessageTemplate.ASSIGN_TITLE);
-                                        notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
-                                                bookingEdited.getCustomer().getUser().getFullname()));
-                                        notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
-                                        notification.setType(Constant.ASSIGN_TYPE);
-                                        notification.setUser(consultant.getUser());
-                                        notificationService.insertNewNotification(notification);
-                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
+                                        boolean checkBookingAll = true;
+                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
+                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
+                                                checkBookingAll = false;
+                                            }
+                                        }
+                                        if (checkBookingAll) {
+                                            booking.setStatusBooking(StatusBooking.BOOKING);
+                                            bookingEdited = bookingService.editBooking(booking);
+                                        }
                                     }
-                                } else {
-                                    check = false;
+                                    if (Objects.nonNull(bookingEdited)) {
+                                        Map<String, String> map = new HashMap<>();
+                                        map.put(MessageTemplate.ASSIGN_STATUS,
+                                                MessageTemplate.ASSIGN_STATUS + "- bookingDetailId "
+                                                        + bookingDetailId.toString());
+                                        if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_TITLE,
+                                                String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                        bookingEdited.getCustomer().getUser().getFullname()),
+                                                map, consultant.getUser().getId(), Role.CONSULTANT)) {
+                                            Notification notification = new Notification();
+                                            notification.setRole(Role.CONSULTANT);
+                                            notification.setTitle(MessageTemplate.ASSIGN_TITLE);
+                                            notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                    bookingEdited.getCustomer().getUser().getFullname()));
+                                            notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
+                                            notification.setType(Constant.ASSIGN_TYPE);
+                                            notification.setUser(consultant.getUser());
+                                            notificationService.insertNewNotification(notification);
+                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
+                                        } else {
+                                            Notification notification = new Notification();
+                                            notification.setRole(Role.CONSULTANT);
+                                            notification.setTitle(MessageTemplate.ASSIGN_TITLE);
+                                            notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                    bookingEdited.getCustomer().getUser().getFullname()));
+                                            notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
+                                            notification.setType(Constant.ASSIGN_TYPE);
+                                            notification.setUser(consultant.getUser());
+                                            notificationService.insertNewNotification(notification);
+                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
+                                        }
+                                    } else {
+                                        check = false;
+                                    }
                                 }
-//                            }
                             } else {
                                 check = false;
                                 LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
@@ -2092,8 +2089,8 @@ public class ManagerController {
             Integer count = 0;
             for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                 Rating rating = bookingDetailStep.getRating();
-                if(rating.getStatusRating().equals(StatusRating.RATED)){
-                    if(rating.getRate().equals(rate)){
+                if (rating.getStatusRating().equals(StatusRating.RATED)) {
+                    if (rating.getRate().equals(rate)) {
                         count++;
                     }
                 }
@@ -2104,11 +2101,11 @@ public class ManagerController {
     }
 
     @GetMapping("/getStaffRating/{spaId}")
-    public Response getAllStaffRatingBySpa(@PathVariable Integer spaId){
+    public Response getAllStaffRatingBySpa(@PathVariable Integer spaId) {
         List<StaffRatingResponse> response = new ArrayList<>();
         List<Staff> allStaffList =
                 staffService.findBySpaIdAndStatusAvailable(spaId);
-        if(allStaffList!=null){
+        if (allStaffList != null) {
             for (Staff staff : allStaffList) {
                 StaffRatingResponse staffRatingResponse = new StaffRatingResponse();
                 staffRatingResponse.setStaff(staff);
@@ -2209,9 +2206,9 @@ public class ManagerController {
     }
 
     @GetMapping("/spa/getInfo/{spaId}")
-    public Response getSpaInformation(@PathVariable Integer spaId){
+    public Response getSpaInformation(@PathVariable Integer spaId) {
         Spa spa = spaService.findById(spaId);
-        if(spa!=null){
+        if (spa != null) {
             return ResponseHelper.ok(spa);
         } else {
             LOGGER.error(String.format(LoggingTemplate.GET_FAILED, Constant.SPA));
