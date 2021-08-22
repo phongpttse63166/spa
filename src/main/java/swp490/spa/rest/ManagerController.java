@@ -1113,34 +1113,35 @@ public class ManagerController {
                             bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetailGet);
                             if (Objects.nonNull(bookingDetailEdited)) {
-                                Integer countBookingDetail =
-                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
-                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-                                                .getContent().size();
-                                if (Objects.nonNull(countBookingDetail)) {
-                                    Booking booking =
-                                            bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
-                                    if (countBookingDetail == 1) {
-                                        booking.setStatusBooking(StatusBooking.BOOKING);
-                                        bookingEdited = bookingService.editBooking(booking);
-                                    } else {
-                                        boolean checkBookingAll = true;
-                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
-                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
-                                                checkBookingAll = false;
-                                            }
-                                        }
-                                        if (checkBookingAll) {
-                                            booking.setStatusBooking(StatusBooking.BOOKING);
-                                            bookingEdited = bookingService.editBooking(booking);
-                                        }
-                                    }
-                                    if (Objects.nonNull(bookingEdited)) {
-                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
-                                    } else {
-                                        check = false;
-                                    }
+                                Booking booking = bookingDetailEdited.getBooking();
+//                                Integer countBookingDetail =
+//                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
+//                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+//                                                .getContent().size();
+//                                if (Objects.nonNull(countBookingDetail)) {
+//                                    Booking booking =
+//                                            bookingService.findByBookingId(bookingDetailEdited.getBooking().getId());
+//                                    if (countBookingDetail == 1) {
+                                booking.setStatusBooking(StatusBooking.BOOKING);
+                                bookingEdited = bookingService.editBooking(booking);
+//                                    } else {
+//                                        boolean checkBookingAll = true;
+//                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
+//                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
+//                                                checkBookingAll = false;
+//                                            }
+//                                        }
+//                                        if (checkBookingAll) {
+//                                            booking.setStatusBooking(StatusBooking.BOOKING);
+//                                            bookingEdited = bookingService.editBooking(booking);
+//                                        }
+//                                    }
+                                if (Objects.nonNull(bookingEdited)) {
+                                    return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.STAFF));
+                                } else {
+                                    check = false;
                                 }
+//                                }
                             } else {
                                 check = false;
                                 LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
@@ -1218,63 +1219,63 @@ public class ManagerController {
                             bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetailGet);
                             if (Objects.nonNull(bookingDetailEdited)) {
-                                Integer countBookingDetail =
-                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
-                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
-                                                .getContent().size();
-                                if (Objects.nonNull(countBookingDetail)) {
-                                    Booking booking = bookingDetailEdited.getBooking();
-                                    if (countBookingDetail == 1) {
-                                        booking.setStatusBooking(StatusBooking.BOOKING);
-                                        bookingEdited = bookingService.editBooking(booking);
+//                                Integer countBookingDetail =
+//                                        bookingDetailService.findByBooking(bookingDetailGet.getBooking().getId(),
+//                                                PageRequest.of(Constant.PAGE_DEFAULT, Constant.SIZE_DEFAULT, Sort.unsorted()))
+//                                                .getContent().size();
+//                                if (Objects.nonNull(countBookingDetail)) {
+                                Booking booking = bookingDetailEdited.getBooking();
+//                                    if (countBookingDetail == 1) {
+                                booking.setStatusBooking(StatusBooking.BOOKING);
+                                bookingEdited = bookingService.editBooking(booking);
+//                                    } else {
+//                                        boolean checkBookingAll = true;
+//                                        booking = bookingDetailEdited.getBooking();
+//                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
+//                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
+//                                                checkBookingAll = false;
+//                                            }
+//                                        }
+//                                        if (checkBookingAll) {
+//                                            booking.setStatusBooking(StatusBooking.BOOKING);
+//                                            bookingEdited = bookingService.editBooking(booking);
+//                                        }
+//                                    }
+                                if (Objects.nonNull(bookingEdited)) {
+                                    Map<String, String> map = new HashMap<>();
+                                    map.put(MessageTemplate.ASSIGN_STATUS,
+                                            MessageTemplate.ASSIGN_STATUS + "- bookingDetailId "
+                                                    + bookingDetailId.toString());
+                                    if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_TITLE,
+                                            String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                    bookingEdited.getCustomer().getUser().getFullname()),
+                                            map, consultant.getUser().getId(), Role.CONSULTANT)) {
+                                        Notification notification = new Notification();
+                                        notification.setRole(Role.CONSULTANT);
+                                        notification.setTitle(MessageTemplate.ASSIGN_TITLE);
+                                        notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                bookingEdited.getCustomer().getUser().getFullname()));
+                                        notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
+                                        notification.setType(Constant.ASSIGN_TYPE);
+                                        notification.setUser(consultant.getUser());
+                                        notificationService.insertNewNotification(notification);
+                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
                                     } else {
-                                        boolean checkBookingAll = true;
-                                        booking = bookingDetailEdited.getBooking();
-                                        for (BookingDetail bookingDetail : booking.getBookingDetails()) {
-                                            if (!bookingDetail.getStatusBooking().equals(StatusBooking.BOOKING)) {
-                                                checkBookingAll = false;
-                                            }
-                                        }
-                                        if (checkBookingAll) {
-                                            booking.setStatusBooking(StatusBooking.BOOKING);
-                                            bookingEdited = bookingService.editBooking(booking);
-                                        }
+                                        Notification notification = new Notification();
+                                        notification.setRole(Role.CONSULTANT);
+                                        notification.setTitle(MessageTemplate.ASSIGN_TITLE);
+                                        notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
+                                                bookingEdited.getCustomer().getUser().getFullname()));
+                                        notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
+                                        notification.setType(Constant.ASSIGN_TYPE);
+                                        notification.setUser(consultant.getUser());
+                                        notificationService.insertNewNotification(notification);
+                                        return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
                                     }
-                                    if (Objects.nonNull(bookingEdited)) {
-                                        Map<String, String> map = new HashMap<>();
-                                        map.put(MessageTemplate.ASSIGN_STATUS,
-                                                MessageTemplate.ASSIGN_STATUS + "- bookingDetailId "
-                                                        + bookingDetailId.toString());
-                                        if (notificationFireBaseService.notify(MessageTemplate.ASSIGN_TITLE,
-                                                String.format(MessageTemplate.ASSIGN_MESSAGE,
-                                                        bookingEdited.getCustomer().getUser().getFullname()),
-                                                map, consultant.getUser().getId(), Role.CONSULTANT)) {
-                                            Notification notification = new Notification();
-                                            notification.setRole(Role.CONSULTANT);
-                                            notification.setTitle(MessageTemplate.ASSIGN_TITLE);
-                                            notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
-                                                    bookingEdited.getCustomer().getUser().getFullname()));
-                                            notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
-                                            notification.setType(Constant.ASSIGN_TYPE);
-                                            notification.setUser(consultant.getUser());
-                                            notificationService.insertNewNotification(notification);
-                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
-                                        } else {
-                                            Notification notification = new Notification();
-                                            notification.setRole(Role.CONSULTANT);
-                                            notification.setTitle(MessageTemplate.ASSIGN_TITLE);
-                                            notification.setMessage(String.format(MessageTemplate.ASSIGN_MESSAGE,
-                                                    bookingEdited.getCustomer().getUser().getFullname()));
-                                            notification.setData(map.get(MessageTemplate.ASSIGN_STATUS));
-                                            notification.setType(Constant.ASSIGN_TYPE);
-                                            notification.setUser(consultant.getUser());
-                                            notificationService.insertNewNotification(notification);
-                                            return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.CONSULTANT));
-                                        }
-                                    } else {
-                                        check = false;
-                                    }
+                                } else {
+                                    check = false;
                                 }
+//                            }
                             } else {
                                 check = false;
                                 LOGGER.error(String.format(LoggingTemplate.EDIT_FAILED, Constant.BOOKING_DETAIL));
