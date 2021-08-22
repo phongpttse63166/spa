@@ -16,7 +16,7 @@ public class Constant {
     public static final String TIME_DEFAULT = "00:00:00";
     public static final int TIME_BETWEEN_TWO_BOOKING = 15;
     public static final int DURATION_OF_CONSULTATION = 30;
-    // Filebase's setting
+    // Firebase's setting
     public static final String STORAGE_URL = "https://storage.googleapis.com/testuploadimgae.appspot.com/%s";
     public static final String FILE_JSON = "testuploadimgae-firebase-adminsdk-tpl07-8b469b8252.json";
     public static final String STORAGE_BUCKET = "testuploadimgae.appspot.com";
@@ -32,6 +32,7 @@ public class Constant {
     public final static String APP_ID = "1383309215977390719";
     public final static String APP_SECRET = "h3NeAfGT2FmZ63ATALDu";
     public final static String CODE = "p3QTtRotGGEw9QVfYCDK5F1acTdCxbWjkcJbtiEv6Gk23z7cjfy-1eWEtjBDc1KOzHBQxOEjSmxMJR3Gd_n-FQHjdDsHYqOFu2Mtq-YOVoQT1CJh_Fi8Fw9DnzNIoG0Rc7U0huIr7dowADUUriqt2UjpjPQxkHrhYItbYBNSFqNQHFI2yOyxT9mTy_sre6D6e4RKyjVDDnBdClxvjxHAJUWO_iE0YXjJiZxE-AVPMKgDNSpn-EDRIQTqbfkSwLjiwMxOku6A57UYRuxBqwBuBjHo8eMbxDzPgbqBgkhFXnEz7dhVofbGWUbSfbJkZH1OiQ_lfBeSDpU--PsBmtfDC-sdbxl4Icadwil2kir6U6AKqDN-MIO4swK5aUjeCG";
+    public static final String DEFAULT_PASSWORD = "123@123a";
     // Properties
     public static final Integer TOTAL_TIME_DEFAULT = 0;
     public static final int PASSWORD_LENGTH = 12;
@@ -131,6 +132,4 @@ public class Constant {
     public static final Integer RATE_3 = 3;
     public static final Integer RATE_2 = 2;
     public static final Integer RATE_1 = 1;
-
-
 }

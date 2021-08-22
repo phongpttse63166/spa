@@ -1463,7 +1463,7 @@ public class ManagerController {
                     if (!bookingDetailStep.getIsConsultation().equals(IsConsultation.TRUE)) {
                         if (!bookingDetailStep.getStatusBooking().equals(StatusBooking.FINISH)) {
                             bookingDetailStep.setStaff(staff);
-                            bookingDetailStep.setStatusBooking(StatusBooking.BOOKING);
+                            bookingDetailStep.setStatusBooking(StatusBooking.PENDING);
                             bookingDetailStep.setReason(null);
                         } else if (bookingDetailStep.getStatusBooking().equals(StatusBooking.FINISH)) {
                             oldStaff = staffService.findByStaffId(bookingDetailStep.getStaff().getId());
@@ -1472,7 +1472,7 @@ public class ManagerController {
                     bookingDetailStepEdit.add(bookingDetailStep);
                 }
                 bookingDetail.setBookingDetailSteps(bookingDetailStepEdit);
-                bookingDetail.setStatusBooking(StatusBooking.PENDING);
+                bookingDetail.setStatusBooking(StatusBooking.BOOKING);
                 bookingDetailService.editBookingDetail(bookingDetail);
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
                 Customer customer = bookingDetail.getBooking().getCustomer();

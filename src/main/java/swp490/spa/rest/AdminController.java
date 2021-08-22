@@ -648,7 +648,6 @@ public class AdminController {
                 String imageLink = UploadImage.uploadImage(managerRequest.getFile());
                 user = new User();
                 if (imageLink != "") {
-                    password = RandomStringUtils.random(Constant.PASSWORD_LENGTH, true, true);
                     user.setFullname(managerRequest.getFullname());
                     user.setPhone(managerRequest.getPhone());
                     user.setGender(managerRequest.getGender());
@@ -657,7 +656,7 @@ public class AdminController {
                     user.setEmail(managerRequest.getEmail());
                     user.setActive(true);
                     user.setImage(imageLink);
-                    user.setPassword(password);
+                    user.setPassword(Constant.DEFAULT_PASSWORD);
                     User userResult = userService.insertNewUser(user);
                     if (Objects.nonNull(userResult)) {
                         Manager manager = new Manager();
