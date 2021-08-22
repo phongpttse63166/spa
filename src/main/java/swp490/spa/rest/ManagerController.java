@@ -1215,6 +1215,7 @@ public class ManagerController {
                         }
                         if (bookingDetailSteps.size() == bookingDetailStepEdited.size()) {
                             bookingDetailGet.setStatusBooking(StatusBooking.BOOKING);
+                            bookingDetailGet.setBookingDetailSteps(bookingDetailStepEdited);
                             bookingDetailEdited =
                                     bookingDetailService.editBookingDetail(bookingDetailGet);
                             if (Objects.nonNull(bookingDetailEdited)) {
