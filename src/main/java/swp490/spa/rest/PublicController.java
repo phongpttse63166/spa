@@ -170,14 +170,14 @@ public class PublicController {
             result.setCreateTime(createTime);
             result.setExpiredTime(expiredTime);
             if (Objects.nonNull(accountRegisterService.updateAccountRegister(result))) {
-                phoneMessageService
-                        .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
-                                result.getPhone());
-                ResponseGetAccessToken responseGetAccessToken =
-                        phoneMessageService.setResponseGetAccessToken();
-                phoneMessageService.sendMessageZalo(Constant.RECEIVER_CUSTOMER_ID,
-                        MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
-                        responseGetAccessToken.getAccess_token());
+//                phoneMessageService
+//                        .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
+//                                result.getPhone());
+//                ResponseGetAccessToken responseGetAccessToken =
+//                        phoneMessageService.setResponseGetAccessToken();
+//                phoneMessageService.sendMessageZalo(Constant.RECEIVER_CUSTOMER_ID,
+//                        MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
+//                        responseGetAccessToken.getAccess_token());
                 return ResponseHelper.ok(result);
             }
             return ResponseHelper.error(LoggingTemplate.SEND_OTP_FAILED);
@@ -190,14 +190,14 @@ public class PublicController {
                 AccountRegister newAccountRegister = accountRegisterService
                         .insertNewAccountRegister(accountRegister);
                 if (Objects.nonNull(newAccountRegister)) {
-                    phoneMessageService
-                            .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
-                                    result.getPhone());
-                    ResponseGetAccessToken responseGetAccessToken =
-                            phoneMessageService.setResponseGetAccessToken();
-                    phoneMessageService.sendMessageZalo(Constant.RECEIVER_CUSTOMER_ID,
-                            MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
-                            responseGetAccessToken.getAccess_token());
+//                    phoneMessageService
+//                            .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
+//                                    result.getPhone());
+//                    ResponseGetAccessToken responseGetAccessToken =
+//                            phoneMessageService.setResponseGetAccessToken();
+//                    phoneMessageService.sendMessageZalo(Constant.RECEIVER_CUSTOMER_ID,
+//                            MessageTemplate.PHONE_MESSAGE_OTP + result.getOtpCode(),
+//                            responseGetAccessToken.getAccess_token());
                     return ResponseHelper.ok(accountRegister);
                 }
             } else {
@@ -415,4 +415,15 @@ public class PublicController {
         }
         return ResponseHelper.ok(conversion.convertToPageSpaPackageResponse(spaPackages));
     }
+//
+//    @GetMapping("/testSendMessagePhone")
+//    public String testSendMessagePhone(@RequestParam("phone") String phone, @RequestParam("message") String message){
+//
+//        try {
+//            phoneMessageService.sendMessageTwilio(message, phone);
+//        }catch (Exception ex){
+//            return "Thất bại rùi";
+//        }
+//        return "Thành công";
+//    }
 }
