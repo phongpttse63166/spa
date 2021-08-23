@@ -1557,45 +1557,82 @@ public class ManagerController {
         SpaDateOffResponse spaDateOffResponse = new SpaDateOffResponse();
         Date oldDate = Date.valueOf(Constant.DATE_DEFAULT);
         Date newDate = Date.valueOf(Constant.DATE_DEFAULT);
-        for (DateOff dateOff : dateOffs) {
-            oldDate = newDate;
-            newDate = dateOff.getDateOff();
-            if (newDate.compareTo(oldDate) == 0) {
-                for (Staff staff : allStaffs) {
-                    if (staff.getUser().equals(dateOff.getEmployee())) {
-                        staffs.add(dateOff.getEmployee());
+        if(dateOffs.size() == 0){
+            return ResponseHelper.ok("");
+        } else if (dateOffs.size() == 1){
+            spaDateOffResponse.setDate(dateOffs.get(0).getDateOff());
+            for (Staff staff : allStaffs) {
+                if (staff.getUser().equals(dateOffs.get(0).getEmployee())) {
+                    staffs.add(dateOffs.get(0).getEmployee());
+                }
+            }
+            for (Consultant consultant : allConsultants) {
+                if (consultant.getUser().equals(dateOffs.get(0).getEmployee())) {
+                    consultants.add(dateOffs.get(0).getEmployee());
+                }
+            }
+            spaDateOffResponse.setStaffs(staffs);
+            spaDateOffResponse.setConsultants(consultants);
+            result.add(spaDateOffResponse);
+        } else {
+            for (DateOff dateOff : dateOffs) {
+                oldDate = newDate;
+                newDate = dateOff.getDateOff();
+                if (newDate.compareTo(oldDate) == 0) {
+                    for (Staff staff : allStaffs) {
+                        if (staff.getUser().equals(dateOff.getEmployee())) {
+                            staffs.add(dateOff.getEmployee());
+                        }
                     }
-                }
-                for (Consultant consultant : allConsultants) {
-                    if (consultant.getUser().equals(dateOff.getEmployee())) {
-                        consultants.add(dateOff.getEmployee());
+                    for (Consultant consultant : allConsultants) {
+                        if (consultant.getUser().equals(dateOff.getEmployee())) {
+                            consultants.add(dateOff.getEmployee());
+                        }
                     }
-                }
-                if (dateOffs.get(dateOffs.size() - 1).equals(dateOff)) {
-                    spaDateOffResponse.setStaffs(staffs);
-                    spaDateOffResponse.setConsultants(consultants);
-                    result.add(spaDateOffResponse);
-                }
-            } else {
-                if (!dateOffs.get(dateOffs.size() - 1).equals(dateOff)) {
-                    if (result.size() == 0) {
-                        if (!dateOffs.get(0).equals(dateOff)) {
+                    if (dateOffs.get(dateOffs.size() - 1).equals(dateOff)) {
+                        spaDateOffResponse.setStaffs(staffs);
+                        spaDateOffResponse.setConsultants(consultants);
+                        result.add(spaDateOffResponse);
+                    }
+                } else {
+                    if (!dateOffs.get(dateOffs.size() - 1).equals(dateOff)) {
+                        if (result.size() == 0) {
+                            if (!dateOffs.get(0).equals(dateOff)) {
+                                spaDateOffResponse.setStaffs(staffs);
+                                spaDateOffResponse.setConsultants(consultants);
+                                result.add(spaDateOffResponse);
+                                staffs = new ArrayList<>();
+                                consultants = new ArrayList<>();
+                                spaDateOffResponse = new SpaDateOffResponse();
+                            }
+                            spaDateOffResponse.setDate(newDate);
+                            for (Staff staff : allStaffs) {
+                                if (staff.getUser().equals(dateOff.getEmployee())) {
+                                    staffs.add(dateOff.getEmployee());
+                                }
+                            }
+                            for (Consultant consultant : allConsultants) {
+                                if (consultant.getUser().equals(dateOff.getEmployee())) {
+                                    consultants.add(dateOff.getEmployee());
+                                }
+                            }
+                        } else {
                             spaDateOffResponse.setStaffs(staffs);
                             spaDateOffResponse.setConsultants(consultants);
                             result.add(spaDateOffResponse);
                             staffs = new ArrayList<>();
                             consultants = new ArrayList<>();
                             spaDateOffResponse = new SpaDateOffResponse();
-                        }
-                        spaDateOffResponse.setDate(newDate);
-                        for (Staff staff : allStaffs) {
-                            if (staff.getUser().equals(dateOff.getEmployee())) {
-                                staffs.add(dateOff.getEmployee());
+                            spaDateOffResponse.setDate(newDate);
+                            for (Staff staff : allStaffs) {
+                                if (staff.getUser().equals(dateOff.getEmployee())) {
+                                    staffs.add(dateOff.getEmployee());
+                                }
                             }
-                        }
-                        for (Consultant consultant : allConsultants) {
-                            if (consultant.getUser().equals(dateOff.getEmployee())) {
-                                consultants.add(dateOff.getEmployee());
+                            for (Consultant consultant : allConsultants) {
+                                if (consultant.getUser().equals(dateOff.getEmployee())) {
+                                    consultants.add(dateOff.getEmployee());
+                                }
                             }
                         }
                     } else {
@@ -1616,28 +1653,10 @@ public class ManagerController {
                                 consultants.add(dateOff.getEmployee());
                             }
                         }
+                        spaDateOffResponse.setStaffs(staffs);
+                        spaDateOffResponse.setConsultants(consultants);
+                        result.add(spaDateOffResponse);
                     }
-                } else {
-                    spaDateOffResponse.setStaffs(staffs);
-                    spaDateOffResponse.setConsultants(consultants);
-                    result.add(spaDateOffResponse);
-                    staffs = new ArrayList<>();
-                    consultants = new ArrayList<>();
-                    spaDateOffResponse = new SpaDateOffResponse();
-                    spaDateOffResponse.setDate(newDate);
-                    for (Staff staff : allStaffs) {
-                        if (staff.getUser().equals(dateOff.getEmployee())) {
-                            staffs.add(dateOff.getEmployee());
-                        }
-                    }
-                    for (Consultant consultant : allConsultants) {
-                        if (consultant.getUser().equals(dateOff.getEmployee())) {
-                            consultants.add(dateOff.getEmployee());
-                        }
-                    }
-                    spaDateOffResponse.setStaffs(staffs);
-                    spaDateOffResponse.setConsultants(consultants);
-                    result.add(spaDateOffResponse);
                 }
             }
         }
