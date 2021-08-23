@@ -234,6 +234,7 @@ public class StaffController {
                             rating.setCreateTime(Date.valueOf(LocalDateTime.now().toLocalDate()));
                             rating.setExpireTime(Date.valueOf(LocalDateTime.now().plusDays(3).toLocalDate()));
                             rating.setCustomer(bookingDetailStep.getBookingDetail().getBooking().getCustomer());
+                            rating.setBookingDetailStep(bookingDetailStep);
                             Rating ratingNew = ratingService.insertNewRating(rating);
                             if (Objects.nonNull(ratingNew)) {
                                 bookingDetailStep.setRating(rating);
