@@ -459,7 +459,7 @@ public class ConsultantController {
         List<Booking> bookings = new ArrayList<>();
         List<BookingDetail> bookingDetails = new ArrayList<>();
         List<BookingDetailStep> bookingDetailSteps =
-                bookingDetailStepService.findByConsultantIdAndStatusBookingPendingBooking(consultantId);
+                bookingDetailStepService.findByConsultantIdAndStatusBookingPendingBookingFinish(consultantId);
         if (Objects.nonNull(bookingDetailSteps)) {
             for (BookingDetailStep bookingDetailStep : bookingDetailSteps) {
                 BookingDetail bookingDetail = bookingDetailStep.getBookingDetail();

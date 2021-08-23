@@ -73,10 +73,11 @@ public interface BookingDetailStepRepository extends JpaRepository<BookingDetail
                                                                             Integer consultantId);
 
     @Query("FROM BookingDetailStep b WHERE b.consultant.user.id = ?1 " +
-            "AND (b.statusBooking = ?2 OR b.statusBooking = ?3) ORDER BY b.bookingDetail.id ASC")
+            "AND (b.statusBooking = ?2 OR b.statusBooking = ?3 OR b.statusBooking = ?4) ORDER BY b.bookingDetail.id ASC")
     List<BookingDetailStep> findByConsultantAndStatusBooking(Integer consultantId,
                                                              StatusBooking status1,
-                                                             StatusBooking status2);
+                                                             StatusBooking status2,
+                                                             StatusBooking status3);
 
     List<BookingDetailStep> findByDateBookingAndConsultant_User_IdOrderByStartTime(Date dateBooking,
                                                                                    Integer consultantId);

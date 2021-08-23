@@ -97,9 +97,9 @@ public class BookingDetailStepService {
                 .findByDateBookingAndStartEndTimeAndConsultantId(dateBooking,startTime,endTime,consultantId);
     }
 
-    public List<BookingDetailStep> findByConsultantIdAndStatusBookingPendingBooking(Integer consultantId) {
+    public List<BookingDetailStep> findByConsultantIdAndStatusBookingPendingBookingFinish(Integer consultantId) {
         return this.bookingDetailStepRepository.findByConsultantAndStatusBooking(consultantId,
-                StatusBooking.PENDING,StatusBooking.BOOKING);
+                StatusBooking.PENDING,StatusBooking.BOOKING,StatusBooking.FINISH);
     }
 
     public List<BookingDetailStep> findByDateBookingAndConsultant(Date dateBooking, Integer consultantId) {
