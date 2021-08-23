@@ -687,7 +687,6 @@ public class ManagerController {
                 String imageLink = UploadImage.uploadImage(employeeRequest.getFile());
                 user = new User();
                 if (imageLink != "") {
-                    password = RandomStringUtils.random(Constant.PASSWORD_LENGTH, true, true);
                     user.setFullname(employeeRequest.getFullname());
                     user.setPhone(employeeRequest.getPhone());
                     user.setGender(employeeRequest.getGender());
@@ -696,7 +695,7 @@ public class ManagerController {
                     user.setEmail(employeeRequest.getEmail());
                     user.setActive(true);
                     user.setImage(imageLink);
-                    user.setPassword(password);
+                    user.setPassword(Constant.DEFAULT_PASSWORD);
                     User userResult = userService.insertNewUser(user);
                     if (Objects.nonNull(userResult)) {
                         if (employeeRequest.getRole().equals(Role.STAFF)) {
@@ -706,14 +705,6 @@ public class ManagerController {
                             staff.setStatus(Status.AVAILABLE);
                             Staff staffResult = staffService.insertNewStaff(staff);
                             if (Objects.nonNull(staffResult)) {
-                                phoneMessageService
-                                        .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
-                                                user.getPhone());
-                                ResponseGetAccessToken responseGetAccessToken =
-                                        phoneMessageService.setResponseGetAccessToken();
-                                phoneMessageService.sendMessageZalo(Constant.RECEIVER_EMPLOYEE_ID,
-                                        MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
-                                        responseGetAccessToken.getAccess_token());
                                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                             }
                         } else {
@@ -723,14 +714,6 @@ public class ManagerController {
                             consultant.setStatus(Status.AVAILABLE);
                             Consultant consultantResult = consultantService.insertNewConsultant(consultant);
                             if (Objects.nonNull(consultantResult)) {
-                                phoneMessageService
-                                        .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
-                                                user.getPhone());
-                                ResponseGetAccessToken responseGetAccessToken =
-                                        phoneMessageService.setResponseGetAccessToken();
-                                phoneMessageService.sendMessageZalo(Constant.RECEIVER_EMPLOYEE_ID,
-                                        MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
-                                        responseGetAccessToken.getAccess_token());
                                 return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                             }
                         }
@@ -752,14 +735,6 @@ public class ManagerController {
                         staff.setStatus(Status.AVAILABLE);
                         Staff staffResult = staffService.insertNewStaff(staff);
                         if (Objects.nonNull(staffResult)) {
-                            phoneMessageService
-                                    .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
-                                            user.getPhone());
-                            ResponseGetAccessToken responseGetAccessToken =
-                                    phoneMessageService.setResponseGetAccessToken();
-                            phoneMessageService.sendMessageZalo(Constant.RECEIVER_EMPLOYEE_ID,
-                                    MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
-                                    responseGetAccessToken.getAccess_token());
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                         }
                     }
@@ -779,14 +754,6 @@ public class ManagerController {
                         consultant.setStatus(Status.AVAILABLE);
                         Consultant consultantResult = consultantService.insertNewConsultant(consultant);
                         if (Objects.nonNull(consultantResult)) {
-                            phoneMessageService
-                                    .sendMessageTwilio(MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
-                                            user.getPhone());
-                            ResponseGetAccessToken responseGetAccessToken =
-                                    phoneMessageService.setResponseGetAccessToken();
-                            phoneMessageService.sendMessageZalo(Constant.RECEIVER_EMPLOYEE_ID,
-                                    MessageTemplate.PHONE_MESSAGE_PASSWORD + user.getPassword(),
-                                    responseGetAccessToken.getAccess_token());
                             return ResponseHelper.ok(String.format(LoggingTemplate.INSERT_SUCCESS, Constant.EMPLOYEE));
                         }
                     }
